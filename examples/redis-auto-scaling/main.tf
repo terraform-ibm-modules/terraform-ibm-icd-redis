@@ -18,5 +18,6 @@ module "redis" {
   resource_group_id = module.resource_group.resource_group_id
   instance_name     = "${var.prefix}-redis"
   region            = var.region
+  auto_scaling      = var.auto_scaling
   tags              = var.resource_tags
 }
