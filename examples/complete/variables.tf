@@ -28,32 +28,8 @@ variable "redis_version" {
   default     = null
 }
 
-variable "sm_service_plan" {
-  type        = string
-  description = "Secrets Manager plan"
-  default     = "trial"
-}
-
 variable "resource_tags" {
   type        = list(string)
   description = "Optional list of tags to be added to created resources"
   default     = []
-}
-
-variable "service_credentials" {
-  description = "A list of service credentials that you want to create for the database"
-  type        = list(string)
-  default     = ["redis_credential_microservices", "redis_credential_dev_1", "redis_credential_dev_2"]
-}
-
-variable "existing_sm_instance_guid" {
-  type        = string
-  description = "Existing Secrets Manager GUID. If not provided an new instance will be provisioned"
-  default     = null
-}
-
-variable "existing_sm_instance_region" {
-  type        = string
-  description = "Required if value is passed into var.existing_sm_instance_guid"
-  default     = null
 }
