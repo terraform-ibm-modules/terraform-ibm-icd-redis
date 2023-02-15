@@ -111,7 +111,7 @@ module "cbr_rule" {
       },
       {
         name     = "serviceInstance"
-        value    = ibm_database.redis_database.id
+        value    = ibm_database.redis_database.guid
         operator = "stringEquals"
       },
       {
