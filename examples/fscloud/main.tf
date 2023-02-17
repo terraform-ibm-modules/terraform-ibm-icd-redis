@@ -90,16 +90,6 @@ module "redis" {
       description      = "sample rule"
       enforcement_mode = "enabled"
       account_id       = data.ibm_iam_account_settings.iam_account_settings.account_id
-      tags = [
-        {
-          name  = "environment"
-          value = "${var.prefix}-test"
-        },
-        {
-          name  = "terraform-rule"
-          value = "allow-${var.prefix}-vpc-to-${var.prefix}-redis"
-        }
-      ]
       rule_contexts = [{
         attributes = [
           {

@@ -186,7 +186,7 @@ variable "cbr_rules" {
     tags = optional(list(object({
       name  = string
       value = string
-    })))
+    })), [])
   }))
   description = "(Optional, list) List of CBR rules to create"
   default     = []

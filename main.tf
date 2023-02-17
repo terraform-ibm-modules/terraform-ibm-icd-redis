@@ -120,12 +120,7 @@ module "cbr_rule" {
         operator = "stringEquals"
       }
     ],
-    tags = var.cbr_rules[count.index].tags != null ? var.cbr_rules[count.index].tags : [
-      {
-        name  = "terraform-rule"
-        value = "allow-redis"
-      }
-    ]
+    tags = var.cbr_rules[count.index].tags
   }]
   #  There is only 1 operation type for Redis so it is not exposed as a configuration
   operations = [{
