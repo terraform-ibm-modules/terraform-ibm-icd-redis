@@ -24,7 +24,16 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestRunDefaultExample(t *testing.T) {
+func TestRunner(t *testing.T) {
+	t.Run("Tests", func(t *testing.T) {
+		t.Run("testRunDefaultExample", testRunDefaultExample)
+		t.Run("testRunRedisAutoScaleExample", testRunRedisAutoScaleExample)
+		t.Run("testRunCompleteExample", testRunCompleteExample)
+		t.Run("testRunRedisFSCloudExample", testRunRedisFSCloudExample)
+		t.Run("testRunUpgradeExample", testRunUpgradeExample)
+	})
+}
+func testRunDefaultExample(t *testing.T) {
 	t.Parallel()
 
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
@@ -39,7 +48,7 @@ func TestRunDefaultExample(t *testing.T) {
 	assert.NotNil(t, output, "Expected some output")
 }
 
-func TestRunRedisAutoScaleExample(t *testing.T) {
+func testRunRedisAutoScaleExample(t *testing.T) {
 	t.Parallel()
 
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
@@ -55,7 +64,7 @@ func TestRunRedisAutoScaleExample(t *testing.T) {
 	assert.NotNil(t, output, "Expected some output")
 }
 
-func TestRunRedisFSCloudExample(t *testing.T) {
+func testRunRedisFSCloudExample(t *testing.T) {
 	t.Parallel()
 
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
@@ -89,7 +98,7 @@ func testRunComplete(t *testing.T, version string) {
 	assert.Nil(t, err, "This should not have errored")
 	assert.NotNil(t, output, "Expected some output")
 }
-func TestRunCompleteExample(t *testing.T) {
+func testRunCompleteExample(t *testing.T) {
 	t.Parallel()
 	versions := []string{"5", "6"}
 	for _, version := range versions {
@@ -97,7 +106,7 @@ func TestRunCompleteExample(t *testing.T) {
 	}
 }
 
-func TestRunUpgradeExample(t *testing.T) {
+func testRunUpgradeExample(t *testing.T) {
 	// TODO: Remove this line after the first merge to primary branch is complete to enable upgrade test
 	t.Skip("Skipping upgrade test until initial code is in primary branch")
 	t.Parallel()
