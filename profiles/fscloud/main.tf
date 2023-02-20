@@ -1,3 +1,8 @@
+locals {
+  # tflint-ignore: terraform_unused_declarations
+  validate_restrictions_set = (var.allowlist == null && var.cbr_rules == null) ? tobool("Allow list and/or CBR Rules must be set") : true
+}
+
 module "redis" {
   source                    = "../.."
   resource_group_id         = var.resource_group_id
