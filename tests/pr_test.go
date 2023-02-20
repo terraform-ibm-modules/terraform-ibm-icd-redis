@@ -2,7 +2,6 @@
 package test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,11 +17,6 @@ const autoscalingExampleTerraformDir = "examples/redis-auto-scaling"
 
 // Restricting due to limited availability of BYOK in certain regions
 const regionSelectionPath = "../common-dev-assets/common-go-assets/icd-region-prefs.yaml"
-
-// TestMain will be run before any parallel tests, used to read data from yaml for use with tests
-func TestMain(m *testing.M) {
-	os.Exit(m.Run())
-}
 
 func TestRunner(t *testing.T) {
 	t.Parallel()
