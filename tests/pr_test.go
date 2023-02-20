@@ -25,6 +25,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestRunner(t *testing.T) {
+	t.Parallel()
 	t.Run("Tests", func(t *testing.T) {
 		t.Run("testRunDefaultExample", testRunDefaultExample)
 		t.Run("testRunRedisAutoScaleExample", testRunRedisAutoScaleExample)
