@@ -78,7 +78,7 @@ module "cbr_zone" {
 # Redis Instance
 ##############################################################################
 
-module "icd_redis" {
+module "redis" {
   source              = "../../"
   resource_group_id   = module.resource_group.resource_group_id
   redis_version       = var.redis_version
@@ -90,7 +90,7 @@ module "icd_redis" {
   cbr_rules = [
     {
       description      = "${var.prefix}-redis access only from vpc"
-      enforcement_mode = "enabled"
+      enforcement_mode = "enabled" # NOTE: Redis only supports enabled or disabled and does not support report
       account_id       = data.ibm_iam_account_settings.iam_account_settings.account_id
       rule_contexts = [{
         attributes = [
