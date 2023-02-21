@@ -1,4 +1,4 @@
-# Complete example with byok encryption, CBR rules and storing credentials in secrets manager
+# Complete example with byok encryption and CBR rules
 
 An end-to-end example that uses the module's default variable values.
 This example uses the IBM Cloud terraform provider to:

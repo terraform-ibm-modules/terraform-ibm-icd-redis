@@ -38,9 +38,9 @@ You need the following permissions to run this module.
 <!-- BEGIN EXAMPLES HOOK -->
 ## Examples
 
-- [ Complete example with byok encryption, CBR rules and storing credentials in secrets manager](examples/complete)
+- [ Complete example with byok encryption and CBR rules](examples/complete)
 - [ Default example](examples/default)
-- [ FS Cloud profile example](examples/fscloud)
+- [ Financial Services Cloud Profile example](examples/fscloud)
 - [ Redis with auto-scaling example](examples/redis-auto-scaling)
 <!-- END EXAMPLES HOOK -->
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
