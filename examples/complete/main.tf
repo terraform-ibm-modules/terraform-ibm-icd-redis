@@ -89,19 +89,9 @@ module "icd_redis" {
   tags                = var.resource_tags
   cbr_rules = [
     {
-      description      = "sample rule"
+      description      = "${var.prefix}-redis access only from vpc"
       enforcement_mode = "enabled"
       account_id       = data.ibm_iam_account_settings.iam_account_settings.account_id
-      tags = [
-        {
-          name  = "environment"
-          value = "${var.prefix}-test"
-        },
-        {
-          name  = "terraform-rule"
-          value = "allow-${var.prefix}-vpc-to-${var.prefix}-redis"
-        }
-      ]
       rule_contexts = [{
         attributes = [
           {

@@ -87,7 +87,7 @@ module "redis" {
   key_protect_key_crn = module.key_protect_all_inclusive.keys["icd.${var.prefix}-redis"].crn
   cbr_rules = [
     {
-      description      = "sample rule"
+      description      = "${var.prefix}-redis access only from vpc"
       enforcement_mode = "enabled"
       account_id       = data.ibm_iam_account_settings.iam_account_settings.account_id
       rule_contexts = [{
