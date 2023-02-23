@@ -88,6 +88,7 @@ You need the following permissions to run this module.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_guid"></a> [guid](#output\_guid) | redis instance guid |
 | <a name="output_id"></a> [id](#output\_id) | redis instance id |
 | <a name="output_version"></a> [version](#output\_version) | redis instance version |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
