@@ -119,8 +119,7 @@ module "cbr_rule" {
         value    = "databases-for-redis"
         operator = "stringEquals"
       }
-    ],
-    tags = var.cbr_rules[count.index].tags
+    ]
   }]
   #  There is only 1 operation type for Redis so it is not exposed as a configuration
   operations = [{
