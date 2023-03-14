@@ -1,6 +1,6 @@
-# Default example
+# Redis with auto-scaling example
 
 An end-to-end example that uses the module's default variable values.
 This example uses the IBM Cloud terraform provider to:
  - Create a new resource group if one is not passed in.
- - Create a new redis database instance.
+ - Create a new redis database instance with auto-scaling.
