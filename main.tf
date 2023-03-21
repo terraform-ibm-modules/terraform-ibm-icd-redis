@@ -3,7 +3,8 @@ This file is used to implement the ROOT module.
 *********************************************************************/
 
 locals {
-  kp_backup_crn = var.backup_encryption_key_crn != null ? var.backup_encryption_key_crn : var.key_protect_key_crn
+  kp_backup_crn        = var.backup_encryption_key_crn != null ? var.backup_encryption_key_crn : var.key_protect_key_crn
+  auto_scaling_enabled = var.auto_scaling == null ? [] : [1]
 }
 
 resource "ibm_database" "redis_database" {
@@ -21,32 +22,37 @@ resource "ibm_database" "redis_database" {
 
   configuration = var.configuration != null ? jsonencode(var.configuration) : null
 
-  auto_scaling {
-    cpu {
-      rate_increase_percent       = var.auto_scaling.cpu.rate_increase_percent
-      rate_limit_count_per_member = var.auto_scaling.cpu.rate_limit_count_per_member
-      rate_period_seconds         = var.auto_scaling.cpu.rate_period_seconds
-      rate_units                  = var.auto_scaling.cpu.rate_units
-    }
-    disk {
-      capacity_enabled             = var.auto_scaling.disk.capacity_enabled
-      free_space_less_than_percent = var.auto_scaling.disk.free_space_less_than_percent
-      io_above_percent             = var.auto_scaling.disk.io_above_percent
-      io_enabled                   = var.auto_scaling.disk.io_enabled
-      io_over_period               = var.auto_scaling.disk.io_over_period
-      rate_increase_percent        = var.auto_scaling.disk.rate_increase_percent
-      rate_limit_mb_per_member     = var.auto_scaling.disk.rate_limit_mb_per_member
-      rate_period_seconds          = var.auto_scaling.disk.rate_period_seconds
-      rate_units                   = var.auto_scaling.disk.rate_units
-    }
-    memory {
-      io_above_percent         = var.auto_scaling.memory.io_above_percent
-      io_enabled               = var.auto_scaling.memory.io_enabled
-      io_over_period           = var.auto_scaling.memory.io_over_period
-      rate_increase_percent    = var.auto_scaling.memory.rate_increase_percent
-      rate_limit_mb_per_member = var.auto_scaling.memory.rate_limit_mb_per_member
-      rate_period_seconds      = var.auto_scaling.memory.rate_period_seconds
-      rate_units               = var.auto_scaling.memory.rate_units
+  ## This for_each block is NOT a loop to attach to multiple auto_scaling blocks.
+  ## This block is only used to conditionally add auto_scaling block depending on var.auto_scaling
+  dynamic "auto_scaling" {
+    for_each = local.auto_scaling_enabled
+    content {
+      cpu {
+        rate_increase_percent       = var.auto_scaling.cpu.rate_increase_percent
+        rate_limit_count_per_member = var.auto_scaling.cpu.rate_limit_count_per_member
+        rate_period_seconds         = var.auto_scaling.cpu.rate_period_seconds
+        rate_units                  = var.auto_scaling.cpu.rate_units
+      }
+      disk {
+        capacity_enabled             = var.auto_scaling.disk.capacity_enabled
+        free_space_less_than_percent = var.auto_scaling.disk.free_space_less_than_percent
+        io_above_percent             = var.auto_scaling.disk.io_above_percent
+        io_enabled                   = var.auto_scaling.disk.io_enabled
+        io_over_period               = var.auto_scaling.disk.io_over_period
+        rate_increase_percent        = var.auto_scaling.disk.rate_increase_percent
+        rate_limit_mb_per_member     = var.auto_scaling.disk.rate_limit_mb_per_member
+        rate_period_seconds          = var.auto_scaling.disk.rate_period_seconds
+        rate_units                   = var.auto_scaling.disk.rate_units
+      }
+      memory {
+        io_above_percent         = var.auto_scaling.memory.io_above_percent
+        io_enabled               = var.auto_scaling.memory.io_enabled
+        io_over_period           = var.auto_scaling.memory.io_over_period
+        rate_increase_percent    = var.auto_scaling.memory.rate_increase_percent
+        rate_limit_mb_per_member = var.auto_scaling.memory.rate_limit_mb_per_member
+        rate_period_seconds      = var.auto_scaling.memory.rate_period_seconds
+        rate_units               = var.auto_scaling.memory.rate_units
+      }
     }
   }
 
@@ -98,7 +104,7 @@ resource "ibm_database" "redis_database" {
 
 module "cbr_rule" {
   count            = length(var.cbr_rules) > 0 ? length(var.cbr_rules) : 0
-  source           = "git::https://github.com/terraform-ibm-modules/terraform-ibm-cbr//cbr-rule-module?ref=v1.1.2"
+  source           = "git::https://github.com/terraform-ibm-modules/terraform-ibm-cbr//cbr-rule-module?ref=v1.1.4"
   rule_description = var.cbr_rules[count.index].description
   enforcement_mode = var.cbr_rules[count.index].enforcement_mode
   rule_contexts    = var.cbr_rules[count.index].rule_contexts
