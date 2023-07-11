@@ -1,0 +1,16 @@
+{
+    "scc_goals": [
+        {
+            "scc_goal_id": "3000210",
+            "description": "Check whether Databases for Redis network access is restricted to specific IP range",
+            "ignore_reason": "This module supports restricting network access using Context Based Restrictions (CBRs), however SCC does not yet support scanning for CBR rules, hence the goal currently fails. SCC CBR support is being tracked in AHA SCC-961",
+            "is_valid": true
+        },
+        {
+            "scc_goal_id": "3000408",
+            "description": "Check whether Flow Logs for VPC are enabled",
+            "ignore_reason": "This rule is not relevant to the module itself, just the VPC resource that is used in the example that is scanned",
+            "is_valid": false
+        }
+    ]
+}

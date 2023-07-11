@@ -2,24 +2,60 @@
 package test
 
 import (
+	"crypto/rand"
+	"encoding/base64"
+	"log"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/common"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testhelper"
 )
 
 // Use existing resource group
-const resourceGroup = "geretain-test-resources"
-const defaultExampleTerraformDir = "examples/default"
+const resourceGroup = "geretain-test-redis"
 
-func TestRunDefaultExample(t *testing.T) {
+// Restricting due to limited availability of BYOK in certain regions
+const regionSelectionPath = "../common-dev-assets/common-go-assets/icd-region-prefs.yaml"
+
+// Define a struct with fields that match the structure of the YAML data
+const yamlLocation = "../common-dev-assets/common-go-assets/common-permanent-resources.yaml"
+
+var permanentResources map[string]interface{}
+
+// TestMain will be run before any parallel tests, used to read data from yaml for use with tests
+func TestMain(m *testing.M) {
+
+	var err error
+	permanentResources, err = common.LoadMapFromYaml(yamlLocation)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	os.Exit(m.Run())
+}
+
+func TestRunRedisFSCloudExample(t *testing.T) {
 	t.Parallel()
 
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
-		Testing:       t,
-		TerraformDir:  defaultExampleTerraformDir,
-		Prefix:        "mod-template",
-		ResourceGroup: resourceGroup,
+		Testing:      t,
+		TerraformDir: "examples/fscloud",
+		Prefix:       "fs-redis",
+		Region:       "us-south", // For FSCloud locking into us-south since that is where the HPCS permanent instance is
+		/*
+		 Comment out the 'ResourceGroup' input to force this tests to create a unique resource group to ensure tests do
+		 not clash. This is due to the fact that an auth policy may already exist in this resource group since we are
+		 re-using a permanent HPCS instance. By using a new resource group, the auth policy will not already exist
+		 since this module scopes auth policies by resource group.
+		*/
+		//ResourceGroup: resourceGroup,
+		TerraformVars: map[string]interface{}{
+			"redis_version":              "6.2", // Always lock this test into the latest supported Redis version
+			"existing_kms_instance_guid": permanentResources["hpcs_south"],
+			"kms_key_crn":                permanentResources["hpcs_south_root_key_crn"],
+		},
 	})
 
 	output, err := options.RunTestConsistency()
@@ -27,17 +63,31 @@ func TestRunDefaultExample(t *testing.T) {
 	assert.NotNil(t, output, "Expected some output")
 }
 
-func TestRunUpgradeExample(t *testing.T) {
+func TestRunCompleteExampleUpgrade(t *testing.T) {
 	t.Parallel()
 
-	// TODO: Remove this line after the first merge to primary branch is complete to enable upgrade test
-	t.Skip("Skipping upgrade test until initial code is in primary branch")
+	// Generate a 10 char long random string for the admin_pass
+	randomBytes := make([]byte, 10)
+	_, err := rand.Read(randomBytes)
+	randomPass := base64.URLEncoding.EncodeToString(randomBytes)[:10]
 
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
-		Testing:       t,
-		TerraformDir:  defaultExampleTerraformDir,
-		Prefix:        "mod-template-upg",
-		ResourceGroup: resourceGroup,
+		Testing:            t,
+		TerraformDir:       "examples/complete",
+		Prefix:             "redis-complete-upg",
+		ResourceGroup:      resourceGroup,
+		BestRegionYAMLPath: regionSelectionPath,
+		TerraformVars: map[string]interface{}{
+			"redis_version": "6", // Locking this to version 6 as users block is not supported in <6 Redis versions.
+			"users": []map[string]interface{}{
+				{
+					"name":     "testuser",
+					"password": randomPass, // pragma: allowlist secret
+					"type":     "database",
+				},
+			},
+			"admin_pass": randomPass,
+		},
 	})
 
 	output, err := options.RunTestUpgrade()

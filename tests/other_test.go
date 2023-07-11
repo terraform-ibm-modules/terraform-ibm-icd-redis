@@ -8,16 +8,17 @@ import (
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testhelper"
 )
 
-const nonDefaultExampleTerraformDir = "examples/non-default"
-
-func TestRunNonDefaultExample(t *testing.T) {
+func TestRunBasicExample(t *testing.T) {
 	t.Parallel()
 
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
 		Testing:       t,
-		TerraformDir:  nonDefaultExampleTerraformDir,
-		Prefix:        "non-default-tmp",
+		TerraformDir:  "examples/basic",
+		Prefix:        "redis",
 		ResourceGroup: resourceGroup,
+		TerraformVars: map[string]interface{}{
+			"redis_version": "5", // Always lock to the lowest supported Redis version
+		},
 	})
 
 	output, err := options.RunTestConsistency()
