@@ -10,25 +10,6 @@ This module implements an instance of IBM Cloud Databases for Redis.
 
 :exclamation: The module does not support major version upgrades or updates to encryption and backup encryption keys. To upgrade the version, create another instance of Databases for Redis with the updated version and follow the steps in  [Upgrading to a new Major Version doc](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-upgrading&interface=ui) in the IBM Cloud Docs.
 
-## Compliance and security
-
-This module implements the following NIST controls. For more information about how this module implements the controls in the following list, see [NIST controls](docs/controls.md).
-
-|Profile|Category|ID|Description|
-|---|---|---|---|
-|NIST|AC-6|AC-6| Employ the principle of least privilege, allowing only authorized accesses for users. |
-|NIST|CP-9|CP-9(a) & CP-9(d)| Conduct backups of user-level information contained in system components and Protect the confidentiality, integrity, and availability of backup information. |
-|NIST|CP-10|CP-10| Provide for the recovery and reconstitution of the system to a known state after a disruption, compromise, or failure.|
-|NIST|CP-10(2)|CP-10(2)| Implement transaction recovery for systems that are transaction-based with the support of Point In Time Recovery (PITR)|
-|NIST|SC-5|SC-5| Limit the effects of denial-of-service events.|
-|NIST|SC-7|SC-7(3)| Limit the number of external network connections to the system.|
-|NIST|SC-7|SC-7(4)(c)| Implement a managed interface for each external telecommunication service.|
-|NIST|SC-7|SC-7(5)| Deny network communications traffic by default and allows network communications traffic by exception.|
-|NIST|SC-8|SC-8| Protect the confidentiality and integrity of data during transmission.|
-|NIST|SC-13|SC-13| Cryptography is implemented to support a variety of security solutions.|
-|NIST|SC-28|SC-28| Protect the confidentiality and integrity of data at rest.|
-|NIST|SC-28(1)|SC-28(1)| Implement cryptographic mechanisms to prevent unauthorized disclosure and modification of the information at rest.|
-
 ## Usage
 
 IBM Cloud Databases supports only Key Protect encryption for backups, not Hyper Protect Crypto Services. If you enable key management encryption and no value is passed for 'backup_encryption_key_crn', the value of 'kms_key_crn' is used. And if a HPCS value is set for `kms_key_crn`, the database backup encryption uses the default encryption keys. For more information, see [Hyper Protect Crypto Services Integration](https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-hpcs) in the IBM Cloud Documents.
