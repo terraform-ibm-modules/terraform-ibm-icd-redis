@@ -22,7 +22,7 @@ provider "ibm" {
 
 module "redis" {
   # replace "main" with a GIT release version to lock into a specific release
-  source            = "git::https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis?ref=main"
+  source            = "terraform-ibm-modules/icd-redis/ibm"
   resource_group_id = "xxXXxxXXxXxXXXXxxXxxxXXXXxXXXXX"
   region            = "us-south"
   instance_name     = "my-redis-instance"
@@ -57,7 +57,7 @@ You need the following permissions to run this module.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_cbr_rule"></a> [cbr\_rule](#module\_cbr\_rule) | git::https://github.com/terraform-ibm-modules/terraform-ibm-cbr//cbr-rule-module | v1.2.1 |
+| <a name="module_cbr_rule"></a> [cbr\_rule](#module\_cbr\_rule) | terraform-ibm-modules/cbr/ibm//cbr-rule-module | 1.2.0 |
 
 ## Resources
 
