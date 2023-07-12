@@ -78,7 +78,7 @@ func TestRunCompleteExampleUpgrade(t *testing.T) {
 		ResourceGroup:      resourceGroup,
 		BestRegionYAMLPath: regionSelectionPath,
 		TerraformVars: map[string]interface{}{
-			"redis_version": "6", // Locking this to version 6 as users block is not supported in <6 Redis versions.
+			"redis_version": "6",
 			"users": []map[string]interface{}{
 				{
 					"name":     "testuser",

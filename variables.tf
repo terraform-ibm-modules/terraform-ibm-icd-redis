@@ -85,7 +85,7 @@ variable "instance_name" {
 
 variable "tags" {
   type        = list(any)
-  description = "Optional list of tags to be added to the Redis instance and the associated service credentials (if creating)."
+  description = "Optional list of tags to be added to the Redis instance."
   default     = []
 }
 

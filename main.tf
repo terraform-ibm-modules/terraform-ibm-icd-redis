@@ -180,7 +180,6 @@ resource "ibm_resource_key" "service_credentials" {
   name                 = each.key
   role                 = each.value
   resource_instance_id = ibm_database.redis_database.id
-  tags                 = var.tags
 }
 
 locals {
