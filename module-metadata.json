@@ -258,11 +258,10 @@
     "tags": {
       "name": "tags",
       "type": "list(any)",
-      "description": "Optional list of tags to be added to the Redis instance and the associated service credentials (if creating).",
+      "description": "Optional list of tags to be added to the Redis instance.",
       "default": [],
       "source": [
-        "ibm_database.redis_database.tags",
-        "ibm_resource_key.service_credentials.tags"
+        "ibm_database.redis_database.tags"
       ],
       "pos": {
         "filename": "variables.tf",
@@ -429,8 +428,7 @@
       "type": "ibm_resource_key",
       "name": "service_credentials",
       "attributes": {
-        "for_each": "service_credential_names",
-        "tags": "tags"
+        "for_each": "service_credential_names"
       },
       "provider": {
         "name": "ibm"
@@ -457,7 +455,7 @@
       },
       "pos": {
         "filename": "main.tf",
-        "line": 207
+        "line": 206
       }
     }
   },
