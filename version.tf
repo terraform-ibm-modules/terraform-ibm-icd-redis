@@ -6,5 +6,9 @@ terraform {
       # Use "greater than or equal to" range in modules
       version = ">= 1.54.0, < 2.0.0"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = ">= 0.9.1"
+    }
   }
 }
