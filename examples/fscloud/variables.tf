@@ -44,6 +44,17 @@ variable "redis_version" {
   default     = null
 }
 
+variable "service_credential_names" {
+  description = "Map of name, role for service credentials that you want to create for the database"
+  type        = map(string)
+  default = {
+    "redis_admin" : "Administrator",
+    "redis_operator" : "Operator",
+    "redis_viewer" : "Viewer",
+    "redis_editor" : "Editor",
+  }
+}
+
 variable "auto_scaling" {
   type = object({
     disk = object({

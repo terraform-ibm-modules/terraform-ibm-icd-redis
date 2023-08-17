@@ -20,5 +20,5 @@ module "redis" {
   backup_encryption_key_crn     = null # Need to use default encryption until ICD adds HPCS support for backup encryption
   auto_scaling                  = var.auto_scaling
   tags                          = var.tags
-
+  service_credential_names      = var.service_credential_names
 }
