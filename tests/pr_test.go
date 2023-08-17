@@ -58,7 +58,7 @@ func TestRunRedisFSCloudExample(t *testing.T) {
 			"kms_key_crn":                permanentResources["hpcs_south_root_key_crn"],
 		},
 	})
-
+	options.SkipTestTearDown = true
 	output, err := options.RunTestConsistency()
 	assert.Nil(t, err, "This should not have errored")
 	assert.NotNil(t, output, "Expected some output")
