@@ -14,10 +14,10 @@ output "guid" {
 
 output "hostname" {
   description = "Database hostname. Only contains value when var.service_credential_names or var.users are set."
-  value       = module.etcd_db.hostname
+  value       = module.redis.hostname
 }
 
 output "port" {
   description = "Database port. Only contains value when var.service_credential_names or var.users are set."
-  value       = module.etcd_db.port
+  value       = module.redis.port
 }
