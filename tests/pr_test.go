@@ -8,6 +8,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/common"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testhelper"
@@ -57,10 +58,17 @@ func TestRunRedisFSCloudExample(t *testing.T) {
 			"kms_key_crn":                permanentResources["hpcs_south_root_key_crn"],
 		},
 	})
-
+	options.SkipTestTearDown = true
 	output, err := options.RunTestConsistency()
 	assert.Nil(t, err, "This should not have errored")
 	assert.NotNil(t, output, "Expected some output")
+
+	// check if outputs exist
+	outputs := terraform.OutputAll(options.Testing, options.TerraformOptions)
+	expectedOutputs := []string{"port", "hostname"}
+	_, outputErr := testhelper.ValidateTerraformOutputs(outputs, expectedOutputs...)
+	assert.NoErrorf(t, outputErr, "Some outputs not found or nil")
+	options.TestTearDown()
 }
 
 func TestRunCompleteExampleUpgrade(t *testing.T) {
