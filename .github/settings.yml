@@ -13,4 +13,4 @@ repository:
 
   description: "Implements an instance of IBM Cloud Databases for Redis."
 
-  topics: core-team, terraform, ibm-cloud, terraform-module, icd, redis, icd-redis
+  topics: core-team, terraform, ibm-cloud, terraform-module, icd, redis, icd-redis, supported, graduated
