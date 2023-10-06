@@ -11,7 +11,7 @@
       ],
       "pos": {
         "filename": "variables.tf",
-        "line": 140
+        "line": 146
       }
     },
     "auto_scaling": {
@@ -20,13 +20,13 @@
       "description": "Optional rules to allow the database to increase resources in response to usage. Only a single autoscaling block is allowed. Make sure you understand the effects of autoscaling, especially for production environments. See https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-autoscaling in the IBM Cloud Docs.",
       "pos": {
         "filename": "variables.tf",
-        "line": 159
+        "line": 165
       }
     },
     "backup_encryption_key_crn": {
       "name": "backup_encryption_key_crn",
       "type": "string",
-      "description": "The CRN of a Key Protect key that you want to use for encrypting the disk that holds deployment backups. Only used if var.kms_encryption_enabled is set to true. BYOK for backups is available only in US regions us-south and us-east, and in eu-de. Only keys in the us-south and eu-de are durable to region failures. To ensure that your backups are available even if a region failure occurs, use a key from us-south or eu-de. Hyper Protect Crypto Services for IBM Cloud Databases backups is not currently supported. If no value is passed here, the value passed for the 'kms_key_crn' variable is used. And if a HPCS value is passed for var.kms_key_crn, the database backup encryption uses the default encryption keys.",
+      "description": "The CRN of a Key Protect key that you want to use for encrypting the disk that holds deployment backups. Only used if var.kms_encryption_enabled is set to true. BYOK for backups is available only in US regions us-south and us-east, and in eu-de. Only keys in the us-south and eu-de are durable to region failures. To ensure that your backups are available even if a region failure occurs, use a key from us-south or eu-de. Hyper Protect Crypto Services for IBM Cloud Databases backups is not currently supported. If no value is passed here, the value passed for the 'kms_key_crn' variable is used, unless 'use_default_backup_encryption_key' is set to 'true'. And if a HPCS value is passed for var.kms_key_crn, the database backup encryption uses the default encryption keys.",
       "pos": {
         "filename": "variables.tf",
         "line": 130
@@ -46,7 +46,7 @@
       ],
       "pos": {
         "filename": "variables.tf",
-        "line": 201
+        "line": 207
       }
     },
     "configuration": {
@@ -243,7 +243,7 @@
       ],
       "pos": {
         "filename": "variables.tf",
-        "line": 186
+        "line": 192
       }
     },
     "skip_iam_authorization_policy": {
@@ -269,6 +269,16 @@
         "line": 86
       }
     },
+    "use_default_backup_encryption_key": {
+      "name": "use_default_backup_encryption_key",
+      "type": "bool",
+      "description": "Set to true to use default ICD randomly generated keys.",
+      "default": false,
+      "pos": {
+        "filename": "variables.tf",
+        "line": 140
+      }
+    },
     "users": {
       "name": "users",
       "type": "list(object({\n    name     = string\n    password = string # pragma: allowlist secret\n    type     = string # \"type\" is required to generate the connection string for the outputs.\n    role     = optional(string)\n  }))",
@@ -282,7 +292,7 @@
       ],
       "pos": {
         "filename": "variables.tf",
-        "line": 147
+        "line": 153
       }
     }
   },
@@ -410,7 +420,7 @@
       },
       "pos": {
         "filename": "main.tf",
-        "line": 50
+        "line": 52
       }
     },
     "ibm_iam_authorization_policy.kms_policy": {
@@ -428,7 +438,7 @@
       },
       "pos": {
         "filename": "main.tf",
-        "line": 33
+        "line": 35
       }
     },
     "ibm_resource_key.service_credentials": {
@@ -443,7 +453,7 @@
       },
       "pos": {
         "filename": "main.tf",
-        "line": 186
+        "line": 188
       }
     },
     "time_sleep.wait_for_authorization_policy": {
@@ -455,7 +465,7 @@
       },
       "pos": {
         "filename": "main.tf",
-        "line": 44
+        "line": 46
       }
     }
   },
@@ -475,7 +485,7 @@
       },
       "pos": {
         "filename": "main.tf",
-        "line": 214
+        "line": 216
       }
     }
   },
@@ -554,7 +564,7 @@
       },
       "pos": {
         "filename": "main.tf",
-        "line": 146
+        "line": 148
       }
     }
   }
