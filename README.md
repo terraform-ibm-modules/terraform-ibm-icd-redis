@@ -88,7 +88,6 @@ You need the following permissions to run this module.
 | <a name="input_kms_key_crn"></a> [kms\_key\_crn](#input\_kms\_key\_crn) | The root key CRN of a Key Management Services like Key Protect or Hyper Protect Crypto Service (HPCS) that you want to use for disk encryption. Only used if var.kms\_encryption\_enabled is set to true. | `string` | `null` | no |
 | <a name="input_members"></a> [members](#input\_members) | Allocated number of members. Members can be scaled up but not down. | `number` | `2` | no |
 | <a name="input_memory_mb"></a> [memory\_mb](#input\_memory\_mb) | Allocated memory per member. For more information, see https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-resources-scaling | `number` | `1024` | no |
-| <a name="input_plan_validation"></a> [plan\_validation](#input\_plan\_validation) | Enable or disable validating the database parameters for Redis during the plan phase. | `bool` | `true` | no |
 | <a name="input_redis_version"></a> [redis\_version](#input\_redis\_version) | Version of the Redis instance to provision. If no value is passed, the current preferred version of IBM Cloud Databases is used. | `string` | `null` | no |
 | <a name="input_region"></a> [region](#input\_region) | The region where you want to deploy your instance. | `string` | `"us-south"` | no |
 | <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id) | The resource group ID where the Redis instance will be created. | `string` | n/a | yes |
