@@ -56,7 +56,6 @@ resource "ibm_database" "redis_database" {
   location                  = var.region
   service                   = "databases-for-redis"
   version                   = var.redis_version
-  plan_validation           = var.plan_validation
   resource_group_id         = var.resource_group_id
   service_endpoints         = var.endpoints
   tags                      = var.tags

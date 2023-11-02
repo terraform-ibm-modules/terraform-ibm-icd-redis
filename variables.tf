@@ -89,12 +89,6 @@ variable "tags" {
   default     = []
 }
 
-variable "plan_validation" {
-  type        = bool
-  description = "Enable or disable validating the database parameters for Redis during the plan phase."
-  default     = true
-}
-
 variable "kms_encryption_enabled" {
   type        = bool
   description = "Set this to true to control the encryption keys used to encrypt the data that you store in IBM Cloud® Databases. If set to false, the data is encrypted by using randomly generated keys. For more info on Key Protect integration, see https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-key-protect. For more info on HPCS integration, see https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-hpcs"
