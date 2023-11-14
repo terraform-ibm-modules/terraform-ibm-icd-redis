@@ -14,7 +14,9 @@
         "terraform",
         "redis",
         "icd",
-        "database"
+        "database",
+        "cache",
+        "message-broker"
       ],
       "short_description": "Implements an instance of IBM Cloud Databases for Redis.",
       "long_description": "Use this module to provision and configure an instance of IBM Cloud Databases for Redis.",
