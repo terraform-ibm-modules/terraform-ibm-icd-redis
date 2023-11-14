@@ -2,7 +2,7 @@
   "products": [
     {
       "name": "terraform-ibm-icd-redis",
-      "label": "ICD Redis Module",
+      "label": "ICD Redis module",
       "product_kind": "module",
       "tags": [
         "dev_ops",
@@ -13,28 +13,37 @@
       "keywords": [
         "terraform",
         "redis",
-        "icd"
+        "icd",
+        "database"
       ],
       "short_description": "Implements an instance of IBM Cloud Databases for Redis.",
-      "long_description": "Use this module to provision and configure an IBM Cloud Database for Redis instance.",
+      "long_description": "Use this module to provision and configure an instance of IBM Cloud Databases for Redis.",
       "offering_docs_url": "https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/README.md",
       "offering_icon_url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-icd-redis/main/images/redis_icon.svg",
       "features": [
         {
-          "title": "Create Redis instance",
-          "description": "Create IBM Cloud Database for Redis instance."
+          "title": "Create instance of Databases for Redis",
+          "description": "Creates an instance of IBM Cloud Databases for Redis."
         },
         {
-          "title": "Attach Users",
-          "description": "Attach list of users to the Redis instance."
+          "title": "Managing users and roles",
+          "description": "Manage IAM service credentials as well as Databases for Redis admin and default user credentials and roles."
         },
         {
-          "title": "Auto Scaling instance",
-          "description": "Rules to allow the Redis database instance to increase resources in response to usage."
+          "title": "Auto scaling instance",
+          "description": "Supports rules that allow the Cloud Databases instance to increase resources in response to usage."
         },
         {
-          "title": "Create Service Credentials Roles",
-          "description": "Create Service Credentials Roles for the ICD Redis database instance."
+          "title": "Create service credentials roles",
+          "description": "Create service credentials roles for the instance of Databases for Redis."
+        },
+        {
+          "title": "Configure Databases for Redis instance",
+          "description": "Configure Databases for Redis settings to tune database based on the use-case."
+        },
+        {
+          "title": "Scaling Disk, Memory, and CPU",
+          "description": "Adjust the amount of resources available to Database for Redis deployment to suit workload and the size of data."
         },
         {
           "title": "KMS encryption",
@@ -42,7 +51,7 @@
         },
         {
           "title": "CBR",
-          "description": "Create context-based restriction (CBR) rules for both instance and buckets."
+          "description": "Create context-based restriction (CBR) rules for both Databases for Redis instance."
         }
       ],
       "flavors": [
