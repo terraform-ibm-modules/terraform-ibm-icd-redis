@@ -76,7 +76,7 @@ func TestRunCompleteExampleUpgrade(t *testing.T) {
 
 	// Generate a 15 char long random string for the admin_pass
 	randomBytes := make([]byte, 13)
-	_, err := rand.Read(randomBytes)
+	rand.Read(randomBytes)
 	randomPass := "A1" + base64.URLEncoding.EncodeToString(randomBytes)[:13]
 
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
