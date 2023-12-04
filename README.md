@@ -22,7 +22,7 @@ provider "ibm" {
 
 module "redis" {
   # replace "main" with a GIT release version to lock into a specific release
-  source            = "terraform-ibm-modules/icd-redis/ibm"
+  source            = "terraform-ibm-modules/terraform-ibm-icd-redis/ibm?ref=main"
   resource_group_id = "xxXXxxXXxXxXXXXxxXxxxXXXXxXXXXX"
   region            = "us-south"
   instance_name     = "my-redis-instance"

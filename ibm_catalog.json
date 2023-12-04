@@ -19,7 +19,7 @@
         "message-broker"
       ],
       "short_description": "Implements an instance of IBM Cloud Databases for Redis.",
-      "long_description": "Use this module to provision and configure an instance of IBM Cloud Databases for Redis.",
+      "long_description": "Use this module to provision and configure an instance of IBM Cloud Databases for Redis.\n\n#### Usage\n```hcl\nprovider \"ibm\" {\n  ibmcloud_api_key = \"XXXXXXXXXX\"\n  region           = \"us-south\"\n}\n\nmodule \"redis\" {\n  # Replace “X.X.X” with a release version to lock into a specific release\n  source            = \"https://cm.globalcatalog.cloud.ibm.com/api/v1-beta/offering/source?archive=tgz&kind=terraform&name=terraform-ibm-icd-redis&version=X.X.X\"\n  resource_group_id = \"xxXXxxXXxXxXXXXxxXxxxXXXXxXXXXX\"\n  region            = \"us-south\"\n  instance_name     = \"my-redis-instance\"\n}\n```",
       "offering_docs_url": "https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/README.md",
       "offering_icon_url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-icd-redis/main/images/redis_icon.svg",
       "features": [
