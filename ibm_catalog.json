@@ -86,7 +86,7 @@
                   "url": "https://raw.githubusercontent.com/terraform-ibm-modules/documentation/main/icons/ModuleExampleDiagram.svg",
                   "type": "image/svg+xml"
                 },
-                "description": "This example creates a IBM Cloud Database for Redis instance with KMS encryption enabled and CBR rules configured."
+                "description": "This example creates an IBM Cloud Database for Redis instance with KMS encryption enabled and CBR rules configured."
               }
             ]
           }

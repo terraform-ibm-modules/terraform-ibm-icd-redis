@@ -1,6 +1,6 @@
 # Financial Services compliant example
 
-This example uses the [Profile for IBM Cloud Framework for Financial Services](../../modules/fscloud/) to provision an IBM Cloud Databases for Redis instance.
+This example uses the [Profile for IBM Cloud Framework for Financial Services](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/modules/fscloud) to provision an IBM Cloud Databases for Redis instance.
 
 The following resources are provisioned by this example:
 
