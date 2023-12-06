@@ -21,8 +21,8 @@ provider "ibm" {
 }
 
 module "redis" {
-  # replace "main" with a GIT release version to lock into a specific release
-  source            = "terraform-ibm-modules/terraform-ibm-icd-redis/ibm?ref=main"
+  source            = "terraform-ibm-modules/icd-redis/ibm"
+  version           = "X.X.X" # Replace "X.X.X" with a release version to lock into a specific release
   resource_group_id = "xxXXxxXXxXxXXXXxxXxxxXXXXxXXXXX"
   region            = "us-south"
   instance_name     = "my-redis-instance"
@@ -41,9 +41,9 @@ You need the following permissions to run this module.
 <!-- BEGIN EXAMPLES HOOK -->
 ## Examples
 
+- [ Advanced example](examples/advanced)
 - [ Basic example](examples/basic)
-- [ Complete example with BYOK encryption, and CBR rules](examples/complete)
-- [ Financial Services Cloud profile example](examples/fscloud)
+- [ Financial Services compliant example](examples/fscloud)
 <!-- END EXAMPLES HOOK -->
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ### Requirements
