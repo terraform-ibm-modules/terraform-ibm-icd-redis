@@ -49,7 +49,7 @@ resource "time_sleep" "wait_for_authorization_policy" {
   create_duration = "30s"
 }
 
-resource "ibm_database" "redis_database" { #checkov:skip=CKV2_IBM_6
+resource "ibm_database" "redis_database" {
   depends_on                = [ibm_iam_authorization_policy.kms_policy]
   name                      = var.instance_name
   plan                      = "standard" # Only standard plan is available for redis
