@@ -75,7 +75,7 @@
           }
         },
         {
-          "label": "Advanced example",
+          "label": "Advanced",
           "name": "advanced",
           "working_directory": "examples/advanced",
           "architecture": {
@@ -92,7 +92,7 @@
           }
         },
         {
-          "label": "Financial Services compliant example",
+          "label": "Financial Services compliant",
           "name": "fscloud",
           "working_directory": "examples/fscloud",
           "architecture": {
