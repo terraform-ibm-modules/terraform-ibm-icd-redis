@@ -71,18 +71,18 @@ func TestRunRedisFSCloudExample(t *testing.T) {
 	options.TestTearDown()
 }
 
-func TestRunCompleteExampleUpgrade(t *testing.T) {
+func TestRunAdvancedExampleUpgrade(t *testing.T) {
 	t.Parallel()
 
-	// Generate a 10 char long random string for the admin_pass
-	randomBytes := make([]byte, 10)
-	_, err := rand.Read(randomBytes)
-	randomPass := "A" + base64.URLEncoding.EncodeToString(randomBytes)[:10]
+	// Generate a 15 char long random string for the admin_pass
+	randomBytes := make([]byte, 13)
+	rand.Read(randomBytes)
+	randomPass := "A1" + base64.URLEncoding.EncodeToString(randomBytes)[:13]
 
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
 		Testing:            t,
-		TerraformDir:       "examples/complete",
-		Prefix:             "redis-complete-upg",
+		TerraformDir:       "examples/advanced",
+		Prefix:             "redis-advanced-upg",
 		ResourceGroup:      resourceGroup,
 		BestRegionYAMLPath: regionSelectionPath,
 		TerraformVars: map[string]interface{}{
