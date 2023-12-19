@@ -10,7 +10,21 @@ This module implements an instance of IBM Cloud Databases for Redis.
 
 :exclamation: The module does not support major version upgrades or updates to encryption and backup encryption keys. To upgrade the version, create another instance of Databases for Redis with the updated version and follow the steps in  [Upgrading to a new Major Version doc](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-upgrading&interface=ui) in the IBM Cloud Docs.
 
-## Usage
+<!-- Below content is automatically populated via pre-commit hook -->
+<!-- BEGIN OVERVIEW HOOK -->
+## Overview
+* [terraform-ibm-icd-redis](#terraform-ibm-icd-redis)
+* [Submodules](./modules)
+    * [fscloud](./modules/fscloud)
+* [Examples](./examples)
+    * [Advanced example](./examples/advanced)
+    * [Basic example](./examples/basic)
+    * [Financial Services compliant example](./examples/fscloud)
+* [Contributing](#contributing)
+<!-- END OVERVIEW HOOK -->
+
+## terraform-ibm-icd-redis
+### Usage
 
 IBM Cloud Databases supports only Key Protect encryption for backups, not Hyper Protect Crypto Services. If you enable key management encryption and no value is passed for 'backup_encryption_key_crn', the value of 'kms_key_crn' is used. And if a HPCS value is set for `kms_key_crn`, the database backup encryption uses the default encryption keys. For more information, see [Hyper Protect Crypto Services Integration](https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-hpcs) in the IBM Cloud Documents.
 
@@ -29,7 +43,7 @@ module "redis" {
 }
 ```
 
-## Required IAM access policies
+### Required IAM access policies
 
 You need the following permissions to run this module.
 
@@ -37,14 +51,6 @@ You need the following permissions to run this module.
     - **Databases for Redis** service
         - `Editor` role access
 
-
-<!-- BEGIN EXAMPLES HOOK -->
-## Examples
-
-- [ Advanced example](examples/advanced)
-- [ Basic example](examples/basic)
-- [ Financial Services compliant example](examples/fscloud)
-<!-- END EXAMPLES HOOK -->
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ### Requirements
 
