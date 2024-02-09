@@ -33,14 +33,23 @@ resource "ibm_is_subnet" "testacc_subnet" {
 
 module "key_protect_all_inclusive" {
   source            = "terraform-ibm-modules/key-protect-all-inclusive/ibm"
-  version           = "4.4.2"
+  version           = "4.6.0"
   resource_group_id = module.resource_group.resource_group_id
   # Note: Database instance and Key Protect must be created in the same region when using BYOK
   # See https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-key-protect&interface=ui#key-byok
   region                    = var.region
   key_protect_instance_name = "${var.prefix}-kp"
   resource_tags             = var.resource_tags
-  key_map                   = { "icd" = ["${var.prefix}-redis"] }
+  keys = [
+    {
+      key_ring_name = "icd"
+      keys = [
+        {
+          key_name = "${var.prefix}-redis"
+        }
+      ]
+    }
+  ]
 }
 
 ##############################################################################
@@ -78,7 +87,7 @@ module "icd_redis" {
   region                     = var.region
   admin_pass                 = var.admin_pass
   users                      = var.users
-  existing_kms_instance_guid = module.key_protect_all_inclusive.key_protect_guid
+  existing_kms_instance_guid = module.key_protect_all_inclusive.kms_guid
   kms_key_crn                = module.key_protect_all_inclusive.keys["icd.${var.prefix}-redis"].crn
   tags                       = var.resource_tags
   service_credential_names   = var.service_credential_names
