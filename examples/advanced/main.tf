@@ -33,7 +33,7 @@ resource "ibm_is_subnet" "testacc_subnet" {
 
 module "key_protect_all_inclusive" {
   source            = "terraform-ibm-modules/key-protect-all-inclusive/ibm"
-  version           = "4.6.0"
+  version           = "4.7.0"
   resource_group_id = module.resource_group.resource_group_id
   # Note: Database instance and Key Protect must be created in the same region when using BYOK
   # See https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-key-protect&interface=ui#key-byok
@@ -64,7 +64,7 @@ data "ibm_iam_account_settings" "iam_account_settings" {
 ##############################################################################
 module "cbr_zone" {
   source           = "terraform-ibm-modules/cbr/ibm//modules/cbr-zone-module"
-  version          = "1.18.1"
+  version          = "1.19.0"
   name             = "${var.prefix}-VPC-network-zone"
   zone_description = "CBR Network zone containing VPC"
   account_id       = data.ibm_iam_account_settings.iam_account_settings.account_id
