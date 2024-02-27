@@ -14,11 +14,9 @@ variable "redis_version" {
   validation {
     condition = anytrue([
       var.redis_version == null,
-      var.redis_version == "5",
-      var.redis_version == "6",
       var.redis_version == "6.2"
     ])
-    error_message = "Version must be 5, 6 or 6.2. If no value passed, the current ICD preferred version is used."
+    error_message = "Version must be 6.2. If no value passed, the current ICD preferred version is used."
   }
 }
 
