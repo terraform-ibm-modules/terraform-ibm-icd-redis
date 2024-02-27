@@ -17,7 +17,7 @@ func TestRunBasicExample(t *testing.T) {
 		Prefix:        "redis",
 		ResourceGroup: resourceGroup,
 		TerraformVars: map[string]interface{}{
-			"redis_version": "5", // Always lock to the lowest supported Redis version
+			"redis_version": "6.2", // Always lock to the lowest supported Redis version
 		},
 	})
 
