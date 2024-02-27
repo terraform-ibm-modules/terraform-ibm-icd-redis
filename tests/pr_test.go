@@ -91,7 +91,7 @@ func TestRunAdvancedExampleUpgrade(t *testing.T) {
 		ResourceGroup:      resourceGroup,
 		BestRegionYAMLPath: regionSelectionPath,
 		TerraformVars: map[string]interface{}{
-			"redis_version": "6",
+			"redis_version": "6.2",
 			"users": []map[string]interface{}{
 				{
 					"name":     "testuser",
