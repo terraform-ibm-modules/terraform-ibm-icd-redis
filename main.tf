@@ -62,6 +62,7 @@ resource "ibm_database" "redis_database" {
   adminpassword             = var.admin_pass
   key_protect_key           = var.kms_key_crn
   backup_encryption_key_crn = local.backup_encryption_key_crn
+  backup_id                 = var.backup_crn
 
   # For default configuration, see here: https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-changing-configuration&interface=cli
   configuration = var.configuration == null ? null : jsonencode({
