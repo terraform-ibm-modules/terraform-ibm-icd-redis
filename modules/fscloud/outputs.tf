@@ -39,12 +39,23 @@ output "service_credentials_object" {
   sensitive   = true
 }
 
+output "adminuser" {
+  description = "Database admin user name"
+  value       = module.redis.adminuser
+}
+
 output "hostname" {
-  description = "Postgresql instance hostname"
+  description = "Database connection hostname"
   value       = module.redis.hostname
 }
 
 output "port" {
-  description = "Postgresql instance port"
+  description = "Database connection port"
   value       = module.redis.port
+}
+
+output "certificate_base64" {
+  description = "Database connection certificate"
+  value       = module.redis.certificate_base64
+  sensitive   = true
 }
