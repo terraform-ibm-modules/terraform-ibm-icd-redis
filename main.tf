@@ -20,6 +20,9 @@ locals {
   # Determine if auto scaling is enabled
   auto_scaling_enabled = var.auto_scaling == null ? [] : [1]
 
+  # Determine if host_flavor is used
+  host_flavor_set = var.member_host_flavor != null ? true : false
+
   # Determine what KMS service is being used for database encryption
   kms_service = var.kms_key_crn != null ? (
     can(regex(".*kms.*", var.kms_key_crn)) ? "kms" : (
@@ -82,20 +85,39 @@ resource "ibm_database" "redis_database" {
       role     = (users.value.role != "" ? users.value.role : null)
     }
   }
+  dynamic "group" {
+    for_each = local.host_flavor_set ? [1] : []
+    content {
+      group_id = "member" # Only member type is allowed for redis
+      host_flavor {
+        id = var.member_host_flavor
+      }
+      disk {
+        allocation_mb = var.disk_mb
+      }
+      members {
+        allocation_count = var.members
+      }
+    }
+  }
 
-  group {
-    group_id = "member"
-    memory {
-      allocation_mb = var.memory_mb
-    }
-    disk {
-      allocation_mb = var.disk_mb
-    }
-    cpu {
-      allocation_count = var.cpu_count
-    }
-    members {
-      allocation_count = var.members
+  ## This block is for if host_flavor IS NOT set
+  dynamic "group" {
+    for_each = local.host_flavor_set ? [] : [1]
+    content {
+      group_id = "member" # Only member type is allowed for redis
+      memory {
+        allocation_mb = var.memory_mb
+      }
+      disk {
+        allocation_mb = var.disk_mb
+      }
+      cpu {
+        allocation_count = var.cpu_count
+      }
+      members {
+        allocation_count = var.members
+      }
     }
   }
 
