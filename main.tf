@@ -85,8 +85,12 @@ resource "ibm_database" "redis_database" {
       role     = (users.value.role != "" ? users.value.role : null)
     }
   }
+
+  ## This for_each block is NOT a loop to attach to multiple group blocks.
+  ## This is used to conditionally add one, OR, the other group block depending on var.local.host_flavor_set
+  ## This block is for if host_flavor IS set to specific pre-defined host sizes and not set to "multitenant"
   dynamic "group" {
-    for_each = local.host_flavor_set ? [1] : []
+    for_each = local.host_flavor_set && var.member_host_flavor != "multitenant" ? [1] : []
     content {
       group_id = "member" # Only member type is allowed for redis
       host_flavor {
@@ -101,9 +105,9 @@ resource "ibm_database" "redis_database" {
     }
   }
 
-  ## This block is for if host_flavor IS NOT set
+  ## This block is for if host_flavor IS set to "multitenant"
   dynamic "group" {
-    for_each = local.host_flavor_set ? [] : [1]
+    for_each = local.host_flavor_set && var.member_host_flavor == "multitenant" ? [1] : []
     content {
       group_id = "member" # Only member type is allowed for redis
       memory {
