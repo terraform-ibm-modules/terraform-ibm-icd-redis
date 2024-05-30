@@ -37,7 +37,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	// #TEST- dummy changes
 	os.Exit(m.Run())
 }
 
