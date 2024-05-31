@@ -6,6 +6,14 @@ on:
     types:
       - created
 jobs:
+  
+  print-msg:
+    runs-on: ubuntu-latest
+    steps:
+    - name: test-msg
+      run: |
+        echo: "Temporary step: Testing changes....."
+
   call-terraform-ci-pipeline:
     # uses: terraform-ibm-modules/common-pipeline-assets/.github/workflows/common-terraform-module-ci-v2.yml@v1.22.1
     uses: terraform-ibm-modules/common-pipeline-assets/.github/workflows/common-terraform-module-ci-v2.yml@refs/heads/9252-remove-spaces
