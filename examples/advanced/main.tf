@@ -42,10 +42,12 @@ module "key_protect_all_inclusive" {
   resource_tags             = var.resource_tags
   keys = [
     {
-      key_ring_name = "icd"
+      key_ring_name         = "icd"
+      force_delete_key_ring = true
       keys = [
         {
-          key_name = "${var.prefix}-redis"
+          key_name     = "${var.prefix}-redis"
+          force_delete = true
         }
       ]
     }
