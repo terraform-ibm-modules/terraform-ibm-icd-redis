@@ -57,7 +57,7 @@ func TestRunRedisFSCloudExample(t *testing.T) {
 		*/
 		//ResourceGroup: resourceGroup,
 		TerraformVars: map[string]interface{}{
-			"redis_version":              "6.2", // Always lock this test into the latest supported Redis version
+			"redis_version":              "7.2", // Always lock this test into the latest supported Redis version
 			"existing_kms_instance_guid": permanentResources["hpcs_south"],
 			"kms_key_crn":                permanentResources["hpcs_south_root_key_crn"],
 		},
