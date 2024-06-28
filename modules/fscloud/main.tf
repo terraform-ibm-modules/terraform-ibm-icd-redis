@@ -18,7 +18,7 @@ module "redis" {
   kms_encryption_enabled        = true
   existing_kms_instance_guid    = var.existing_kms_instance_guid
   kms_key_crn                   = var.kms_key_crn
-  backup_encryption_key_crn     = null # Need to use default encryption until ICD adds HPCS support for backup encryption
+  backup_encryption_key_crn     = var.backup_encryption_key_crn
   auto_scaling                  = var.auto_scaling
   tags                          = var.tags
   service_credential_names      = var.service_credential_names
