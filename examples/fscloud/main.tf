@@ -64,6 +64,8 @@ module "redis" {
   existing_kms_instance_guid = var.existing_kms_instance_guid
   service_credential_names   = var.service_credential_names
   auto_scaling               = var.auto_scaling
+  backup_encryption_key_crn  = var.backup_encryption_key_crn
+  backup_crn                 = var.backup_crn
   cbr_rules = [
     {
       description      = "sample rule"
