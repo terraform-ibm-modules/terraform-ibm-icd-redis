@@ -11,6 +11,7 @@ module "redis" {
   cpu_count                     = var.cpu_count
   memory_mb                     = var.memory_mb
   members                       = var.members
+  member_host_flavor            = var.member_host_flavor
   admin_pass                    = var.admin_pass
   users                         = var.users
   disk_mb                       = var.disk_mb

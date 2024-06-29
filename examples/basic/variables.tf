@@ -33,3 +33,9 @@ variable "redis_version" {
   type        = string
   default     = null
 }
+
+variable "member_host_flavor" {
+  type        = string
+  description = "Allocated host flavor per member. For more information, see https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/database#host_flavor"
+  default     = null
+}
