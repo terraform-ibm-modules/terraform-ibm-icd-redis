@@ -10,6 +10,7 @@ module "redis" {
   configuration                 = var.configuration
   cpu_count                     = var.cpu_count
   memory_mb                     = var.memory_mb
+  member_host_flavor            = var.member_host_flavor
   members                       = var.members
   admin_pass                    = var.admin_pass
   users                         = var.users
