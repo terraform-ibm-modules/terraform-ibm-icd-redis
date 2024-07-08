@@ -8,6 +8,12 @@ locals {
   redis_key_ring_name = var.prefix != null ? "${var.prefix}-${var.redis_key_ring_name}" : var.redis_key_ring_name
 
   kms_key_crn = var.existing_kms_key_crn != null ? var.existing_kms_key_crn : module.kms[0].keys[format("%s.%s", local.redis_key_ring_name, local.redis_key_name)].crn
+
+  create_cross_account_auth_policy = !var.skip_iam_authorization_policy && var.ibmcloud_kms_api_key != null
+
+  kms_service_name = local.kms_key_crn != null ? (
+    can(regex(".*kms.*", local.kms_key_crn)) ? "kms" : can(regex(".*hs-crypto.*", local.kms_key_crn)) ? "hs-crypto" : null
+  ) : null
 }
 
 #######################################################################################################################
@@ -24,6 +30,30 @@ module "resource_group" {
 #######################################################################################################################
 # KMS root key for Elasticsearch
 #######################################################################################################################
+
+data "ibm_iam_account_settings" "iam_account_settings" {
+  count = local.create_cross_account_auth_policy ? 1 : 0
+}
+
+resource "ibm_iam_authorization_policy" "redis_kms_policy" {
+  count                       = local.create_cross_account_auth_policy
+  provider = ibm.kms
+  source_service_account      = data.ibm_iam_account_settings.iam_account_settings[0].account_id  
+  source_service_name         = "databases-for-redis"
+  source_resource_group_id    = module.resource_group[0].resource_group_id
+  target_service_name         = local.kms_service_name
+  target_resource_instance_id = local.existing_kms_instance_guid
+  roles                       = ["Reader"]
+  description                 = "Allow all Redis instances in the resource group ${module.resource_group[0].resource_group_id} in the account ${data.ibm_iam_account_settings.iam_account_settings[0].account_id} to read from the ${local.kms_service_name} instance GUID ${local.existing_kms_instance_guid}"
+}
+
+# workaround for https://github.com/IBM-Cloud/terraform-provider-ibm/issues/4478
+resource "time_sleep" "wait_for_redis_authorization_policy" {
+  depends_on      = [ibm_iam_authorization_policy.redis_kms_policy]
+  create_duration = "30s"
+}
+
+
 
 module "kms" {
   providers = {
@@ -57,14 +87,16 @@ module "kms" {
 
 module "redis"{
   source = "../../modules/fscloud"
+  depends_on = [ time_sleep.wait_for_redis_authorization_policy ]
   resource_group_id = module.resource_group.resource_group_id
   instance_name = var.prefix == null ? var.name: "${var.prefix}-${var.name}"
   region = var.region
-  skip_iam_authorization_policy = var.skip_iam_authorization_policy
   redis_version = var.redis_version
 
+  skip_iam_authorization_policy = var.skip_iam_authorization_policy
   existing_kms_instance_guid = local.existing_kms_instance_guid
   kms_key_crn = local.kms_key_crn
+  
   tags = var.tags
   admin_pass = var.admin_pass
   users = var.users

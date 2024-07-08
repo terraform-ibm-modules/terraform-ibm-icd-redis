@@ -127,6 +127,14 @@ variable "tags" {
   default     = []
 }
 
+variable "ibmcloud_kms_api_key" {
+  type        = string
+  description = "The IBM Cloud API key that can create a root key and key ring in the key management service (KMS) instance. If not specified, the 'ibmcloud_api_key' variable is used. Specify this key if the instance in `existing_kms_instance_crn` is in an account that's different from the Redis instance. Leave this input empty if the same account owns both instances."
+  sensitive   = true
+  default     = null
+}
+
+
 
 variable "kms_endpoint_type" {
   type        = string
@@ -140,12 +148,12 @@ variable "kms_endpoint_type" {
 
 variable "existing_kms_key_crn" {
   type        = string
-  description = "The CRN of a Hyper Protect Crypto Services or Key Protect root key to use for disk encryption. If not specified, a root key is created in the KMS instance."
+  description = "The CRN of a Hyper Protect Crypto Services or Key Protect root key to use for disk encryption. If not specified, a new key ring and root key are created in the KMS instance."
   default     = null
 }
 
 variable "existing_kms_instance_crn" {
-  description = "The CRN of a Hyper Protect Crypto Services or Key Protect instance in the same account as the Databases for Redis instance. This value is used to create an authorization policy if `skip_iam_authorization_policy` is false. If not specified, a root key is created."
+  description = "The CRN of the KMS instance (Hyper Protect Crypto Services or Key Protect). Required only if `existing_kms_key_crn` is not specified. If the KMS instance is in different account you must also provide a value for `ibmcloud_kms_api_key`."
   type        = string
   default     = null
 }
