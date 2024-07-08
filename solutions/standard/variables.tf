@@ -139,7 +139,7 @@ variable "ibmcloud_kms_api_key" {
 variable "kms_endpoint_type" {
   type        = string
   description = "The type of endpoint to use to communicate with the KMS instance. Possible values: `public`, `private`."
-  default     = "public"
+  default     = "private"
   validation {
     condition     = can(regex("public|private", var.kms_endpoint_type))
     error_message = "The kms_endpoint_type value must be 'public' or 'private'."
@@ -203,5 +203,3 @@ variable "auto_scaling" {
   description = "Optional rules to allow the database to increase resources in response to usage. Only a single autoscaling block is allowed. Make sure you understand the effects of autoscaling, especially for production environments. See https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-autoscaling in the IBM Cloud Docs."
   default     = null
 }
-
-

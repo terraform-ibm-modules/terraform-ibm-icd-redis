@@ -12,3 +12,14 @@ offerings:
         mark_ready: true
       - name: fscloud
         mark_ready: true
+  - name: deploy-arch-ibm-icd-redis
+    kind: solution
+    catalog_id: <TBA>
+    offering_id: <TBA>
+    variations:
+      - name: standard
+        mark_ready: true
+        install_type: fullstack
+        scc:
+          instance_id: 1c7d5f78-9262-44c3-b779-b28fe4d88c37
+          region: us-south

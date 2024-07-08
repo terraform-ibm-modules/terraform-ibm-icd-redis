@@ -36,9 +36,9 @@ data "ibm_iam_account_settings" "iam_account_settings" {
 }
 
 resource "ibm_iam_authorization_policy" "redis_kms_policy" {
-  count                       = local.create_cross_account_auth_policy
-  provider = ibm.kms
-  source_service_account      = data.ibm_iam_account_settings.iam_account_settings[0].account_id  
+  count                       = local.create_cross_account_auth_policy ? 1 : 0
+  provider                    = ibm.kms
+  source_service_account      = data.ibm_iam_account_settings.iam_account_settings[0].account_id
   source_service_name         = "databases-for-redis"
   source_resource_group_id    = module.resource_group[0].resource_group_id
   target_service_name         = local.kms_service_name
@@ -85,29 +85,27 @@ module "kms" {
   ]
 }
 
-module "redis"{
-  source = "../../modules/fscloud"
-  depends_on = [ time_sleep.wait_for_redis_authorization_policy ]
+module "redis" {
+  source            = "../../modules/fscloud"
+  depends_on        = [time_sleep.wait_for_redis_authorization_policy]
   resource_group_id = module.resource_group.resource_group_id
-  instance_name = var.prefix == null ? var.name: "${var.prefix}-${var.name}"
-  region = var.region
-  redis_version = var.redis_version
+  instance_name     = var.prefix == null ? var.name : "${var.prefix}-${var.name}"
+  region            = var.region
+  redis_version     = var.redis_version
 
   skip_iam_authorization_policy = var.skip_iam_authorization_policy
-  existing_kms_instance_guid = local.existing_kms_instance_guid
-  kms_key_crn = local.kms_key_crn
-  
-  tags = var.tags
+  existing_kms_instance_guid    = local.existing_kms_instance_guid
+  kms_key_crn                   = local.kms_key_crn
+
+  tags       = var.tags
   admin_pass = var.admin_pass
-  users = var.users
-  members = var.members
+  users      = var.users
+  members    = var.members
   # member_host_flavor            = var.member_host_flavor
-  memory_mb =  var.member_memory_mb
-  disk_mb = var.member_disk_mb
-  cpu_count = var.member_cpu_count
-  auto_scaling = var.auto_scaling
-  configuration = var.configuration
+  memory_mb                = var.member_memory_mb
+  disk_mb                  = var.member_disk_mb
+  cpu_count                = var.member_cpu_count
+  auto_scaling             = var.auto_scaling
+  configuration            = var.configuration
   service_credential_names = var.service_credential_names
-  }
-
-
+}

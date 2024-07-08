@@ -26,6 +26,8 @@ const yamlLocation = "../common-dev-assets/common-go-assets/common-permanent-res
 
 var permanentResources map[string]interface{}
 
+const standardSolutionTerraformDir = "solutions/standard"
+
 var sharedInfoSvc *cloudinfo.CloudInfoService
 
 // TestMain will be run before any parallel tests, used to read data from yaml for use with tests
@@ -106,6 +108,48 @@ func TestRunAdvancedExampleUpgrade(t *testing.T) {
 		},
 		CloudInfoService: sharedInfoSvc,
 	})
+
+	output, err := options.RunTestUpgrade()
+	if !options.UpgradeTestSkipped {
+		assert.Nil(t, err, "This should not have errored")
+		assert.NotNil(t, output, "Expected some output")
+	}
+}
+
+func setupOptionsStandardSolution(t *testing.T, prefix string) *testhelper.TestOptions {
+
+	options := testhelper.TestOptionsDefault(&testhelper.TestOptions{
+		Testing:       t,
+		TerraformDir:  standardSolutionTerraformDir,
+		Region:        "us-south",
+		Prefix:        prefix,
+		ResourceGroup: resourceGroup,
+	})
+
+	options.TerraformVars = map[string]interface{}{
+		"access_tags":               permanentResources["accessTags"],
+		"existing_kms_instance_crn": permanentResources["hpcs_south_crn"],
+		"kms_endpoint_type":         "public",
+		"resource_group_name":       options.Prefix,
+	}
+
+	return options
+}
+
+func TestRunStandardSolution(t *testing.T) {
+	t.Parallel()
+
+	options := setupOptionsStandardSolution(t, "redis-st-da")
+
+	output, err := options.RunTestConsistency()
+	assert.Nil(t, err, "This should not have errored")
+	assert.NotNil(t, output, "Expected some output")
+}
+
+func TestRunStandardUpgradeSolution(t *testing.T) {
+	t.Parallel()
+
+	options := setupOptionsStandardSolution(t, "redis-st-da-upg")
 
 	output, err := options.RunTestUpgrade()
 	if !options.UpgradeTestSkipped {
