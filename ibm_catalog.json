@@ -111,8 +111,238 @@
       ]
     },
     {
-
-
+      "name": "deploy-arch-ibm-icd-redis",
+      "label": "Databases for Redis",
+      "product_kind": "solution",
+      "tags": [
+        "ibm_created",
+        "target_terraform",
+        "terraform",
+        "data_management",
+        "solution"
+      ],
+      "keywords": [
+        "redis",
+        "IaC",
+        "infrastructure as code",
+        "terraform",
+        "solution",
+        "redis standard",
+        "cache",
+        "in memory "
+      ],
+      "short_description": "Creates and configures an instance of IBM Cloud Databases for Redis.",
+      "long_description": "This architecture supports creating and configuring an instance of Databases for Redis with KMS encryption.",
+      "offering_docs_url": "https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/README.md",
+      "offering_icon_url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-icd-redis/main/images/redis_icon.svg",
+      "provider_name": "IBM",
+      "features": [
+        {
+          "title": "Creates an instance of Databases for Redis",
+          "description": "Creates and configures an IBM Cloud Databases for Redis instance."
+        },
+        {
+          "title": "Supports KMS encryption",
+          "description": "Provides KMS encryption for the data that you store in the database."
+        },
+        {
+          "title": "Supports autoscaling",
+          "description": "Provides the autoscaling to allow the database to increase resources in response to usage."
+        }
+      ],
+      "flavors": [
+        {
+          "label": "Standard",
+          "name": "standard",
+          "install_type": "fullstack",
+          "working_directory": "solutions/standard",
+          "compliance": {
+            "authority": "scc-v3",
+            "profiles": [
+              {
+                "profile_name": "IBM Cloud Framework for Financial Services",
+                "profile_version": "1.6.0"
+              }
+            ]},
+          "iam_permissions": [
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ],
+              "service_name": "databases-for-redis"
+            }
+          ],
+          "architecture": {
+            "descriptions": "This architecture creates an instance of IBM CLoud Databases for Redis instance with KMS encryption. Supports autoscaling.",
+            "features": [
+              {
+                "title": " Creates an instance of Databases for Redis",
+                "description": "This architecture creates an instance of IBM Cloud Databases for Redis with KMS encryption. It accepts or creates a resource group, and provides autoscaling rules."
+              }
+            ],
+            "diagrams": [
+              {
+                "diagram": {
+                  "caption": "Databases for Redis instance on IBM Cloud",
+                  "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-icd-redis/main/reference-architecture/deployable-architecture-redis.svg",
+                  "type": "image/svg+xml"
+                },
+                "description": "This architecture supports creating and configuring an instance of Databases for Redis instance with KMS encryption."
+              }
+            ]
+          },
+          "configuration": [
+              {
+                "key": "ibmcloud_api_key"
+              },
+              {
+                "key": "use_existing_resource_group"
+              },
+              {
+                "key": "resource_group_name"
+              },
+              {
+                "key": "prefix"
+              },
+              {
+                "key": "name"
+              },
+              {
+                "key": "region",
+                "required": true,
+                "default_value": "",
+                "options": [
+                  {
+                    "displayname": "Chennai (che01)",
+                    "value": "che01"
+                  },
+                  {
+                    "displayname": "Dallas (us-south)",
+                    "value": "us-south"
+                  },
+                  {
+                    "displayname": "Frankfurt (eu-de)",
+                    "value": "eu-de"
+                  },
+                  {
+                    "displayname": "London (eu-gb)",
+                    "value": "eu-gb"
+                  },
+                  {
+                    "displayname": "Madrid (eu-es)",
+                    "value": "eu-es"
+                  },
+                  {
+                    "displayname": "Osaka (jp-osa)",
+                    "value": "jp-osa"
+                  },
+                  {
+                    "displayname": "Paris (par01)",
+                    "value": "par01"
+                  },
+                  {
+                    "displayname": "Sao Paulo (br-sao)",
+                    "value": "br-sao"
+                  },
+                  {
+                    "displayname": "Sydney (au-syd)",
+                    "value": "au-syd"
+                  },
+                  {
+                    "displayname": "Toronto (ca-tor)",
+                    "value": "ca-tor"
+                  },
+                  {
+                    "displayname": "Tokyo (jp-tok)",
+                    "value": "jp-tok"
+                  },
+                  {
+                    "displayname": "Washington (us-east)",
+                    "value": "us-east"
+                  }
+                ]
+              },
+              {
+                "key": "redis_version",
+                "required": true,
+                "options": [
+                  {
+                    "displayname": "6.2",
+                    "value": "6.2"
+                  },
+                  {
+                    "displayname": "7.2",
+                    "value": "7.2"
+                  }
+                ]
+              },
+              {
+                "key": "members"
+              },
+              {
+                "key": "member_memory_mb"
+              },
+              {
+                "key": "member_cpu_count"
+              },
+              {
+                "key": "member_disk_mb"
+              },
+              {
+                "key": "member_host_flavor"
+              },
+              {
+                "key": "configuration"
+              },
+              {
+                "key": "service_credential_names"
+              },
+              {
+                "key": "admin_pass"
+              },
+              {
+                "key": "users"
+              },
+              {
+                "key": "tags"
+              },
+              {
+                "key": "ibmcloud_kms_api_key"
+              },
+              {
+                "key": "existing_kms_instance_crn"
+              },
+              {
+                "key": "existing_kms_key_crn"
+              },
+              {
+                "key": "kms_endpoint_type",
+                "options": [
+                  {
+                    "displayname": "public",
+                    "value": "public"
+                  },
+                  {
+                    "displayname": "private",
+                    "value": "private"
+                  }
+                ]
+              },
+              {
+                "key": "skip_iam_authorization_policy"
+              },
+              {
+                "key": "redis_key_ring_name"
+              },
+              {
+                "key": "redis_key_name"
+              },
+              {
+                "key": "auto_scaling"
+              }
+            ]
+        }
+      ]
     }
   ]
 }
