@@ -2,7 +2,6 @@
 # Input Variables
 ##############################################################################
 
-
 variable "ibmcloud_api_key" {
   type        = string
   description = "The IBM Cloud API key to deploy resources."
@@ -71,15 +70,10 @@ variable "member_host_flavor" {
   type        = string
   description = "The host flavor per member. [Learn more](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/database#host_flavor)."
   default     = "multitenant"
-  # Prevent null or "", require multitenant or a machine type
-  validation {
-    condition     = (length(var.member_host_flavor) > 0)
-    error_message = "Member host flavor must be specified. [Learn more](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/database#host_flavor)."
-  }
 }
 
 variable "configuration" {
-  description = "Database Configuration."
+  description = "Database Configuration for Redis instance."
   type = object({
     maxmemory                   = optional(number)
     maxmemory-policy            = optional(string)
@@ -107,7 +101,6 @@ variable "admin_pass" {
   default     = null
   sensitive   = true
 }
-
 
 variable "users" {
   type = list(object({
@@ -146,7 +139,6 @@ variable "existing_kms_key_crn" {
   default     = null
 }
 
-
 variable "kms_endpoint_type" {
   type        = string
   description = "The type of endpoint to use to communicate with the KMS instance. Possible values: `public`, `private`."
@@ -156,11 +148,6 @@ variable "kms_endpoint_type" {
     error_message = "The kms_endpoint_type value must be 'public' or 'private'."
   }
 }
-
-
-
-
-
 
 variable "skip_iam_authorization_policy" {
   type        = bool
@@ -179,7 +166,6 @@ variable "redis_key_name" {
   default     = "redis-key"
   description = "The name for the key created for the Databases for Redis key. Applies only if not specifying an existing key. If a prefix input variable is specified, the prefix is added to the name in the `<prefix>-<name>` format."
 }
-
 
 variable "auto_scaling" {
   type = object({

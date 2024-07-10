@@ -28,7 +28,7 @@ module "resource_group" {
 }
 
 #######################################################################################################################
-# KMS root key for Elasticsearch
+# KMS root key for Redis
 #######################################################################################################################
 
 data "ibm_iam_account_settings" "iam_account_settings" {
@@ -52,8 +52,6 @@ resource "time_sleep" "wait_for_redis_authorization_policy" {
   depends_on      = [ibm_iam_authorization_policy.redis_kms_policy]
   create_duration = "30s"
 }
-
-
 
 module "kms" {
   providers = {
@@ -86,21 +84,19 @@ module "kms" {
 }
 
 module "redis" {
-  source            = "../../modules/fscloud"
-  depends_on        = [time_sleep.wait_for_redis_authorization_policy]
-  resource_group_id = module.resource_group.resource_group_id
-  instance_name     = var.prefix == null ? var.name : "${var.prefix}-${var.name}"
-  region            = var.region
-  redis_version     = var.redis_version
-
+  source                        = "../../modules/fscloud"
+  depends_on                    = [time_sleep.wait_for_redis_authorization_policy]
+  resource_group_id             = module.resource_group.resource_group_id
+  instance_name                 = var.prefix == null ? var.name : "${var.prefix}-${var.name}"
+  region                        = var.region
+  redis_version                 = var.redis_version
   skip_iam_authorization_policy = var.skip_iam_authorization_policy
   existing_kms_instance_guid    = local.existing_kms_instance_guid
   kms_key_crn                   = local.kms_key_crn
-
-  tags       = var.tags
-  admin_pass = var.admin_pass
-  users      = var.users
-  members    = var.members
+  tags                          = var.tags
+  admin_pass                    = var.admin_pass
+  users                         = var.users
+  members                       = var.members
   # member_host_flavor            = var.member_host_flavor
   memory_mb                = var.member_memory_mb
   disk_mb                  = var.member_disk_mb
