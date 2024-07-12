@@ -30,11 +30,11 @@ output "service_credentials_object" {
 }
 
 output "hostname" {
-  description = "Postgresql instance hostname"
+  description = "Redis instance hostname"
   value       = module.icd_redis.hostname
 }
 
 output "port" {
-  description = "Postgresql instance port"
+  description = "Redis instance port"
   value       = module.icd_redis.port
 }
