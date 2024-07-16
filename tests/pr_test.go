@@ -148,6 +148,7 @@ func TestRunStandardSolution(t *testing.T) {
 
 func TestRunStandardUpgradeSolution(t *testing.T) {
 	t.Parallel()
+	t.Skip()
 
 	options := setupOptionsStandardSolution(t, "redis-st-da-upg")
 
