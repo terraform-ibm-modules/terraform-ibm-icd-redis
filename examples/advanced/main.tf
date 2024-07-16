@@ -93,6 +93,7 @@ module "icd_redis" {
   kms_key_crn                = module.key_protect_all_inclusive.keys["icd.${var.prefix}-redis"].crn
   tags                       = var.resource_tags
   service_credential_names   = var.service_credential_names
+  member_host_flavor         = "multitenant"
   cbr_rules = [
     {
       description      = "sample rule"

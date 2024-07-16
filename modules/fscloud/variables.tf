@@ -40,7 +40,7 @@ variable "cpu_count" {
 variable "memory_mb" {
   description = "Allocated memory per member. For more information, see https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-resources-scaling"
   type        = number
-  default     = 1024
+  default     = 4096
 }
 
 variable "disk_mb" {
@@ -54,6 +54,12 @@ variable "members" {
   type        = number
   default     = 2
   # Validation is done in terraform plan phase by IBM provider, so no need to add any extra validation here
+}
+
+variable "member_host_flavor" {
+  type        = string
+  description = "Allocated host flavor per member. [Learn more](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/database#host_flavor)."
+  default     = null
 }
 
 variable "admin_pass" {
