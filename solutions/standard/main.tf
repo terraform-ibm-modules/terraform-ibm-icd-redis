@@ -97,11 +97,11 @@ module "redis" {
   admin_pass                    = var.admin_pass
   users                         = var.users
   members                       = var.members
-  # member_host_flavor            = var.member_host_flavor
-  memory_mb                = var.member_memory_mb
-  disk_mb                  = var.member_disk_mb
-  cpu_count                = var.member_cpu_count
-  auto_scaling             = var.auto_scaling
-  configuration            = var.configuration
-  service_credential_names = var.service_credential_names
+  member_host_flavor            = var.member_host_flavor
+  memory_mb                     = var.member_memory_mb
+  disk_mb                       = var.member_disk_mb
+  cpu_count                     = var.member_cpu_count
+  auto_scaling                  = var.auto_scaling
+  configuration                 = var.configuration
+  service_credential_names      = var.service_credential_names
 }

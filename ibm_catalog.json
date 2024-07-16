@@ -130,7 +130,7 @@
         "solution",
         "redis standard",
         "cache",
-        "in memory "
+        "in memory"
       ],
       "short_description": "Creates and configures an instance of IBM Cloud Databases for Redis.",
       "long_description": "This architecture supports creating and configuring an instance of Databases for Redis with KMS encryption.",
