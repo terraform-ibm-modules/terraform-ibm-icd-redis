@@ -94,9 +94,9 @@ func TestRunAdvancedExampleUpgrade(t *testing.T) {
 		TerraformDir:  "examples/advanced",
 		Prefix:        "redis-advanced-upg",
 		ResourceGroup: resourceGroup,
-		// Using the HPCS Key for Backup encryption is only supported in eu-es
+		// Using the HPCS Key for Backup encryption is not supported in all region
 		// https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-hpcs#use-hpcs-backups
-		Region: "eu-es",
+		Region: "us-south",
 		TerraformVars: map[string]interface{}{
 			"redis_version": "6.2",
 			"users": []map[string]interface{}{
