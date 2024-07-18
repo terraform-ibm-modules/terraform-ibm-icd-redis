@@ -19,7 +19,7 @@ import (
 const resourceGroup = "geretain-test-redis"
 
 // Restricting due to limited availability of BYOK in certain regions
-// const regionSelectionPath = "../common-dev-assets/common-go-assets/icd-region-prefs.yaml"
+const regionSelectionPath = "../common-dev-assets/common-go-assets/icd-region-prefs.yaml"
 
 // Define a struct with fields that match the structure of the YAML data
 const yamlLocation = "../common-dev-assets/common-go-assets/common-permanent-resources.yaml"
@@ -90,13 +90,11 @@ func TestRunAdvancedExampleUpgrade(t *testing.T) {
 	randomPass := "A1" + base64.URLEncoding.EncodeToString(randomBytes)[:13]
 
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
-		Testing:       t,
-		TerraformDir:  "examples/advanced",
-		Prefix:        "redis-advanced-upg",
-		ResourceGroup: resourceGroup,
-		// Using the HPCS Key for Backup encryption is not supported in all region
-		// https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-hpcs#use-hpcs-backups
-		Region: "us-south",
+		Testing:            t,
+		TerraformDir:       "examples/advanced",
+		Prefix:             "redis-advanced-upg",
+		ResourceGroup:      resourceGroup,
+		BestRegionYAMLPath: regionSelectionPath,
 		TerraformVars: map[string]interface{}{
 			"redis_version": "6.2",
 			"users": []map[string]interface{}{
@@ -129,6 +127,7 @@ func setupOptionsStandardSolution(t *testing.T, prefix string) *testhelper.TestO
 	})
 
 	options.TerraformVars = map[string]interface{}{
+		"access_tags":               permanentResources["accessTags"],
 		"existing_kms_instance_crn": permanentResources["hpcs_south_crn"],
 		"kms_endpoint_type":         "public",
 		"resource_group_name":       options.Prefix,

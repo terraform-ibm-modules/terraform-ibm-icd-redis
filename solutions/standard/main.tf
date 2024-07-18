@@ -87,7 +87,7 @@ module "redis" {
   source                        = "../../modules/fscloud"
   depends_on                    = [time_sleep.wait_for_redis_authorization_policy]
   resource_group_id             = module.resource_group.resource_group_id
-  instance_name                 = var.prefix == null ? var.name : "${var.prefix}-${var.name}"
+  instance_name                 = var.prefix != null ? "${var.prefix}-${var.name}" : var.name
   region                        = var.region
   redis_version                 = var.redis_version
   skip_iam_authorization_policy = var.skip_iam_authorization_policy
