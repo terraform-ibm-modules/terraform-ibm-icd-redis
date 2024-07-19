@@ -18,9 +18,6 @@ import (
 // Use existing resource group
 const resourceGroup = "geretain-test-redis"
 
-// Restricting due to limited availability of BYOK in certain regions
-const regionSelectionPath = "../common-dev-assets/common-go-assets/icd-region-prefs.yaml"
-
 // Define a struct with fields that match the structure of the YAML data
 const yamlLocation = "../common-dev-assets/common-go-assets/common-permanent-resources.yaml"
 
@@ -90,11 +87,11 @@ func TestRunAdvancedExampleUpgrade(t *testing.T) {
 	randomPass := "A1" + base64.URLEncoding.EncodeToString(randomBytes)[:13]
 
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
-		Testing:            t,
-		TerraformDir:       "examples/advanced",
-		Prefix:             "redis-advanced-upg",
-		ResourceGroup:      resourceGroup,
-		BestRegionYAMLPath: regionSelectionPath,
+		Testing:       t,
+		TerraformDir:  "examples/advanced",
+		Prefix:        "redis-advanced-upg",
+		ResourceGroup: resourceGroup,
+		Region:        "eu-de",
 		TerraformVars: map[string]interface{}{
 			"redis_version": "6.2",
 			"users": []map[string]interface{}{
