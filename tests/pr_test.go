@@ -124,6 +124,7 @@ func setupOptionsStandardSolution(t *testing.T, prefix string) *testhelper.TestO
 	})
 
 	options.TerraformVars = map[string]interface{}{
+		"redis_version":             "7.2", // Always lock this test into the latest supported Redis version
 		"existing_kms_instance_crn": permanentResources["hpcs_south_crn"],
 		"kms_endpoint_type":         "public",
 		"resource_group_name":       options.Prefix,

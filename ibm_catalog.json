@@ -336,10 +336,10 @@
                 "key": "skip_iam_authorization_policy"
               },
               {
-                "key": "redis_key_ring_name"
+                "key": "key_ring_name"
               },
               {
-                "key": "redis_key_name"
+                "key": "key_name"
               },
               {
                 "key": "auto_scaling"

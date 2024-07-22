@@ -73,7 +73,7 @@ variable "member_host_flavor" {
 }
 
 variable "configuration" {
-  description = "Database Configuration for Redis instance."
+  description = "Database Configuration for Redis instance. [Learn more](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-changing-configuration)."
   type = object({
     maxmemory                   = optional(number)
     maxmemory-policy            = optional(string)
@@ -106,7 +106,7 @@ variable "users" {
   }))
   default     = []
   sensitive   = true
-  description = "A list of users that you want to create on the database. Users block is supported by Redis version >= 6.0. Multiple blocks are allowed. The user password must be in the range of 10-32 characters. Be warned that in most case using IAM service credentials (via the var.service_credential_names) is sufficient to control access to the Redis instance. This blocks creates native redis database users, more info on that can be found here https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-user-management&interface=ui"
+  description = "A list of users that you want to create on the database. Users block is supported by Redis version >= 6.0. Multiple blocks are allowed. The user password must be in the range of 10-32 characters. Be warned that in most case using IAM service credentials (via the var.service_credential_names) is sufficient to control access to the Redis instance. This blocks creates native redis database users. [Learn more](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-user-management&interface=ui)"
 }
 
 variable "tags" {
@@ -150,13 +150,13 @@ variable "skip_iam_authorization_policy" {
   default     = false
 }
 
-variable "redis_key_ring_name" {
+variable "key_ring_name" {
   type        = string
   default     = "redis-key-ring"
   description = "The name for the key ring created for the Databases for Redis key. Applies only if not specifying an existing key. If a prefix input variable is specified, the prefix is added to the name in the `<prefix>-<name>` format."
 }
 
-variable "redis_key_name" {
+variable "key_name" {
   type        = string
   default     = "redis-key"
   description = "The name for the key created for the Databases for Redis key. Applies only if not specifying an existing key. If a prefix input variable is specified, the prefix is added to the name in the `<prefix>-<name>` format."
@@ -185,6 +185,6 @@ variable "auto_scaling" {
       rate_units               = optional(string, "mb")
     })
   })
-  description = "Optional rules to allow the database to increase resources in response to usage. Only a single autoscaling block is allowed. Make sure you understand the effects of autoscaling, especially for production environments. See https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-autoscaling in the IBM Cloud Docs."
+  description = "Optional rules to allow the database to increase resources in response to usage. Only a single autoscaling block is allowed. Make sure you understand the effects of autoscaling, especially for production environments. [Learn more](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-autoscaling)"
   default     = null
 }

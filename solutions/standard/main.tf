@@ -4,10 +4,10 @@ locals {
   existing_kms_instance_guid      = var.existing_kms_instance_crn != null ? element(local.existing_kms_instance_crn_split, length(local.existing_kms_instance_crn_split) - 3) : null
   existing_kms_instance_region    = var.existing_kms_instance_crn != null ? element(local.existing_kms_instance_crn_split, length(local.existing_kms_instance_crn_split) - 5) : null
 
-  redis_key_name      = var.prefix != null ? "${var.prefix}-${var.redis_key_name}" : var.redis_key_name
-  redis_key_ring_name = var.prefix != null ? "${var.prefix}-${var.redis_key_ring_name}" : var.redis_key_ring_name
+  key_name      = var.prefix != null ? "${var.prefix}-${var.key_name}" : var.key_name
+  key_ring_name = var.prefix != null ? "${var.prefix}-${var.key_ring_name}" : var.key_ring_name
 
-  kms_key_crn = var.existing_kms_key_crn != null ? var.existing_kms_key_crn : module.kms[0].keys[format("%s.%s", local.redis_key_ring_name, local.redis_key_name)].crn
+  kms_key_crn = var.existing_kms_key_crn != null ? var.existing_kms_key_crn : module.kms[0].keys[format("%s.%s", local.key_ring_name, local.key_name)].crn
 
   create_cross_account_auth_policy = !var.skip_iam_authorization_policy && var.ibmcloud_kms_api_key != null
 
@@ -35,7 +35,7 @@ data "ibm_iam_account_settings" "iam_account_settings" {
   count = local.create_cross_account_auth_policy ? 1 : 0
 }
 
-resource "ibm_iam_authorization_policy" "redis_kms_policy" {
+resource "ibm_iam_authorization_policy" "kms_policy" {
   count                       = local.create_cross_account_auth_policy ? 1 : 0
   provider                    = ibm.kms
   source_service_account      = data.ibm_iam_account_settings.iam_account_settings[0].account_id
@@ -48,8 +48,8 @@ resource "ibm_iam_authorization_policy" "redis_kms_policy" {
 }
 
 # workaround for https://github.com/IBM-Cloud/terraform-provider-ibm/issues/4478
-resource "time_sleep" "wait_for_redis_authorization_policy" {
-  depends_on      = [ibm_iam_authorization_policy.redis_kms_policy]
+resource "time_sleep" "wait_for_authorization_policy" {
+  depends_on      = [ibm_iam_authorization_policy.kms_policy]
   create_duration = "30s"
 }
 
@@ -67,12 +67,12 @@ module "kms" {
   key_endpoint_type           = var.kms_endpoint_type
   keys = [
     {
-      key_ring_name         = local.redis_key_ring_name
+      key_ring_name         = local.key_ring_name
       existing_key_ring     = false
       force_delete_key_ring = true
       keys = [
         {
-          key_name                 = local.redis_key_name
+          key_name                 = local.key_name
           standard_key             = false
           rotation_interval_month  = 3
           dual_auth_delete_enabled = false
@@ -85,7 +85,7 @@ module "kms" {
 
 module "redis" {
   source                        = "../../modules/fscloud"
-  depends_on                    = [time_sleep.wait_for_redis_authorization_policy]
+  depends_on                    = [time_sleep.wait_for_authorization_policy]
   resource_group_id             = module.resource_group.resource_group_id
   instance_name                 = var.prefix != null ? "${var.prefix}-${var.name}" : var.name
   region                        = var.region
