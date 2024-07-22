@@ -1,6 +1,6 @@
 # Configuring complex inputs in Databases for Elasticsearch
 
-Several optional input variables in the IBM Cloud [Databases for Redis deployable architecture](https://cloud.ibm.com/catalog#deployable_architecture) use complex object types. You specify these inputs when you configure you deployable architecture.
+Several optional input variables in the IBM Cloud [Databases for Redis deployable architecture](https://cloud.ibm.com/catalog#deployable_architecture) use complex object types. You specify these inputs when you configure deployable architecture.
 
 - [Service credentials](#svc-credential-name) (`service_credential_names`)
 - [Users](#users) (`users`)
