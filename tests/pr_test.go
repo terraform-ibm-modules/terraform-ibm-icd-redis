@@ -105,7 +105,6 @@ func TestRunStandardSolution(t *testing.T) {
 
 func TestRunStandardUpgradeSolution(t *testing.T) {
 	t.Parallel()
-	t.Skip()
 
 	options := testhelper.TestOptionsDefault(&testhelper.TestOptions{
 		Testing:       t,
