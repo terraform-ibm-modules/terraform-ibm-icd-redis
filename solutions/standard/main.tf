@@ -4,13 +4,10 @@ locals {
   existing_kms_instance_guid      = var.existing_kms_instance_crn != null ? element(local.existing_kms_instance_crn_split, length(local.existing_kms_instance_crn_split) - 3) : null
   existing_kms_instance_region    = var.existing_kms_instance_crn != null ? element(local.existing_kms_instance_crn_split, length(local.existing_kms_instance_crn_split) - 5) : null
 
-  key_name      = var.prefix != null ? "${var.prefix}-${var.key_name}" : var.key_name
-  key_ring_name = var.prefix != null ? "${var.prefix}-${var.key_ring_name}" : var.key_ring_name
-
-  kms_key_crn = var.existing_kms_key_crn != null ? var.existing_kms_key_crn : module.kms[0].keys[format("%s.%s", local.key_ring_name, local.key_name)].crn
-
+  key_name                         = var.prefix != null ? "${var.prefix}-${var.key_name}" : var.key_name
+  key_ring_name                    = var.prefix != null ? "${var.prefix}-${var.key_ring_name}" : var.key_ring_name
+  kms_key_crn                      = var.existing_kms_key_crn != null ? var.existing_kms_key_crn : module.kms[0].keys[format("%s.%s", local.key_ring_name, local.key_name)].crn
   create_cross_account_auth_policy = !var.skip_iam_authorization_policy && var.ibmcloud_kms_api_key != null
-
   kms_service_name = local.kms_key_crn != null ? (
     can(regex(".*kms.*", local.kms_key_crn)) ? "kms" : can(regex(".*hs-crypto.*", local.kms_key_crn)) ? "hs-crypto" : null
   ) : null
