@@ -87,7 +87,7 @@ module "redis" {
   instance_name                 = var.prefix != null ? "${var.prefix}-${var.name}" : var.name
   region                        = var.region
   redis_version                 = var.redis_version
-  skip_iam_authorization_policy = var.skip_iam_authorization_policy
+  skip_iam_authorization_policy = var.skip_iam_authorization_policy || local.create_cross_account_auth_policy
   existing_kms_instance_guid    = local.existing_kms_instance_guid
   kms_key_crn                   = local.kms_key_crn
   tags                          = var.tags

@@ -1,4 +1,4 @@
-# Configuring complex inputs in Databases for Elasticsearch
+# Configuring complex inputs in Databases for Redis
 
 Several optional input variables in the IBM Cloud [Databases for Redis deployable architecture](https://cloud.ibm.com/catalog#deployable_architecture) use complex object types. You specify these inputs when you configure deployable architecture.
 
@@ -139,18 +139,18 @@ The Configuration variable tunes the Redis database to suit different use case. 
 - Variable name: `configuration`
 - Type: An object with `maxmemory`, `maxmemory-policy`, `appendonly`, `maxmemory-samples` and `stop-writes-on-bgsave-error` attributes
 
-### Options for auto_scaling
+### Options for configuration
 
 The configuration object in the input contains the following options. All options are optional.
 
-- `maxmemory`: Determines the amount of data that you can store in Redis (default: `80`).
+- `maxmemory`: Determines the amount of data that you can store in Redis as a percentage of the deployments memory. (default: `80`).
 - `maxmemory-policy`: Determines eviction behavior when `maxmemory` limit is reached [Learn more](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-redis-cache&interface=cli#redis-cache-maxmemory-policy) (default: `noeviction`).
 - `appendonly`: Enables Redis persistence when set to `yes`, If you are caching data, you want to set this value to `no`. (default: `yes`).
 - `maxmemory-samples`: Tunes LRU eviction algorithm when Redis is configured as a cache [Learn more](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-redis-cache&interface=cli#redis-cache-other-settings) (default: `5`).
 - `stop-writes-on-bgsave-error`: Redis stops accepting writes if it detects an unsuccessful backup snapshot. For caching, you can set to `no`. (default: `yes`).
 
 
-### Example autoscaling
+### Example configuration
 
 The following example shows values for the `configuration` input.
 
