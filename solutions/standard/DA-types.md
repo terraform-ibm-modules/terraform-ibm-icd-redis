@@ -138,6 +138,16 @@ The Configuration variable tunes the Redis database to suit different use case. 
 
 - Variable name: `configuration`
 - Type: An object with `maxmemory`, `maxmemory-policy`, `appendonly`, `maxmemory-samples` and `stop-writes-on-bgsave-error` attributes
+- Default value: An object with following configuration:
+```
+{
+  maxmemory : 80,
+  maxmemory-policy : "noeviction",
+  appendonly : "yes",
+  maxmemory-samples : 5,
+  stop-writes-on-bgsave-error : "yes"
+}
+```
 
 ### Options for configuration
 

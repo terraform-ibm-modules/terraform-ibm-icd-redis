@@ -14,8 +14,8 @@ offerings:
         mark_ready: true
   - name: deploy-arch-ibm-icd-redis
     kind: solution
-    catalog_id: <TBA>
-    offering_id: <TBA>
+    catalog_id: 7df1e4ca-d54c-4fd0-82ce-3d13247308cd
+    offering_id: b82c82f3-faa4-422c-9d0a-39f29e0b97b8
     variations:
       - name: standard
         mark_ready: true

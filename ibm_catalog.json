@@ -168,9 +168,22 @@
           "iam_permissions": [
             {
               "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Administrator"
+              ],
+              "service_name": "iam-identity"
+            },
+            {
+              "role_crns": [
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
               "service_name": "databases-for-redis"
+            },
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::serviceRole:Manager",
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ],
+              "service_name": "kms"
             }
           ],
           "architecture": {
@@ -211,7 +224,7 @@
               {
                 "key": "region",
                 "required": true,
-                "default_value": "",
+                "default_value": "us-south",
                 "options": [
                   {
                     "displayname": "Chennai (che01)",
@@ -274,9 +287,6 @@
                   {
                     "displayname": "7.2",
                     "value": "7.2"
-                  },{
-                    "displayname": "__NULL__",
-                    "value": "__NULL__"
                   }
                 ]
               },
