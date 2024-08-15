@@ -42,6 +42,10 @@ variable "redis_version" {
   default     = null
 }
 
+##############################################################################
+# ICD hosting model properties
+##############################################################################
+
 variable "members" {
   type        = number
   description = "The number of members that are allocated. [Learn more](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-resources-scaling)."
@@ -121,6 +125,12 @@ variable "tags" {
   default     = []
 }
 
+variable "access_tags" {
+  type        = list(string)
+  description = "A list of access tags to apply to the Databases for Redis instance created by the solution. [Learn more](https://cloud.ibm.com/docs/account?topic=account-access-tags-tutorial)."
+  default     = []
+}
+
 variable "ibmcloud_kms_api_key" {
   type        = string
   description = "The IBM Cloud API key that can create a root key and key ring in the key management service (KMS) instance. If not specified, the 'ibmcloud_api_key' variable is used. Specify this key if the instance in `existing_kms_instance_crn` is in an account that's different from the Redis instance. Leave this input empty if the same account owns both instances."
@@ -167,6 +177,10 @@ variable "key_name" {
   default     = "redis-key"
   description = "The name for the key created for the Databases for Redis key. Applies only if not specifying an existing key. If a prefix input variable is specified, the prefix is added to the name in the `<prefix>-<name>` format."
 }
+
+##############################################################
+# Auto Scaling
+##############################################################
 
 variable "auto_scaling" {
   type = object({

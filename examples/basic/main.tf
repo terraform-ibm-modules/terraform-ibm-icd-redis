@@ -19,6 +19,7 @@ module "redis" {
   resource_group_id = module.resource_group.resource_group_id
   instance_name     = "${var.prefix}-redis"
   region            = var.region
+  access_tags       = var.access_tags
   tags              = var.resource_tags
   redis_version     = var.redis_version
 }

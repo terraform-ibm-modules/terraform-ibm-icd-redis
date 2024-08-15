@@ -90,6 +90,7 @@ module "redis" {
   skip_iam_authorization_policy = var.skip_iam_authorization_policy || local.create_cross_account_auth_policy
   existing_kms_instance_guid    = local.existing_kms_instance_guid
   kms_key_crn                   = local.kms_key_crn
+  access_tags                   = var.access_tags
   tags                          = var.tags
   admin_pass                    = var.admin_pass
   users                         = var.users
