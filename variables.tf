@@ -121,7 +121,7 @@ variable "tags" {
 
 variable "access_tags" {
   type        = list(string)
-  description = "A list of access tags to apply to the PostgreSQL instance created by the module, see https://cloud.ibm.com/docs/account?topic=account-access-tags-tutorial for more details"
+  description = "A list of access tags to apply to the Redis instance created by the module, see https://cloud.ibm.com/docs/account?topic=account-access-tags-tutorial for more details"
   default     = []
 
   validation {
