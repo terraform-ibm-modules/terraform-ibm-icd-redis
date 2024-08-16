@@ -59,6 +59,7 @@ module "redis" {
   instance_name              = "${var.prefix}-redis"
   region                     = var.region
   redis_version              = var.redis_version
+  access_tags                = var.access_tags
   tags                       = var.resource_tags
   kms_key_crn                = var.kms_key_crn
   existing_kms_instance_guid = var.existing_kms_instance_guid

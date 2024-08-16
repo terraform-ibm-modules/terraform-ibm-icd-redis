@@ -20,6 +20,7 @@ module "redis" {
   kms_key_crn                   = var.kms_key_crn
   backup_encryption_key_crn     = var.backup_encryption_key_crn
   auto_scaling                  = var.auto_scaling
+  access_tags                   = var.access_tags
   tags                          = var.tags
   service_credential_names      = var.service_credential_names
   backup_crn                    = var.backup_crn

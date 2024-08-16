@@ -91,6 +91,7 @@ module "icd_redis" {
   users                      = var.users
   existing_kms_instance_guid = module.key_protect_all_inclusive.kms_guid
   kms_key_crn                = module.key_protect_all_inclusive.keys["icd.${var.prefix}-redis"].crn
+  access_tags                = var.access_tags
   tags                       = var.resource_tags
   service_credential_names   = var.service_credential_names
   member_host_flavor         = "multitenant"

@@ -83,6 +83,12 @@ variable "service_credential_names" {
   default     = {}
 }
 
+variable "access_tags" {
+  type        = list(string)
+  description = "A list of access tags to apply to the Redis instance created by the module, see https://cloud.ibm.com/docs/account?topic=account-access-tags-tutorial for more details"
+  default     = []
+}
+
 variable "tags" {
   type        = list(string)
   description = "Optional list of tags to be added to the Redis instance."
