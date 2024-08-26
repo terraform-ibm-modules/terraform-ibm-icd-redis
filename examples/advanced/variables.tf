@@ -66,6 +66,6 @@ variable "service_credential_names" {
     "redis_admin" : "Administrator",
     "redis_operator" : "Operator",
     "redis_viewer" : "Viewer",
-    "redis_viewer" : "Editor",
+    "redis_editor" : "Editor",
   }
 }
