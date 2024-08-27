@@ -4,6 +4,7 @@ package test
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -91,12 +92,29 @@ func TestRunStandardSolution(t *testing.T) {
 		ResourceGroup: resourceGroup,
 	})
 
+	serviceCredentialSecrets := []map[string]interface{}{
+		{
+			"secret_group_name": fmt.Sprintf("%s-secret-group", options.Prefix),
+			"service_credentials": []map[string]string{
+				{
+					"secret_name": fmt.Sprintf("%s-cred-reader", options.Prefix),
+					"service_credentials_source_service_role": "Reader",
+				},
+				{
+					"secret_name": fmt.Sprintf("%s-cred-writer", options.Prefix),
+					"service_credentials_source_service_role": "Writer",
+				},
+			},
+		},
+	}
+
 	options.TerraformVars = map[string]interface{}{
-		"access_tags":               permanentResources["accessTags"],
-		"redis_version":             "7.2", // Always lock this test into the latest supported Redis version
-		"existing_kms_instance_crn": permanentResources["hpcs_south_crn"],
-		"kms_endpoint_type":         "public",
-		"resource_group_name":       options.Prefix,
+		"access_tags":                permanentResources["accessTags"],
+		"redis_version":              "7.2", // Always lock this test into the latest supported Redis version
+		"existing_kms_instance_crn":  permanentResources["hpcs_south_crn"],
+		"kms_endpoint_type":          "public",
+		"resource_group_name":        options.Prefix,
+		"service_credential_secrets": serviceCredentialSecrets,
 	}
 
 	output, err := options.RunTestConsistency()
