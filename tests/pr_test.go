@@ -109,12 +109,13 @@ func TestRunStandardSolution(t *testing.T) {
 	}
 
 	options.TerraformVars = map[string]interface{}{
-		"access_tags":                permanentResources["accessTags"],
-		"redis_version":              "7.2", // Always lock this test into the latest supported Redis version
-		"existing_kms_instance_crn":  permanentResources["hpcs_south_crn"],
-		"kms_endpoint_type":          "public",
-		"resource_group_name":        options.Prefix,
-		"service_credential_secrets": serviceCredentialSecrets,
+		"access_tags":                           permanentResources["accessTags"],
+		"redis_version":                         "7.2", // Always lock this test into the latest supported Redis version
+		"existing_kms_instance_crn":             permanentResources["hpcs_south_crn"],
+		"existing_secrets_manager_instance_crn": permanentResources["secretsManagerCRN"],
+		"kms_endpoint_type":                     "public",
+		"resource_group_name":                   options.Prefix,
+		"service_credential_secrets":            serviceCredentialSecrets,
 	}
 
 	output, err := options.RunTestConsistency()
