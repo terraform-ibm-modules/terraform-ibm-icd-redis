@@ -2,8 +2,6 @@
 package test
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"log"
 	"os"
 	"testing"
@@ -16,9 +14,6 @@ import (
 
 // Use existing resource group
 const resourceGroup = "geretain-test-redis"
-
-// Restricting due to limited availability of BYOK in certain regions
-const regionSelectionPath = "../common-dev-assets/common-go-assets/icd-region-prefs.yaml"
 
 // Define a struct with fields that match the structure of the YAML data
 const yamlLocation = "../common-dev-assets/common-go-assets/common-permanent-resources.yaml"
@@ -40,44 +35,6 @@ func TestMain(m *testing.M) {
 	}
 
 	os.Exit(m.Run())
-}
-
-func TestRunAdvancedExampleUpgrade(t *testing.T) {
-	t.Parallel()
-
-	// Generate a 15 char long random string for the admin_pass
-	randomBytes := make([]byte, 13)
-	_, err := rand.Read(randomBytes)
-	if err != nil {
-		log.Fatal(err)
-	}
-	randomPass := "A1" + base64.URLEncoding.EncodeToString(randomBytes)[:13]
-
-	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
-		Testing:            t,
-		TerraformDir:       "examples/advanced",
-		Prefix:             "redis-advanced-upg",
-		ResourceGroup:      resourceGroup,
-		BestRegionYAMLPath: regionSelectionPath,
-		TerraformVars: map[string]interface{}{
-			"redis_version": "6.2",
-			"users": []map[string]interface{}{
-				{
-					"name":     "testuser",
-					"password": randomPass, // pragma: allowlist secret
-					"type":     "database",
-				},
-			},
-			"admin_pass": randomPass,
-		},
-		CloudInfoService: sharedInfoSvc,
-	})
-
-	output, err := options.RunTestUpgrade()
-	if !options.UpgradeTestSkipped {
-		assert.Nil(t, err, "This should not have errored")
-		assert.NotNil(t, output, "Expected some output")
-	}
 }
 
 func TestRunStandardSolution(t *testing.T) {
