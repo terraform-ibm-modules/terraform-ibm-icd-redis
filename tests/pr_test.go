@@ -125,21 +125,21 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 		WaitJobCompleteMinutes: 60,
 	})
 
-	//serviceCredentialSecrets := []map[string]interface{}{
-	//	{
-	//		"secret_group_name": fmt.Sprintf("%s-secret-group", prefix),
-	//		"service_credentials": []map[string]string{
-	//			{
-	//				"secret_name": fmt.Sprintf("%s-cred-reader", prefix),
-	//				"service_credentials_source_service_role": "Reader",
-	//			},
-	//			{
-	//				"secret_name": fmt.Sprintf("%s-cred-writer", prefix),
-	//				"service_credentials_source_service_role": "Writer",
-	//			},
-	//		},
-	//	},
-	//}
+	serviceCredentialSecrets := []map[string]interface{}{
+		{
+			"secret_group_name": fmt.Sprintf("%s-secret-group", prefix),
+			"service_credentials": []map[string]string{
+				{
+					"secret_name": fmt.Sprintf("%s-cred-reader", prefix),
+					"service_credentials_source_service_role": "Reader",
+				},
+				{
+					"secret_name": fmt.Sprintf("%s-cred-writer", prefix),
+					"service_credentials_source_service_role": "Writer",
+				},
+			},
+		},
+	}
 
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
@@ -148,9 +148,9 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 		{Name: "kms_endpoint_type", Value: "private", DataType: "string"},
 		{Name: "redis_version", Value: "7.2", DataType: "string"}, // Always lock this test into the latest supported Redis version
 		{Name: "resource_group_name", Value: options.Prefix, DataType: "string"},
-		//{Name: "service_credential_names", Value: "{\"admin_test\": \"Administrator\", \"editor_test\": \"Editor\"}", DataType: "map(string)"},
-		//{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
-		//{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
+		{Name: "service_credential_names", Value: "{\"admin_test\": \"Administrator\", \"editor_test\": \"Editor\"}", DataType: "map(string)"},
+		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
+		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
 	}
 	err := options.RunSchematicTest()
 	assert.Nil(t, err, "This should not have errored")
