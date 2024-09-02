@@ -253,7 +253,7 @@ variable "service_credential_secrets" {
     }))
   }))
   default     = []
-  description = "Service credential secrets configuration for Databases for Redis. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/solutions/instance/DA-types.md#service-credential-secrets)."
+  description = "Service credential secrets configuration for Databases for Redis. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/solutions/standard/DA-types.md#service-credential-secrets)."
 
   validation {
     condition = alltrue([
