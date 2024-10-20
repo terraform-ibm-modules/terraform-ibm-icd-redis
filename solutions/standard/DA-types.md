@@ -10,7 +10,7 @@ Several optional input variables in the IBM Cloud [Databases for Redis deployabl
 
 ## Service credentials <a name="svc-credential-name"></a>
 
-You can specify a set of IAM credentials to connect to the database with the `service_credential_names` input variable. Include a credential name and IAM service role for each key-value pair. Each role provides a specific level of access to the database. For more information, see [Adding and viewing credentials](https://cloud.ibm.com/docs/account?topic=account-service_credentials&interface=ui).
+You can specify a set of IAM credentials to connect to the database with the `service_credential_names` input variable. Include a credential name and IAM service role for each key-value pair. Each role provides a specific level of access to the database. For more information, see [Adding and viewing credentials](https://cloud.ibm.com/docs/account?topic=account-service_credentials&interface=ui). If you want to add service credentials to secret manager and to allow secret manager to manage it, you should use `service_credential_secrets` , see [Service credential secrets](#service-credential-secrets)
 
 - Variable name: `service_credential_names`.
 - Type: A map. The key is the name of the service credential. The value is the role that is assigned to that credential.
@@ -19,7 +19,7 @@ You can specify a set of IAM credentials to connect to the database with the `se
 ### Options for service_credential_names
 
 - Key (required): The name of the service credential.
-- Value (required): The IAM service role that is assigned to the credential. For more information, see [IBM Cloud IAM roles](https://cloud.ibm.com/docs/account?topic=account-userroles).
+- Value (required): The IAM service role that is assigned to the credential. The following values are valid for service credential roles: "Writer", "Reader", "Manager" and "None". For more information, see [IBM Cloud IAM roles](https://cloud.ibm.com/docs/account?topic=account-userroles).
 
 ### Example service credential
 
@@ -34,11 +34,11 @@ You can specify a set of IAM credentials to connect to the database with the `se
 
 ## Service credential secrets <a name="service-credential-secrets"></a>
 
-When you add an IBM Database for Redis service from the IBM Cloud catalog to an IBM Cloud Projects service, you can configure service credentials. In the edit mode for the projects configuration, select the Configure panel and then click the optional tab.
-
-In the configuration, specify the secret group name, whether it already exists or will be created and include all the necessary service credential secrets that need to be created within that secret group.
+When you add an IBM Database for Redis deployable architecture from the IBM Cloud catalog to IBM Cloud Project , you can configure service credentials. In edit mode for the projects configuration, from the configure panel click the optional tab.
 
 To enter a custom value, use the edit action to open the "Edit Array" panel. Add the service credential secrets configurations to the array here.
+
+In the configuration, specify the secret group name, whether it already exists or will be created and include all the necessary service credential secrets that need to be created within that secret group.
 
  [Learn more](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/data-sources/sm_service_credentials_secret) about service credential secrets.
 
@@ -53,7 +53,7 @@ To enter a custom value, use the edit action to open the "Edit Array" panel. Add
 - `existing_secret_group`: (optional, default = `false`): Set to true, if secret group name provided in the variable `secret_group_name` already exists.
 - `service_credentials`: (optional, default = `[]`): A list of object that represents a service credential secret.
 
-### Options for service_credentials
+#### Options for service_credentials
 
 - `secret_name`: (required): A unique human-readable name of the secret to create.
 - `service_credentials_source_service_role`: (required): The role to give the service credential in the Databases for Redis service. Acceptable values are `Writer`, `Reader`, `Manager`, and `None`

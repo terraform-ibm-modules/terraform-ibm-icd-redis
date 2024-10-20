@@ -107,13 +107,12 @@ module "redis" {
 # create a service authorization between Secrets Manager and the target service (Databases for Redis)
 resource "ibm_iam_authorization_policy" "secrets_manager_key_manager" {
   count                       = var.skip_rd_sm_auth_policy || var.existing_secrets_manager_instance_crn == null ? 0 : 1
-  depends_on                  = [module.redis]
   source_service_name         = "secrets-manager"
   source_resource_instance_id = local.existing_secrets_manager_instance_guid
   target_service_name         = "databases-for-redis"
   target_resource_instance_id = module.redis.guid
   roles                       = ["Key Manager"]
-  description                 = "Allow Secrets Manager with instance id ${local.existing_secrets_manager_instance_guid} to manage key for the databases-for-redis instance"
+  description                 = "Allow Secrets Manager to manage key for the databases-for-redis instance"
 }
 
 # workaround for https://github.com/IBM-Cloud/terraform-provider-ibm/issues/4478

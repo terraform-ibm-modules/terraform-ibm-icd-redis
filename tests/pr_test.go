@@ -4,6 +4,7 @@ package test
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -108,6 +109,17 @@ func TestRunStandardSolution(t *testing.T) {
 		},
 	}
 
+	serviceCredentialNames := map[string]string{
+		"admin": "Manager",
+		"user1": "Writer",
+		"user2": "Reader",
+	}
+
+	serviceCredentialNamesJSON, err := json.Marshal(serviceCredentialNames)
+	if err != nil {
+		log.Fatalf("Error converting to JSON: %s", err)
+	}
+
 	options.TerraformVars = map[string]interface{}{
 		"access_tags":                            permanentResources["accessTags"],
 		"redis_version":                          "7.2", // Always lock this test into the latest supported Redis version
@@ -117,6 +129,7 @@ func TestRunStandardSolution(t *testing.T) {
 		"kms_endpoint_type":                      "public",
 		"resource_group_name":                    options.Prefix,
 		"service_credential_secrets":             serviceCredentialSecrets,
+		"service_credential_names":               serviceCredentialNamesJSON,
 	}
 
 	output, err := options.RunTestConsistency()
