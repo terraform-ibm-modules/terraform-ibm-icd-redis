@@ -143,9 +143,9 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 	}
 
 	serviceCredentialNames := map[string]string{
-		"admin": "Manager",
-		"user1": "Writer",
-		"user2": "Reader",
+		"admin": "Administrator",
+		"user1": "Viewer",
+		"user2": "Editor",
 	}
 
 	serviceCredentialNamesJSON, err := json.Marshal(serviceCredentialNames)

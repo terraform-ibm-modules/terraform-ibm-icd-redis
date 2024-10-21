@@ -19,7 +19,7 @@ You can specify a set of IAM credentials to connect to the database with the `se
 ### Options for service_credential_names
 
 - Key (required): The name of the service credential.
-- Value (required): The IAM service role that is assigned to the credential. The following values are valid for service credential roles: "Writer", "Reader", "Manager" and "None". For more information, see [IBM Cloud IAM roles](https://cloud.ibm.com/docs/account?topic=account-userroles).
+- Value (required): The IAM service role that is assigned to the credential. The following values are valid for service credential roles: "Administrator", "Operator", "Viewer" and "Editor". For more information, see [IBM Cloud IAM roles](https://cloud.ibm.com/docs/account?topic=account-userroles).
 
 ### Example service credential
 
