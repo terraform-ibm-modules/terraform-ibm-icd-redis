@@ -6,6 +6,7 @@ This architecture creates an instance of IBM Cloud Databases for Redis and suppo
 - A KMS root key, if one is not passed in.
 - An IBM Cloud Databases for Redis instance with KMS encryption.
 - Autoscaling rules for the database instance, if provided.
+- Service credential secrets and store them in secret manager.
 
 ![fscloud-redis](../../reference-architecture/deployable-architecture-redis.svg)
 
