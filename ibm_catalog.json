@@ -113,7 +113,7 @@
     },
     {
       "name": "deploy-arch-ibm-icd-redis",
-      "label": "Databases for Redis",
+      "label": "Cloud automation for Databases for Redis",
       "product_kind": "solution",
       "tags": [
         "ibm_created",
