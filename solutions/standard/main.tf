@@ -101,4 +101,5 @@ module "redis" {
   auto_scaling                  = var.auto_scaling
   configuration                 = var.configuration
   service_credential_names      = var.service_credential_names
+  backup_crn                    = var.backup_crn
 }
