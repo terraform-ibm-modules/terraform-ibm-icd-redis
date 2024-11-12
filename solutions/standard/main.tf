@@ -8,6 +8,8 @@ locals {
   key_ring_name                    = var.prefix != null ? "${var.prefix}-${var.key_ring_name}" : var.key_ring_name
   kms_key_crn                      = var.existing_kms_key_crn != null ? var.existing_kms_key_crn : module.kms[0].keys[format("%s.%s", local.key_ring_name, local.key_name)].crn
   create_cross_account_auth_policy = !var.skip_iam_authorization_policy && var.ibmcloud_kms_api_key != null
+
+  create_sm_auth_policy = var.skip_redis_sm_auth_policy || var.existing_secrets_manager_instance_crn == null ? 0 : 1
   kms_service_name = local.kms_key_crn != null ? (
     can(regex(".*kms.*", local.kms_key_crn)) ? "kms" : can(regex(".*hs-crypto.*", local.kms_key_crn)) ? "hs-crypto" : null
   ) : null
@@ -106,17 +108,18 @@ module "redis" {
 
 # create a service authorization between Secrets Manager and the target service (Databases for Redis)
 resource "ibm_iam_authorization_policy" "secrets_manager_key_manager" {
-  count                       = var.skip_rd_sm_auth_policy || var.existing_secrets_manager_instance_crn == null ? 0 : 1
+  count                       = local.create_sm_auth_policy
   source_service_name         = "secrets-manager"
   source_resource_instance_id = local.existing_secrets_manager_instance_guid
   target_service_name         = "databases-for-redis"
   target_resource_instance_id = module.redis.guid
   roles                       = ["Key Manager"]
-  description                 = "Allow Secrets Manager to manage key for the databases-for-redis instance"
+  description                 = "Allow Secrets Manager with instance id ${local.existing_secrets_manager_instance_guid} to manage key for the databases-for-redis instance"
 }
 
 # workaround for https://github.com/IBM-Cloud/terraform-provider-ibm/issues/4478
-resource "time_sleep" "wait_for_rd_authorization_policy" {
+resource "time_sleep" "wait_for_redis_authorization_policy" {
+  count           = local.create_sm_auth_policy
   depends_on      = [ibm_iam_authorization_policy.secrets_manager_key_manager]
   create_duration = "30s"
 }
@@ -154,7 +157,7 @@ locals {
 
 module "secrets_manager_service_credentials" {
   count                       = length(local.service_credential_secrets) > 0 ? 1 : 0
-  depends_on                  = [time_sleep.wait_for_rd_authorization_policy]
+  depends_on                  = [time_sleep.wait_for_redis_authorization_policy]
   source                      = "terraform-ibm-modules/secrets-manager/ibm//modules/secrets"
   version                     = "1.17.8"
   existing_sm_instance_guid   = local.existing_secrets_manager_instance_guid

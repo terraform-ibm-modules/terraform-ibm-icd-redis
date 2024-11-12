@@ -213,12 +213,6 @@ variable "auto_scaling" {
 ## Secrets Manager Service Credentials
 ##############################################################################
 
-variable "skip_rd_sm_auth_policy" {
-  type        = bool
-  default     = false
-  description = "Whether an IAM authorization policy is created for Secrets Manager instance to create a service credential secrets for Databases for Redis. If set to false, the Secrets Manager instance passed by the user is granted the Key Manager access to the Redis instance created by the Deployable Architecture. Set to `true` to use an existing policy. The value of this is ignored if any value for 'existing_secrets_manager_instance_crn' is not passed."
-}
-
 variable "existing_secrets_manager_instance_crn" {
   type        = string
   default     = null
@@ -268,6 +262,11 @@ variable "service_credential_secrets" {
   }
 }
 
+variable "skip_redis_sm_auth_policy" {
+  type        = bool
+  default     = false
+  description = "Whether an IAM authorization policy is created for Secrets Manager instance to create a service credential secrets for Databases for Redis. If set to false, the Secrets Manager instance passed by the user is granted the Key Manager access to the Redis instance created by the Deployable Architecture. Set to `true` to use an existing policy. The value of this is ignored if any value for 'existing_secrets_manager_instance_crn' is not passed."
+}
 
 ##############################################################
 # Backup
