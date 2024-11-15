@@ -22,6 +22,10 @@ variable "prefix" {
   type        = string
   description = "Prefix to add to all resources created by this solution."
   default     = null
+  validation {
+    error_message = "Prefix must begin with a lowercase letter and contain only lowercase letters, numbers, and - characters. Prefixes must end with a lowercase letter or number and be 16 or fewer characters."
+    condition     = can(regex("^([a-z]|[a-z][-a-z0-9]*[a-z0-9])$", coalesce(var.prefix, "redis"))) && length(coalesce(var.prefix, "redis")) <= 16
+  }
 }
 
 variable "name" {
