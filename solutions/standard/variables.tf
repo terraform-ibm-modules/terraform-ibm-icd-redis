@@ -146,7 +146,7 @@ variable "existing_kms_instance_crn" {
 
 variable "existing_kms_key_crn" {
   type        = string
-  description = "The CRN of a Hyper Protect Crypto Services or Key Protect root key to use for disk encryption. If not specified, a new key ring and root key are created in the KMS instance."
+  description = "The CRN of a Hyper Protect Crypto Services or Key Protect root key to use for disk encryption. If not specified, a new key ring and root key are created in the KMS instance specified in the `existing_kms_instance_crn` input."
   default     = null
 }
 
