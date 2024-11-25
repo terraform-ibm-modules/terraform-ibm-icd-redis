@@ -139,7 +139,7 @@ variable "ibmcloud_kms_api_key" {
 }
 
 variable "existing_kms_instance_crn" {
-  description = "The CRN of the KMS instance (Hyper Protect Crypto Services or Key Protect). Required only if `existing_kms_key_crn` is not specified. If the KMS instance is in different account you must also provide a value for `ibmcloud_kms_api_key`."
+  description = "The CRN of the KMS instance (Hyper Protect Crypto Services or Key Protect). Required to create a new root key if no value is passed with the `existing_kms_key_crn` input. Also required to create an authorization policy if `skip_iam_authorization_policy` is false. If the KMS instance is in different account you must also provide a value for `ibmcloud_kms_api_key`."
   type        = string
   default     = null
 }
