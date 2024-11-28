@@ -139,14 +139,14 @@ variable "ibmcloud_kms_api_key" {
 }
 
 variable "existing_kms_instance_crn" {
-  description = "The CRN of the KMS instance (Hyper Protect Crypto Services or Key Protect). Required to create a new root key if no value is passed with the `existing_kms_key_crn` input. Also required to create an authorization policy if `skip_iam_authorization_policy` is false. If the KMS instance is in different account you must also provide a value for `ibmcloud_kms_api_key`."
+  description = "The CRN of an Hyper Protect Crypto Services or Key Protect instance that you want to use for both disk and backup encryption. Backup encryption is only supported is some regions ([learn more](https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-key-protect&interface=ui#key-byok)), so if you need to use a different instance for backup encryption from a supported region, use the `existing_backup_kms_instance_crn` input."
   type        = string
   default     = null
 }
 
 variable "existing_kms_key_crn" {
   type        = string
-  description = "The CRN of a Hyper Protect Crypto Services or Key Protect root key to use for disk encryption. If not specified, a new key ring and root key are created in the KMS instance specified in the `existing_kms_instance_crn` input."
+  description = "The CRN of an Hyper Protect Crypto Services or Key Protect encryption key that you want to use to use for both disk and backup encryption. If no value is passed, a new key ring and key will be created in the instance provided in the `existing_kms_instance_crn` input. Backup encryption is only supported is some regions ([learn more](https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-key-protect&interface=ui#key-byok)), so if you need to use a key from a different region for backup encryption, use the `existing_backup_kms_key_crn` input."
   default     = null
 }
 
@@ -236,4 +236,19 @@ variable "provider_visibility" {
     condition     = contains(["public", "private", "public-and-private"], var.provider_visibility)
     error_message = "Invalid visibility option. Allowed values are 'public', 'private', or 'public-and-private'."
   }
+}
+
+##############################################################
+# Backup Encryption
+##############################################################
+variable "existing_backup_kms_key_crn" {
+  type        = string
+  description = "The CRN of an Hyper Protect Crypto Services or Key Protect encryption key that you want to use to encrypt database backups. If no value is passed, the value of `existing_kms_key_crn` is used. If no value is passed for that, a new key will be created in the provided KMS instance and used for both disk encryption, and backup encryption."
+  default     = null
+}
+
+variable "existing_backup_kms_instance_crn" {
+  description = "The CRN of an Hyper Protect Crypto Services or Key Protect instance that you want to use to encrypt database backups. If no value is passed, the value of the `existing_kms_instance_crn` input will be used, however backup encryption is only supported in certain regions so you need to ensure the KMS for backup is coming from one of the supported regions. [Learn more](https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-key-protect&interface=ui#key-byok)"
+  type        = string
+  default     = null
 }

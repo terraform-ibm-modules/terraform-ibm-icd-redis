@@ -151,6 +151,7 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 		{Name: "service_credential_names", Value: "{\"admin_test\": \"Administrator\", \"editor_test\": \"Editor\"}", DataType: "map(string)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
+		{Name: "existing_backup_kms_key_crn", Value: permanentResources["hpcs_south_root_key_crn"], DataType: "string"},
 	}
 	err := options.RunSchematicTest()
 	assert.Nil(t, err, "This should not have errored")
