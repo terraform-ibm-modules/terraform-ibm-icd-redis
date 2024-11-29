@@ -215,6 +215,23 @@
               "key": "ibmcloud_api_key"
             },
             {
+              "key": "provider_visibility",
+              "options": [
+                {
+                  "displayname": "private",
+                  "value": "private"
+                },
+                {
+                  "displayname": "public",
+                  "value": "public"
+                },
+                {
+                  "displayname": "public-and-private",
+                  "value": "public-and-private"
+                }
+              ]
+            },
+            {
               "key": "use_existing_resource_group"
             },
             {
@@ -329,7 +346,8 @@
               "key": "ibmcloud_kms_api_key"
             },
             {
-              "key": "existing_kms_instance_crn"
+              "key": "existing_kms_instance_crn",
+              "required": true
             },
             {
               "key": "existing_kms_key_crn"
