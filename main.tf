@@ -92,7 +92,7 @@ resource "ibm_database" "redis_database" {
   ## This is used to conditionally add one, OR, the other group block depending on var.local.host_flavor_set
   ## This block is for if host_flavor IS set to specific pre-defined host sizes and not set to "multitenant"
   dynamic "group" {
-    for_each = local.host_flavor_set && var.member_host_flavor != "multitenant" ? [1] : []
+    for_each = local.host_flavor_set && var.member_host_flavor != "multitenant" && var.backup_crn == null ? [1] : []
     content {
       group_id = "member" # Only member type is allowed for IBM Cloud Databases
       host_flavor {
@@ -109,7 +109,7 @@ resource "ibm_database" "redis_database" {
 
   ## This block is for if host_flavor IS set to "multitenant"
   dynamic "group" {
-    for_each = local.host_flavor_set && var.member_host_flavor == "multitenant" ? [1] : []
+    for_each = local.host_flavor_set && var.member_host_flavor == "multitenant" && var.backup_crn == null ? [1] : []
     content {
       group_id = "member" # Only member type is allowed for IBM Cloud Databases
       host_flavor {
@@ -132,7 +132,7 @@ resource "ibm_database" "redis_database" {
 
   ## This block is for if host_flavor IS NOT set
   dynamic "group" {
-    for_each = local.host_flavor_set ? [] : [1]
+    for_each = !local.host_flavor_set && var.backup_crn == null ? [1] : []
     content {
       group_id = "member" # Only member type is allowed for IBM Cloud Databases
       memory {
@@ -189,6 +189,8 @@ resource "ibm_database" "redis_database" {
 
   timeouts {
     create = "120m" # Extending provisioning time to 120 minutes
+    update = "120m"
+    delete = "15m"
   }
 }
 
@@ -206,7 +208,7 @@ resource "ibm_resource_tag" "access_tag" {
 module "cbr_rule" {
   count            = length(var.cbr_rules) > 0 ? length(var.cbr_rules) : 0
   source           = "terraform-ibm-modules/cbr/ibm//modules/cbr-rule-module"
-  version          = "1.28.1"
+  version          = "1.29.0"
   rule_description = var.cbr_rules[count.index].description
   enforcement_mode = var.cbr_rules[count.index].enforcement_mode
   rule_contexts    = var.cbr_rules[count.index].rule_contexts

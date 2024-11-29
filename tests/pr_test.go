@@ -171,6 +171,7 @@ func TestRunStandardUpgradeSolution(t *testing.T) {
 		"access_tags":               permanentResources["accessTags"],
 		"existing_kms_instance_crn": permanentResources["hpcs_south_crn"],
 		"kms_endpoint_type":         "public",
+		"provider_visibility":       "public",
 		"resource_group_name":       options.Prefix,
 	}
 
