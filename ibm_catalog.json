@@ -53,6 +53,10 @@
           "description": "Supports key management encryption (BYOK and KYOK), including service-to-service authorization policies with KMS."
         },
         {
+          "title": "Supports backup restoration",
+          "description": "Provides database restoration using a backup created by a deployment with the same service ID."
+        },
+        {
           "title": "CBR",
           "description": "Create context-based restriction (CBR) rules for both Databases for Redis instance."
         }
