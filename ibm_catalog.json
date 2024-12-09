@@ -382,6 +382,28 @@
               "key": "auto_scaling"
             },
             {
+              "key": "existing_secrets_manager_instance_crn"
+            },
+            {
+              "key": "existing_secrets_manager_endpoint_type",
+              "options": [
+                {
+                  "displayname": "public",
+                  "value": "public"
+                },
+                {
+                  "displayname": "private",
+                  "value": "private"
+                }
+              ]
+            },
+            {
+              "key": "service_credential_secrets"
+            },
+            {
+              "key": "skip_redis_sm_auth_policy"
+            },
+            {
               "key": "backup_crn"
             }
           ]
