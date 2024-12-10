@@ -2,6 +2,7 @@
 package test
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"log"
@@ -141,6 +142,17 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 		},
 	}
 
+	serviceCredentialNames := map[string]string{
+		"admin": "Administrator",
+		"user1": "Viewer",
+		"user2": "Editor",
+	}
+
+	serviceCredentialNamesJSON, err := json.Marshal(serviceCredentialNames)
+	if err != nil {
+		log.Fatalf("Error converting to JSON: %s", err)
+	}
+
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 		{Name: "access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
@@ -148,12 +160,11 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 		{Name: "kms_endpoint_type", Value: "private", DataType: "string"},
 		{Name: "redis_version", Value: "7.2", DataType: "string"}, // Always lock this test into the latest supported Redis version
 		{Name: "resource_group_name", Value: options.Prefix, DataType: "string"},
-		{Name: "service_credential_names", Value: "{\"admin_test\": \"Administrator\", \"editor_test\": \"Editor\"}", DataType: "map(string)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
-		{Name: "existing_backup_kms_key_crn", Value: permanentResources["hpcs_south_root_key_crn"], DataType: "string"},
+		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
 	}
-	err := options.RunSchematicTest()
+	err = options.RunSchematicTest()
 	assert.Nil(t, err, "This should not have errored")
 }
 
