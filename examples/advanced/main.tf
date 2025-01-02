@@ -31,6 +31,11 @@ resource "ibm_is_subnet" "testacc_subnet" {
 # Key Protect All Inclusive
 ##############################################################################
 
+locals {
+  data_key_name    = "${var.prefix}-pg"
+  backups_key_name = "${var.prefix}-pg-backups"
+}
+
 module "key_protect_all_inclusive" {
   source            = "terraform-ibm-modules/kms-all-inclusive/ibm"
   version           = "4.19.1"
@@ -42,13 +47,12 @@ module "key_protect_all_inclusive" {
   resource_tags             = var.resource_tags
   keys = [
     {
-      key_ring_name = "icd"
-      keys = [
-        {
-          key_name     = "${var.prefix}-redis"
-          force_delete = true
-        }
-      ]
+      key_name     = local.data_key_name
+      force_delete = true
+    },
+    {
+      key_name     = local.backups_key_name
+      force_delete = true
     }
   ]
 }
@@ -80,20 +84,26 @@ module "cbr_zone" {
 ##############################################################################
 
 module "icd_redis" {
-  source                     = "../../"
-  resource_group_id          = module.resource_group.resource_group_id
-  redis_version              = var.redis_version
-  instance_name              = "${var.prefix}-redis"
-  kms_encryption_enabled     = true
-  region                     = var.region
-  admin_pass                 = var.admin_pass
-  users                      = var.users
-  existing_kms_instance_guid = module.key_protect_all_inclusive.kms_guid
-  kms_key_crn                = module.key_protect_all_inclusive.keys["icd.${var.prefix}-redis"].crn
-  access_tags                = var.access_tags
-  tags                       = var.resource_tags
-  service_credential_names   = var.service_credential_names
-  member_host_flavor         = "multitenant"
+  source            = "../../"
+  resource_group_id = module.resource_group.resource_group_id
+  redis_version     = var.redis_version
+  instance_name     = "${var.prefix}-redis"
+  region            = var.region
+  admin_pass        = var.admin_pass
+  users             = var.users
+  # Example of how to use different KMS keys for data and backups
+  use_ibm_owned_encryption_key = false
+  use_same_kms_key_for_backups = false
+  kms_key_crn                  = module.key_protect_all_inclusive.keys["icd.${var.prefix}-redis"].crn
+  backup_encryption_key_crn    = module.key_protect_all_inclusive.keys["icd.${local.data_key_name}"].crn
+  service_credential_names = {
+    "redis_admin" : "Administrator",
+    "redis_operator" : "Operator",
+    "redis_viewer" : "Viewer",
+    "redis_editor" : "Editor",
+  }
+  access_tags        = var.access_tags
+  member_host_flavor = "multitenant"
   cbr_rules = [
     {
       description      = "sample rule"
