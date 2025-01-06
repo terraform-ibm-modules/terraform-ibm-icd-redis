@@ -47,12 +47,17 @@ module "key_protect_all_inclusive" {
   resource_tags             = var.resource_tags
   keys = [
     {
-      key_name     = local.data_key_name
-      force_delete = true
-    },
-    {
-      key_name     = local.backups_key_name
-      force_delete = true
+      key_ring_name = "icd"
+      keys = [
+        {
+          key_name     = local.data_key_name
+          force_delete = true
+        },
+        {
+          key_name     = local.backups_key_name
+          force_delete = true
+        }
+      ]
     }
   ]
 }

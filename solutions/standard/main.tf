@@ -259,7 +259,7 @@ module "redis" {
   use_default_backup_encryption_key = var.use_default_backup_encryption_key
   access_tags                       = var.access_tags
   tags                              = var.tags
-  admin_pass                        = var.admin_pass
+  admin_pass                        = local.admin_pass
   users                             = var.users
   members                           = var.members
   member_host_flavor                = var.member_host_flavor
