@@ -32,8 +32,8 @@ resource "ibm_is_subnet" "testacc_subnet" {
 ##############################################################################
 
 locals {
-  data_key_name    = "${var.prefix}-pg"
-  backups_key_name = "${var.prefix}-pg-backups"
+  data_key_name    = "${var.prefix}-redis"
+  backups_key_name = "${var.prefix}-redis-backups"
 }
 
 module "key_protect_all_inclusive" {

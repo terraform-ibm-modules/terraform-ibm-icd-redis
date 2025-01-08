@@ -28,9 +28,9 @@ locals {
 #######################################################################################################################
 
 locals {
-  create_new_kms_key     = !var.use_ibm_owned_encryption_key && var.existing_kms_key_crn == null ? true : false # no need to create any KMS resources if passing an existing key, or using IBM owned keys
-  postgres_key_name      = var.prefix != null ? "${var.prefix}-${var.key_name}" : var.key_name
-  postgres_key_ring_name = var.prefix != null ? "${var.prefix}-${var.key_ring_name}" : var.key_ring_name
+  create_new_kms_key  = !var.use_ibm_owned_encryption_key && var.existing_kms_key_crn == null ? true : false # no need to create any KMS resources if passing an existing key, or using IBM owned keys
+  redis_key_name      = var.prefix != null ? "${var.prefix}-${var.key_name}" : var.key_name
+  redis_key_ring_name = var.prefix != null ? "${var.prefix}-${var.key_ring_name}" : var.key_ring_name
 }
 
 module "kms" {
@@ -47,11 +47,11 @@ module "kms" {
   key_endpoint_type           = var.kms_endpoint_type
   keys = [
     {
-      key_ring_name     = local.postgres_key_ring_name
+      key_ring_name     = local.redis_key_ring_name
       existing_key_ring = false
       keys = [
         {
-          key_name                 = local.postgres_key_name
+          key_name                 = local.redis_key_name
           standard_key             = false
           rotation_interval_month  = 3
           dual_auth_delete_enabled = false
@@ -89,8 +89,8 @@ module "kms_backup_key_crn_parser" {
 
 #######################################################################################################################
 # KMS IAM Authorization Policies
-#   - only created if user passes a value for 'ibmcloud_kms_api_key' (used when KMS is in different account to PostgreSQL)
-#   - if no value passed for 'ibmcloud_kms_api_key', the auth policy is created by the PostgreSQL module
+#   - only created if user passes a value for 'ibmcloud_kms_api_key' (used when KMS is in different account to Redis)
+#   - if no value passed for 'ibmcloud_kms_api_key', the auth policy is created by the Redis module
 #######################################################################################################################
 
 # Lookup account ID
@@ -106,8 +106,8 @@ locals {
   kms_account_id    = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].account_id : module.kms_instance_crn_parser[0].account_id
   kms_service       = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].service_name : module.kms_instance_crn_parser[0].service_name
   kms_instance_guid = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].service_instance : module.kms_instance_crn_parser[0].service_instance
-  kms_key_crn       = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? var.existing_kms_key_crn : module.kms[0].keys[format("%s.%s", local.postgres_key_ring_name, local.postgres_key_name)].crn
-  kms_key_id        = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].resource : module.kms[0].keys[format("%s.%s", local.postgres_key_ring_name, local.postgres_key_name)].key_id
+  kms_key_crn       = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? var.existing_kms_key_crn : module.kms[0].keys[format("%s.%s", local.redis_key_ring_name, local.redis_key_name)].crn
+  kms_key_id        = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].resource : module.kms[0].keys[format("%s.%s", local.redis_key_ring_name, local.redis_key_name)].key_id
   kms_region        = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].region : module.kms_instance_crn_parser[0].region
 
   # If creating KMS cross account policy for backups, parse backup key details from passed in key CRN
@@ -125,10 +125,10 @@ resource "ibm_iam_authorization_policy" "kms_policy" {
   count                    = local.create_cross_account_kms_auth_policy ? 1 : 0
   provider                 = ibm.kms
   source_service_account   = local.account_id
-  source_service_name      = "databases-for-postgresql"
+  source_service_name      = "databases-for-redis"
   source_resource_group_id = module.resource_group.resource_group_id
   roles                    = ["Reader"]
-  description              = "Allow all PostgreSQL instances in the resource group ${module.resource_group.resource_group_id} in the account ${local.account_id} to read the ${local.kms_service} key ${local.kms_key_id} from the instance GUID ${local.kms_instance_guid}"
+  description              = "Allow all Redis instances in the resource group ${module.resource_group.resource_group_id} in the account ${local.account_id} to read the ${local.kms_service} key ${local.kms_key_id} from the instance GUID ${local.kms_instance_guid}"
   resource_attributes {
     name     = "serviceName"
     operator = "stringEquals"
@@ -173,10 +173,10 @@ resource "ibm_iam_authorization_policy" "backup_kms_policy" {
   count                    = local.create_cross_account_backup_kms_auth_policy ? 1 : 0
   provider                 = ibm.kms
   source_service_account   = local.account_id
-  source_service_name      = "databases-for-postgresql"
+  source_service_name      = "databases-for-redis"
   source_resource_group_id = module.resource_group.resource_group_id
   roles                    = ["Reader"]
-  description              = "Allow all PostgreSQL instances in the resource group ${module.resource_group.resource_group_id} in the account ${local.account_id} to read the ${local.backup_kms_service} key ${local.backup_kms_key_id} from the instance GUID ${local.backup_kms_instance_guid}"
+  description              = "Allow all Redis instances in the resource group ${module.resource_group.resource_group_id} in the account ${local.account_id} to read the ${local.backup_kms_service} key ${local.backup_kms_key_id} from the instance GUID ${local.backup_kms_instance_guid}"
   resource_attributes {
     name     = "serviceName"
     operator = "stringEquals"
@@ -217,7 +217,7 @@ resource "time_sleep" "wait_for_backup_kms_authorization_policy" {
 }
 
 #######################################################################################################################
-# PostgreSQL admin password
+# Redis admin password
 #######################################################################################################################
 
 resource "random_password" "admin_password" {
@@ -240,7 +240,7 @@ locals {
 }
 
 #######################################################################################################################
-# Postgresql
+# Redis
 #######################################################################################################################
 
 # Create new instance

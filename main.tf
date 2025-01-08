@@ -73,10 +73,10 @@ locals {
 # Create IAM Authorization Policies to allow Redis to access KMS for the encryption key
 resource "ibm_iam_authorization_policy" "kms_policy" {
   count                    = local.create_kms_auth_policy
-  source_service_name      = "databases-for-postgresql"
+  source_service_name      = "databases-for-redis"
   source_resource_group_id = var.resource_group_id
   roles                    = ["Reader"]
-  description              = "Allow all PostgreSQL instances in the resource group ${var.resource_group_id} to read the ${local.kms_service} key ${local.kms_key_id} from the instance GUID ${local.kms_key_instance_guid}"
+  description              = "Allow all Redis instances in the resource group ${var.resource_group_id} to read the ${local.kms_service} key ${local.kms_key_id} from the instance GUID ${local.kms_key_instance_guid}"
   resource_attributes {
     name     = "serviceName"
     operator = "stringEquals"
@@ -119,10 +119,10 @@ resource "time_sleep" "wait_for_authorization_policy" {
 
 resource "ibm_iam_authorization_policy" "backup_kms_policy" {
   count                    = local.create_backup_kms_auth_policy
-  source_service_name      = "databases-for-postgresql"
+  source_service_name      = "databases-for-redis"
   source_resource_group_id = var.resource_group_id
   roles                    = ["Reader"]
-  description              = "Allow all PostgreSQL instances in the Resource Group ${var.resource_group_id} to read the ${local.backup_kms_service} key ${local.backup_kms_key_id} from the instance GUID ${local.backup_kms_key_instance_guid}"
+  description              = "Allow all Redis instances in the Resource Group ${var.resource_group_id} to read the ${local.backup_kms_service} key ${local.backup_kms_key_id} from the instance GUID ${local.backup_kms_key_instance_guid}"
   resource_attributes {
     name     = "serviceName"
     operator = "stringEquals"
@@ -163,7 +163,7 @@ resource "time_sleep" "wait_for_backup_kms_authorization_policy" {
 }
 
 ########################################################################################################################
-# Postgresql instance
+# Redis instance
 ########################################################################################################################
 
 resource "ibm_database" "redis_database" {
