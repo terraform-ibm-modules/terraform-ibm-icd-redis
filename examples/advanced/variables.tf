@@ -58,14 +58,3 @@ variable "users" {
   sensitive   = true
   description = "A list of users that you want to create on the database. Multiple blocks are allowed. The user password must be in the range of 10-32 characters."
 }
-
-variable "service_credential_names" {
-  description = "Map of name, role for service credentials that you want to create for the database"
-  type        = map(string)
-  default = {
-    "redis_admin" : "Administrator",
-    "redis_operator" : "Operator",
-    "redis_viewer" : "Viewer",
-    "redis_editor" : "Editor",
-  }
-}
