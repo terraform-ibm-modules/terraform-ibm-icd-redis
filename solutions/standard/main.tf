@@ -232,7 +232,7 @@ locals {
   # _- are invalid first characters
   # if - replace first char with J
   # elseif _ replace first char with K
-  # else use asis
+  # else use asis.
   admin_pass = var.admin_pass == null ? (startswith(random_password.admin_password[0].result, "-") ? "J${substr(random_password.admin_password[0].result, 1, -1)}" : startswith(random_password.admin_password[0].result, "_") ? "K${substr(random_password.admin_password[0].result, 1, -1)}" : random_password.admin_password[0].result) : var.admin_pass
 }
 
