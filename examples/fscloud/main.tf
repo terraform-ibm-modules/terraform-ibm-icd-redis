@@ -54,20 +54,32 @@ module "cbr_zone" {
 ##############################################################################
 
 module "redis" {
-  source                     = "../../modules/fscloud"
-  resource_group_id          = module.resource_group.resource_group_id
-  instance_name              = "${var.prefix}-redis"
-  region                     = var.region
-  redis_version              = var.redis_version
-  access_tags                = var.access_tags
-  tags                       = var.resource_tags
-  kms_key_crn                = var.kms_key_crn
-  existing_kms_instance_guid = var.existing_kms_instance_guid
-  service_credential_names   = var.service_credential_names
-  auto_scaling               = var.auto_scaling
-  member_host_flavor         = "b3c.4x16.encrypted"
-  backup_encryption_key_crn  = var.backup_encryption_key_crn
-  backup_crn                 = var.backup_crn
+  source                    = "../../modules/fscloud"
+  resource_group_id         = module.resource_group.resource_group_id
+  instance_name             = "${var.prefix}-redis"
+  region                    = var.region
+  redis_version             = var.redis_version
+  access_tags               = var.access_tags
+  tags                      = var.resource_tags
+  kms_key_crn               = var.kms_key_crn
+  backup_encryption_key_crn = var.backup_encryption_key_crn
+  backup_crn                = var.backup_crn
+  service_credential_names = {
+    "redis_admin" : "Administrator",
+    "redis_operator" : "Operator",
+    "redis_viewer" : "Viewer",
+    "redis_editor" : "Editor",
+  }
+  auto_scaling = {
+    disk = {
+      capacity_enabled : true,
+      io_enabled : true
+    }
+    memory = {
+      io_enabled : true,
+    }
+  }
+  member_host_flavor = "b3c.4x16.encrypted"
   cbr_rules = [
     {
       description      = "sample rule"
