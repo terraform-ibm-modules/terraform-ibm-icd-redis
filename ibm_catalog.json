@@ -248,9 +248,19 @@
               "key": "name"
             },
             {
+              "key": "access_tags",
+              "display_name": "array",
+              "custom_config": {
+                  "type": "array",
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                      "type": "string"
+                  }
+              }
+            },
+            {
               "key": "region",
-              "required": true,
-              "default_value": "us-south",
               "options": [
                 {
                   "displayname": "Chennai (che01)",
@@ -304,7 +314,6 @@
             },
             {
               "key": "redis_version",
-              "required": true,
               "options": [
                 {
                   "displayname": "6.2",
@@ -341,44 +350,16 @@
               "key": "admin_pass"
             },
             {
-              "key": "users",
-              "type": "array",
-              "default_value": "",
-              "description": "A list of users that you want to create on the database. Users block is supported by Redis version >= 6.0. Multiple blocks are allowed. The user password must be in the range of 10-32 characters. Be warned that in most case using IAM service credentials (via the var.service_credential_names) is sufficient to control access to the Redis instance. This blocks creates native redis database users. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/solutions/standard/DA-types.md#users)",
-              "display_name": "array",
-              "required": false,
-              "custom_config": {
-                  "type": "array",
-                  "grouping": "deployment",
-                  "original_grouping": "deployment",
-                  "config_constraints": {
-                      "type": "mixed"
-                  }
-              }
-
+              "key": "users"
             },
             {
-              "key": "tags",
-              "type": "array",
-              "default_value": "",
-              "description": "The list of tags to be added to the Databases for Redis instance.",
-              "display_name": "array",
-              "required": false,
-              "custom_config": {
-                  "type": "array",
-                  "grouping": "deployment",
-                  "original_grouping": "deployment",
-                  "config_constraints": {
-                      "type": "mixed"
-                  }
-              }
+              "key": "tags"
             },
             {
               "key": "ibmcloud_kms_api_key"
             },
             {
-              "key": "existing_kms_instance_crn",
-              "required": true
+              "key": "existing_kms_instance_crn"
             },
             {
               "key": "existing_kms_key_crn"
@@ -425,21 +406,7 @@
               ]
             },
             {
-              "key": "service_credential_secrets",
-              "type": "array",
-              "default_value": "",
-              "description": "Service credential secrets configuration for Databases for Redis. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/solutions/standard/DA-types.md#service-credential-secrets).",
-              "display_name": "array",
-              "required": false,
-              "custom_config": {
-                  "type": "array",
-                  "grouping": "deployment",
-                  "original_grouping": "deployment",
-                  "config_constraints": {
-                      "type": "mixed"
-                  }
-              }
-
+              "key": "service_credential_secrets"
             },
             {
               "key": "skip_redis_sm_auth_policy"
