@@ -16,12 +16,13 @@ variable "use_existing_resource_group" {
 variable "resource_group_name" {
   type        = string
   description = "The name of a new or an existing resource group to provision the Databases for Redis in. If a prefix input variable is specified, the prefix is added to the name in the `<prefix>-<name>` format."
+  default     = "test-rg"
 }
 
 variable "prefix" {
   type        = string
   description = "Prefix to add to all resources created by this solution."
-  default     = null
+  default     = "test-fix"
 }
 
 variable "name" {
@@ -144,7 +145,7 @@ variable "use_ibm_owned_encryption_key" {
 variable "existing_kms_instance_crn" {
   type        = string
   description = "The CRN of a Key Protect or Hyper Protect Crypto Services instance. Required to create a new encryption key and key ring which will be used to encrypt both deployment data and backups. Applies only if `use_ibm_owned_encryption_key` is false. To use an existing key, pass values for `existing_kms_key_crn` and/or `existing_backup_kms_key_crn`. Bare in mind that backups encryption is only available in certain regions. See [Bring your own key for backups](https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-key-protect&interface=ui#key-byok) and [Using the HPCS Key for Backup encryption](https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-hpcs#use-hpcs-backups)."
-  default     = null
+  default     = "crn:v1:bluemix:public:hs-crypto:us-south:a/abac0df06b644a9cabc6e44f55b3880e:e6dce284-e80f-46e1-a3c1-830f7adff7a9::"
 }
 
 variable "existing_kms_key_crn" {
@@ -156,7 +157,7 @@ variable "existing_kms_key_crn" {
 variable "kms_endpoint_type" {
   type        = string
   description = "The type of endpoint to use for communicating with the Key Protect or Hyper Protect Crypto Services instance. Possible values: `public`, `private`. Applies only if `existing_kms_key_crn` is not specified."
-  default     = "private"
+  default     = "public"
   validation {
     condition     = can(regex("public|private", var.kms_endpoint_type))
     error_message = "The kms_endpoint_type value must be 'public' or 'private'."
@@ -197,7 +198,7 @@ variable "existing_backup_kms_key_crn" {
 variable "use_default_backup_encryption_key" {
   type        = bool
   description = "When `use_ibm_owned_encryption_key` is set to false, backups will be encrypted with either the key specified in `existing_kms_key_crn`, in `existing_backup_kms_key_crn`, or with a new key that will be created in the instance specified in the `existing_kms_instance_crn` input. If you do not want to use your own key for backups encryption, you can set this to `true` to use the IBM Cloud Databases default encryption for backups. Alternatively set `use_ibm_owned_encryption_key` to true to use the default encryption for both backups and deployment data."
-  default     = false
+  default     = true
 }
 
 variable "backup_crn" {
@@ -216,7 +217,7 @@ variable "backup_crn" {
 variable "provider_visibility" {
   description = "Set the visibility value for the IBM terraform provider. Supported values are `public`, `private`, `public-and-private`. [Learn more](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/guides/custom-service-endpoints)."
   type        = string
-  default     = "private"
+  default     = "public"
 
   validation {
     condition     = contains(["public", "private", "public-and-private"], var.provider_visibility)
@@ -268,7 +269,7 @@ variable "existing_secrets_manager_instance_crn" {
 variable "existing_secrets_manager_endpoint_type" {
   type        = string
   description = "The endpoint type to use if `existing_secrets_manager_instance_crn` is specified. Possible values: public, private."
-  default     = "private"
+  default     = "public"
   validation {
     condition     = contains(["public", "private"], var.existing_secrets_manager_endpoint_type)
     error_message = "Only \"public\" and \"private\" are allowed values for 'existing_secrets_endpoint_type'."
