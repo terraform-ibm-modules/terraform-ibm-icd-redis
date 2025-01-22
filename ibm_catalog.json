@@ -251,7 +251,6 @@
               "key": "access_tags",
               "display_name": "array",
               "custom_config": {
-                  "type": "array",
                   "grouping": "deployment",
                   "original_grouping": "deployment",
                   "config_constraints": {
@@ -261,6 +260,7 @@
             },
             {
               "key": "region",
+              "required": true,
               "options": [
                 {
                   "displayname": "Chennai (che01)",
@@ -314,6 +314,7 @@
             },
             {
               "key": "redis_version",
+              "required": true,
               "options": [
                 {
                   "displayname": "6.2",
@@ -359,7 +360,8 @@
               "key": "ibmcloud_kms_api_key"
             },
             {
-              "key": "existing_kms_instance_crn"
+              "key": "existing_kms_instance_crn",
+              "required": true
             },
             {
               "key": "existing_kms_key_crn"
