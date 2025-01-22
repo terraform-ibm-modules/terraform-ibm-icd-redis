@@ -248,16 +248,6 @@
               "key": "name"
             },
             {
-              "key": "access_tags",
-              "custom_config": {
-                  "grouping": "deployment",
-                  "original_grouping": "deployment",
-                  "config_constraints": {
-                      "type": "string"
-                  }
-              }
-            },
-            {
               "key": "region",
               "required": true,
               "options": [
@@ -354,6 +344,16 @@
             },
             {
               "key": "tags"
+            },
+            {
+              "key": "access_tags",
+              "custom_config": {
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                      "type": "string"
+                  }
+              }
             },
             {
               "key": "ibmcloud_kms_api_key"
