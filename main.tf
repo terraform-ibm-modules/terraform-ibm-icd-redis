@@ -35,7 +35,7 @@ locals {
 
 locals {
   parse_kms_key        = !var.use_ibm_owned_encryption_key
-  parse_backup_kms_key = !var.use_ibm_owned_encryption_key && local.backup_encryption_key_crn != null
+  parse_backup_kms_key = !var.use_ibm_owned_encryption_key && !var.use_default_backup_encryption_key
 }
 
 module "kms_key_crn_parser" {
