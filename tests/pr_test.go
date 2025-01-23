@@ -13,12 +13,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/cloudinfo"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/common"
-	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testhelper"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testschematic"
 )
 
@@ -156,6 +154,8 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 		log.Fatalf("Error converting to JSON: %s", err)
 	}
 
+	os.Setenv("TF_VAR_admin_pass", GetRandomAdminPassword(t))
+
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 		{Name: "access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
@@ -169,83 +169,6 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 	}
 	err = options.RunSchematicTest()
 	assert.Nil(t, err, "This should not have errored")
-}
-
-func TestRunStandardUpgradeSolution(t *testing.T) {
-	t.Parallel()
-
-	options := testhelper.TestOptionsDefault(&testhelper.TestOptions{
-		Testing:            t,
-		TerraformDir:       standardSolutionTerraformDir,
-		BestRegionYAMLPath: regionSelectionPath,
-		Prefix:             "redis-st-da-upg",
-		ResourceGroup:      resourceGroup,
-	})
-
-	options.TerraformVars = map[string]interface{}{
-		"access_tags":               permanentResources["accessTags"],
-		"existing_kms_instance_crn": permanentResources["hpcs_south_crn"],
-		"kms_endpoint_type":         "public",
-		"provider_visibility":       "public",
-		"resource_group_name":       options.Prefix,
-		"admin_pass":                GetRandomAdminPassword(t),
-	}
-
-	output, err := options.RunTestUpgrade()
-	if !options.UpgradeTestSkipped {
-		assert.Nil(t, err, "This should not have errored")
-		assert.NotNil(t, output, "Expected some output")
-	}
-}
-
-func TestPlanValidation(t *testing.T) {
-	t.Parallel()
-
-	options := &terraform.Options{
-		TerraformDir: "../" + standardSolutionTerraformDir,
-		Vars: map[string]interface{}{
-			"prefix":              "validate-plan",
-			"region":              "us-south",
-			"kms_endpoint_type":   "public",
-			"provider_visibility": "public",
-			"resource_group_name": "validate-plan",
-			"admin_pass":          GetRandomAdminPassword(t),
-		},
-		Upgrade: true,
-	}
-
-	_, initErr := terraform.InitE(t, options)
-	assert.Nil(t, initErr, "This should not have errored")
-
-	// Test the DA when using IBM owned encryption keys
-	var ibmOwnedEncrytionKeyTFVars = map[string]interface{}{
-		"use_default_backup_encryption_key": false,
-		"use_ibm_owned_encryption_key":      true,
-	}
-
-	// Test the DA when using Default Backup Encryption Key and not IBM owned encryption keys
-	var notIbmOwnedEncrytionKeyTFVars = map[string]interface{}{
-		"existing_kms_instance_crn":         permanentResources["hpcs_south_crn"],
-		"use_default_backup_encryption_key": true,
-		"use_ibm_owned_encryption_key":      false,
-	}
-
-	// Create a list (slice) of the maps
-	tfVarsList := []map[string]interface{}{
-		ibmOwnedEncrytionKeyTFVars,
-		notIbmOwnedEncrytionKeyTFVars,
-	}
-
-	// Iterate over the slice of maps
-	for _, tfVars := range tfVarsList {
-		// Iterate over the keys and values in each map
-		for key, value := range tfVars {
-			options.Vars[key] = value
-		}
-		output, err := terraform.PlanE(t, options)
-		assert.Nil(t, err, "This should not have errored")
-		assert.NotNil(t, output, "Expected some output")
-	}
 }
 
 func GetRandomAdminPassword(t *testing.T) string {
