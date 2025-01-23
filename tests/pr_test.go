@@ -173,13 +173,6 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 func TestRunStandardUpgradeSolution(t *testing.T) {
 	t.Parallel()
 
-	// Generate a 15 char long random string for the admin_pass
-	randomBytes := make([]byte, 13)
-	_, randErr := rand.Read(randomBytes)
-	require.Nil(t, randErr) // do not proceed if we can't gen a random password
-
-	randomPass := "A1" + base64.URLEncoding.EncodeToString(randomBytes)[:13]
-
 	options := testhelper.TestOptionsDefault(&testhelper.TestOptions{
 		Testing:            t,
 		TerraformDir:       standardSolutionTerraformDir,
@@ -188,13 +181,14 @@ func TestRunStandardUpgradeSolution(t *testing.T) {
 		ResourceGroup:      resourceGroup,
 	})
 
+	os.Setenv("TF_VAR_admin_pass", GetRandomAdminPassword(t))
+
 	options.TerraformVars = map[string]interface{}{
 		"access_tags":               permanentResources["accessTags"],
 		"existing_kms_instance_crn": permanentResources["hpcs_south_crn"],
 		"kms_endpoint_type":         "public",
 		"provider_visibility":       "public",
 		"resource_group_name":       options.Prefix,
-		"admin_pass":                randomPass,
 	}
 
 	output, err := options.RunTestUpgrade()
@@ -202,4 +196,15 @@ func TestRunStandardUpgradeSolution(t *testing.T) {
 		assert.Nil(t, err, "This should not have errored")
 		assert.NotNil(t, output, "Expected some output")
 	}
+}
+
+func GetRandomAdminPassword(t *testing.T) string {
+	// Generate a 15 char long random string for the admin_pass
+	randomBytes := make([]byte, 13)
+	_, randErr := rand.Read(randomBytes)
+	require.Nil(t, randErr) // do not proceed if we can't gen a random password
+
+	randomPass := "A1" + base64.URLEncoding.EncodeToString(randomBytes)[:13]
+
+	return randomPass
 }
