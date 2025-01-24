@@ -1,5 +1,5 @@
 {
-  "products": [    
+  "products": [
     {
       "name": "deploy-arch-ibm-icd-redis",
       "label": "Cloud automation for Databases for Redis",
