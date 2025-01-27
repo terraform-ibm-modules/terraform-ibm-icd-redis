@@ -56,7 +56,7 @@ In the configuration, specify the secret group name, whether it already exists o
 #### Options for service_credentials
 
 - `secret_name`: (required): A unique human-readable name of the secret to create.
-- `service_credentials_source_service_role`: (required): The role to give the service credential in the Databases for Redis service. Acceptable values are `Writer`, `Reader`, `Manager`, and `None`
+- `service_credentials_source_service_role_crn`: (required): The CRN of the role to give the service credential in the IBM Cloud Database service. Service credentials role CRNs can be found at https://cloud.ibm.com/iam/roles, select the IBM Cloud Database and select the role.
 - `secret_labels`: (optional, default = `[]`): Labels of the secret to create. Up to 30 labels can be created. Labels can be 2 - 30 characters, including spaces. Special characters that are not permitted include the angled brackets (<>), comma (,), colon (:), ampersand (&), and vertical pipe character (|).
 - `secret_auto_rotation`: (optional, default = `true`): Whether to configure automatic rotation of service credential.
 - `secret_auto_rotation_unit`: (optional, default = `day`): Specifies the unit of time for rotation of a secret. Acceptable values are `day` or `month`.
@@ -70,11 +70,11 @@ The following example includes all the configuration options for four service cr
   {
     "secret_group_name": "sg-1"
     "existing_secret_group": true
-    "service_credentials": [
+    "service_credentials": [                                              # pragma: allowlist secret
       {
         "secret_name": "cred-1"
-        "service_credentials_source_service_role":  "Writer"
-        "secret_labels": ["test-writer-1", "test-writer-2"]
+        "service_credentials_source_service_role_crn":  "crn:v1:bluemix:public:iam::::role:Editor"
+        "secret_labels": ["test-editor-1", "test-editor-2"]
         "secret_auto_rotation": true
         "secret_auto_rotation_unit": "day"
         "secret_auto_rotation_interval": 89
@@ -83,20 +83,16 @@ The following example includes all the configuration options for four service cr
       },
       {
         "secret_name": "cred-2"
-        "service_credentials_source_service_role": "Reader"
+        "service_credentials_source_service_role_crn": "crn:v1:bluemix:public:iam::::role:Viewer"
       }
     ]
   },
   {
     "secret_group_name": "sg-2"
-    "service_credentials": [
+    "service_credentials": [                                              # pragma: allowlist secret
       {
         "secret_name": "cred-3"
-        "service_credentials_source_service_role": "Editor"
-      },
-      {
-        "secret_name": "cred-4"
-        "service_credentials_source_service_role": "None"
+        "service_credentials_source_service_role_crn": "crn:v1:bluemix:public:iam::::role:Viewer"
       }
     ]
   }
