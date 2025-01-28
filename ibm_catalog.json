@@ -230,7 +230,14 @@
               "key": "users"
             },
             {
-              "key": "tags"
+              "key": "tags",
+              "custom_config": {
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                      "type": "string"
+                  }
+              }
             },
             {
               "key": "access_tags",

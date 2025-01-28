@@ -114,7 +114,7 @@ variable "endpoints" {
 }
 
 variable "tags" {
-  type        = list(any)
+  type        = list(string)
   description = "Optional list of tags to be added to the Redis instance."
   default     = []
 }
