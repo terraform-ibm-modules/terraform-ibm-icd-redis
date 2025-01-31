@@ -130,15 +130,15 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 
 	serviceCredentialSecrets := []map[string]interface{}{
 		{
-			"secret_group_name": fmt.Sprintf("%s-secret-group", prefix),
+			"secret_group_name": fmt.Sprintf("%s-secret-group", options.Prefix),
 			"service_credentials": []map[string]string{
 				{
-					"secret_name": fmt.Sprintf("%s-cred-reader", prefix),
-					"service_credentials_source_service_role": "Reader",
+					"secret_name": fmt.Sprintf("%s-cred-reader", options.Prefix),
+					"service_credentials_source_service_role_crn": "crn:v1:bluemix:public:iam::::role:Viewer",
 				},
 				{
-					"secret_name": fmt.Sprintf("%s-cred-writer", prefix),
-					"service_credentials_source_service_role": "Writer",
+					"secret_name": fmt.Sprintf("%s-cred-writer", options.Prefix),
+					"service_credentials_source_service_role_crn": "crn:v1:bluemix:public:iam::::role:Editor",
 				},
 			},
 		},
