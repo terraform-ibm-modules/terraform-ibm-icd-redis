@@ -21,7 +21,7 @@ variable "resource_group_name" {
 variable "prefix" {
   type        = string
   description = "Prefix to add to all resources created by this solution. To not use any prefix value, you can set this value to `null` or an empty string."
-  default     = "redis"
+  default     = "dev"
 }
 
 variable "name" {
@@ -120,7 +120,7 @@ variable "users" {
 }
 
 variable "tags" {
-  type        = list(any)
+  type        = list(string)
   description = "The list of tags to be added to the Databases for Redis instance."
   default     = []
 }

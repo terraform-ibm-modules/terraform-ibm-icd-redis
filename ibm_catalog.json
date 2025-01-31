@@ -137,7 +137,6 @@
             {
               "key": "region",
               "required": true,
-              "default_value": "us-south",
               "options": [
                 {
                   "displayname": "Chennai (che01)",
@@ -231,7 +230,24 @@
               "key": "users"
             },
             {
-              "key": "tags"
+              "key": "tags",
+              "custom_config": {
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                      "type": "string"
+                  }
+              }
+            },
+            {
+              "key": "access_tags",
+              "custom_config": {
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                      "type": "string"
+                  }
+              }
             },
             {
               "key": "ibmcloud_kms_api_key"
