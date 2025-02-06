@@ -165,6 +165,7 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
+		{Name: "admin_pass", Value: GetRandomAdminPassword(t), DataType: "string"},
 	}
 	err = options.RunSchematicTest()
 	assert.Nil(t, err, "This should not have errored")
@@ -180,8 +181,6 @@ func TestRunStandardUpgradeSolution(t *testing.T) {
 		Prefix:             "redis-st-da-upg",
 		ResourceGroup:      resourceGroup,
 	})
-
-	os.Setenv("TF_VAR_admin_pass", GetRandomAdminPassword(t))
 
 	options.TerraformVars = map[string]interface{}{
 		"access_tags":               permanentResources["accessTags"],
