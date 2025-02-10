@@ -18,9 +18,9 @@ module "resource_group" {
 
 locals {
   # tflint-ignore: terraform_unused_declarations
-  validate_kms_1 = var.use_ibm_owned_encryption_key && (var.existing_kms_instance_crn != null || var.existing_kms_key_crn != null || var.existing_backup_kms_key_crn != null) ? tobool("When setting values for 'existing_kms_instance_crn', 'existing_kms_key_crn' or 'existing_backup_kms_key_crn', the 'use_ibm_owned_encryption_key' input must be set to false.") : true
+  validate_kms_1 = var.existing_db_instance_crn != null ? true : var.use_ibm_owned_encryption_key && (var.existing_kms_instance_crn != null || var.existing_kms_key_crn != null || var.existing_backup_kms_key_crn != null) ? tobool("When setting values for 'existing_kms_instance_crn', 'existing_kms_key_crn' or 'existing_backup_kms_key_crn', the 'use_ibm_owned_encryption_key' input must be set to false.") : true
   # tflint-ignore: terraform_unused_declarations
-  validate_kms_2 = !var.use_ibm_owned_encryption_key && (var.existing_kms_instance_crn == null && var.existing_kms_key_crn == null) ? tobool("When 'use_ibm_owned_encryption_key' is false, a value is required for either 'existing_kms_instance_crn' (to create a new key), or 'existing_kms_key_crn' to use an existing key.") : true
+  validate_kms_2 = var.existing_db_instance_crn != null ? true : !var.use_ibm_owned_encryption_key && (var.existing_kms_instance_crn == null && var.existing_kms_key_crn == null) ? tobool("When 'use_ibm_owned_encryption_key' is false, a value is required for either 'existing_kms_instance_crn' (to create a new key), or 'existing_kms_key_crn' to use an existing key.") : true
 }
 
 #######################################################################################################################
@@ -28,7 +28,7 @@ locals {
 #######################################################################################################################
 
 locals {
-  create_new_kms_key  = !var.use_ibm_owned_encryption_key && var.existing_kms_key_crn == null ? true : false # no need to create any KMS resources if passing an existing key, or using IBM owned keys
+  create_new_kms_key  = var.existing_db_instance_crn == null && !var.use_ibm_owned_encryption_key && var.existing_kms_key_crn == null ? true : false # no need to create any KMS resources if passing an existing key, or using IBM owned keys
   redis_key_name      = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.key_name}" : var.key_name
   redis_key_ring_name = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.key_ring_name}" : var.key_ring_name
 }
@@ -99,23 +99,23 @@ data "ibm_iam_account_settings" "iam_account_settings" {
 
 locals {
   account_id                                  = data.ibm_iam_account_settings.iam_account_settings.account_id
-  create_cross_account_kms_auth_policy        = !var.skip_redis_kms_auth_policy && var.ibmcloud_kms_api_key != null && !var.use_ibm_owned_encryption_key
-  create_cross_account_backup_kms_auth_policy = !var.skip_redis_kms_auth_policy && var.ibmcloud_kms_api_key != null && !var.use_ibm_owned_encryption_key && var.existing_backup_kms_key_crn != null
+  create_cross_account_kms_auth_policy        = var.existing_db_instance_crn == null && !var.skip_redis_kms_auth_policy && var.ibmcloud_kms_api_key != null && !var.use_ibm_owned_encryption_key
+  create_cross_account_backup_kms_auth_policy = var.existing_db_instance_crn == null && !var.skip_redis_kms_auth_policy && var.ibmcloud_kms_api_key != null && !var.use_ibm_owned_encryption_key && var.existing_backup_kms_key_crn != null
 
   # If KMS encryption enabled (and existing ES instance is not being passed), parse details from the existing key if being passed, otherwise get it from the key that the DA creates
-  kms_account_id    = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].account_id : module.kms_instance_crn_parser[0].account_id
-  kms_service       = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].service_name : module.kms_instance_crn_parser[0].service_name
-  kms_instance_guid = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].service_instance : module.kms_instance_crn_parser[0].service_instance
-  kms_key_crn       = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? var.existing_kms_key_crn : module.kms[0].keys[format("%s.%s", local.redis_key_ring_name, local.redis_key_name)].crn
-  kms_key_id        = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].resource : module.kms[0].keys[format("%s.%s", local.redis_key_ring_name, local.redis_key_name)].key_id
-  kms_region        = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].region : module.kms_instance_crn_parser[0].region
+  kms_account_id    = var.existing_db_instance_crn != null || var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].account_id : module.kms_instance_crn_parser[0].account_id
+  kms_service       = var.existing_db_instance_crn != null || var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].service_name : module.kms_instance_crn_parser[0].service_name
+  kms_instance_guid = var.existing_db_instance_crn != null || var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].service_instance : module.kms_instance_crn_parser[0].service_instance
+  kms_key_crn       = var.existing_db_instance_crn != null || var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? var.existing_kms_key_crn : module.kms[0].keys[format("%s.%s", local.redis_key_ring_name, local.redis_key_name)].crn
+  kms_key_id        = var.existing_db_instance_crn != null || var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].resource : module.kms[0].keys[format("%s.%s", local.redis_key_ring_name, local.redis_key_name)].key_id
+  kms_region        = var.existing_db_instance_crn != null || var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].region : module.kms_instance_crn_parser[0].region
 
   # If creating KMS cross account policy for backups, parse backup key details from passed in key CRN
   backup_kms_account_id    = local.create_cross_account_backup_kms_auth_policy ? module.kms_backup_key_crn_parser[0].account_id : local.kms_account_id
   backup_kms_service       = local.create_cross_account_backup_kms_auth_policy ? module.kms_backup_key_crn_parser[0].service_name : local.kms_service
   backup_kms_instance_guid = local.create_cross_account_backup_kms_auth_policy ? module.kms_backup_key_crn_parser[0].service_instance : local.kms_instance_guid
   backup_kms_key_id        = local.create_cross_account_backup_kms_auth_policy ? module.kms_backup_key_crn_parser[0].resource : local.kms_key_id
-  backup_kms_key_crn       = var.use_ibm_owned_encryption_key ? null : var.existing_backup_kms_key_crn
+  backup_kms_key_crn       = var.existing_db_instance_crn != null || var.use_ibm_owned_encryption_key ? null : var.existing_backup_kms_key_crn
   # Always use same key for backups unless user explicially passed a value for 'existing_backup_kms_key_crn'
   use_same_kms_key_for_backups = var.existing_backup_kms_key_crn == null ? true : false
 }
@@ -240,8 +240,51 @@ locals {
 # Redis
 #######################################################################################################################
 
+# Look up existing instance details if user passes one
+module "redis_instance_crn_parser" {
+  count   = var.existing_db_instance_crn != null ? 1 : 0
+  source  = "terraform-ibm-modules/common-utilities/ibm//modules/crn-parser"
+  version = "1.1.0"
+  crn     = var.existing_db_instance_crn
+}
+
+# Existing instance local vars
+locals {
+  existing_redis_guid   = var.existing_db_instance_crn != null ? module.es_instance_crn_parser[0].service_instance : null
+  existing_redis_region = var.existing_db_instance_crn != null ? module.es_instance_crn_parser[0].region : null
+
+  # Validate the region input matches region detected in existing instance CRN (approach based on https://github.com/hashicorp/terraform/issues/25609#issuecomment-1057614400)
+  # tflint-ignore: terraform_unused_declarations
+  validate_existing_instance_region = var.existing_db_instance_crn != null && var.region != local.existing_redis_region ? tobool("The region detected in the 'existing_db_instance_crn' value must match the value of the 'region' input variable when passing an existing instance.") : true
+}
+
+# Do a data lookup on the resource GUID to get more info that is needed for the 'ibm_database' data lookup below
+data "ibm_resource_instance" "existing_instance_resource" {
+  count      = var.existing_db_instance_crn != null ? 1 : 0
+  identifier = local.existing_elasticsearch_guid
+}
+
+# Lookup details of existing instance
+data "ibm_database" "existing_db_instance" {
+  count             = var.existing_db_instance_crn != null ? 1 : 0
+  name              = data.ibm_resource_instance.existing_instance_resource[0].name
+  resource_group_id = data.ibm_resource_instance.existing_instance_resource[0].resource_group_id
+  location          = var.region
+  service           = "databases-for-redis"
+}
+
+# Lookup existing instance connection details
+data "ibm_database_connection" "existing_connection" {
+  count         = var.existing_db_instance_crn != null ? 1 : 0
+  endpoint_type = "private"
+  deployment_id = data.ibm_database.existing_db_instance[0].id
+  user_id       = data.ibm_database.existing_db_instance[0].adminuser
+  user_type     = "database"
+}
+
 # Create new instance
 module "redis" {
+  count                             = var.existing_db_instance_crn != null ? 0 : 1
   source                            = "../../modules/fscloud"
   depends_on                        = [time_sleep.wait_for_authorization_policy, time_sleep.wait_for_backup_kms_authorization_policy]
   resource_group_id                 = module.resource_group.resource_group_id
@@ -267,6 +310,17 @@ module "redis" {
   configuration                     = var.configuration
   service_credential_names          = var.service_credential_names
   backup_crn                        = var.backup_crn
+}
+
+locals {
+  redis_guid     = var.existing_db_instance_crn != null ? data.ibm_database.existing_db_instance[0].guid : module.redis[0].guid
+  redis_id       = var.existing_db_instance_crn != null ? data.ibm_database.existing_db_instance[0].id : module.redis[0].id
+  redis_version  = var.existing_db_instance_crn != null ? data.ibm_database.existing_db_instance[0].version : module.redis[0].version
+  redis_crn      = var.existing_db_instance_crn != null ? var.existing_db_instance_crn : module.redis[0].crn
+  redis_hostname = var.existing_db_instance_crn != null ? data.ibm_database_connection.existing_connection[0].https[0].hosts[0].hostname : module.redis[0].hostname
+  redis_port     = var.existing_db_instance_crn != null ? data.ibm_database_connection.existing_connection[0].https[0].hosts[0].port : module.redis[0].port
+  redis_cert     = var.existing_db_instance_crn != null ? data.ibm_database_connection.existing_connection[0].https[0].certificate[0].certificate_base64 : module.redis[0].certificate_base64
+  redis_username = var.existing_db_instance_crn != null ? data.ibm_database.existing_db_instance[0].adminuser : "admin"
 }
 
 locals {

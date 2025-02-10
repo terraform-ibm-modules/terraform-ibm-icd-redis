@@ -36,6 +36,12 @@ variable "region" {
   default     = "us-south"
 }
 
+variable "existing_db_instance_crn" {
+  type        = string
+  default     = null
+  description = "The CRN of an existing Databases for Redis instance. If no value is specified, a new instance is created."
+}
+
 variable "redis_version" {
   description = "The version of the Databases for Redis instance. If no value is specified, the current preferred version of Databases for Redis is used."
   type        = string

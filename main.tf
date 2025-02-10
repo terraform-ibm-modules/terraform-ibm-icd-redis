@@ -173,13 +173,13 @@ resource "time_sleep" "wait_for_backup_kms_authorization_policy" {
 
 resource "ibm_database" "redis_database" {
   depends_on                = [time_sleep.wait_for_authorization_policy]
-  name                      = var.instance_name
+  name                      = var.name
   plan                      = "standard" # Only standard plan is available for redis
   location                  = var.region
   service                   = "databases-for-redis"
   version                   = var.redis_version
   resource_group_id         = var.resource_group_id
-  service_endpoints         = var.endpoints
+  service_endpoints         = var.service_endpoints
   tags                      = var.tags
   adminpassword             = var.admin_pass
   key_protect_key           = var.kms_key_crn
@@ -391,7 +391,7 @@ locals {
 }
 
 data "ibm_database_connection" "database_connection" {
-  endpoint_type = var.endpoints == "public-and-private" ? "public" : var.endpoints
+  endpoint_type = var.service_endpoints == "public-and-private" ? "public" : var.service_endpoints
   deployment_id = ibm_database.redis_database.id
   user_id       = ibm_database.redis_database.adminuser
   user_type     = "database"

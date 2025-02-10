@@ -10,18 +10,19 @@ module "resource_group" {
   existing_resource_group_name = var.resource_group
 }
 
-##############################################################################
-# Redis
-##############################################################################
+data "ibm_database_backups" "backup_database" {
+  deployment_id = var.existing_database_crn
+}
 
-module "database" {
-  source             = "../.."
+# New elasticsearch instance pointing to the backup instance
+module "restored_icd_redis" {
+  source             = "../../"
   resource_group_id  = module.resource_group.resource_group_id
-  instance_name      = "${var.prefix}-data-store"
-  region             = var.region
-  access_tags        = var.access_tags
-  service_endpoints  = var.service_endpoints
-  member_host_flavor = var.member_host_flavor
-  tags               = var.resource_tags
+  name               = "${var.prefix}-redis-restored"
   redis_version      = var.redis_version
+  region             = var.region
+  tags               = var.resource_tags
+  access_tags        = var.access_tags
+  member_host_flavor = "multitenant"
+  backup_crn         = data.ibm_database_backups.backup_database.backups[0].backup_id
 }
