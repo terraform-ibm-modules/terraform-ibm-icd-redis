@@ -190,8 +190,13 @@
             },
             {
               "key": "redis_version",
-              "required": true,
+              "required": false,
+              "default_value": "__NULL__",
               "options": [
+                {
+                "displayname": "preferred",
+                "value": "__NULL__"
+                },
                 {
                   "displayname": "6.2",
                   "value": "6.2"
