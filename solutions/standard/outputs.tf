@@ -4,22 +4,22 @@
 
 output "id" {
   description = "Redis instance id"
-  value       = module.redis.id
+  value       = local.redis_id
 }
 
 output "version" {
   description = "Redis instance version"
-  value       = module.redis.version
+  value       = local.redis_version
 }
 
 output "guid" {
   description = "Redis instance guid"
-  value       = module.redis.guid
+  value       = local.redis_guid
 }
 
 output "crn" {
   description = "Redis instance crn"
-  value       = module.redis.crn
+  value       = local.redis_crn
 }
 
 output "cbr_rule_ids" {
@@ -46,12 +46,12 @@ output "adminuser" {
 
 output "hostname" {
   description = "Database connection hostname"
-  value       = module.redis.hostname
+  value       = local.redis_hostname
 }
 
 output "port" {
   description = "Database connection port"
-  value       = module.redis.port
+  value       = local.redis_port
 }
 
 output "certificate_base64" {

@@ -17,7 +17,7 @@ module "resource_group" {
 module "database" {
   source             = "../.."
   resource_group_id  = module.resource_group.resource_group_id
-  instance_name      = "${var.prefix}-data-store"
+  name               = "${var.prefix}-data-store"
   region             = var.region
   access_tags        = var.access_tags
   service_endpoints  = var.service_endpoints

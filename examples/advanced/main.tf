@@ -92,7 +92,7 @@ module "icd_redis" {
   source            = "../../"
   resource_group_id = module.resource_group.resource_group_id
   redis_version     = var.redis_version
-  instance_name     = "${var.prefix}-redis"
+  name              = "${var.prefix}-redis"
   region            = var.region
   admin_pass        = var.admin_pass
   users             = var.users

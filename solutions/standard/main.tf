@@ -233,7 +233,10 @@ locals {
   # if - replace first char with J
   # elseif _ replace first char with K
   # else use asis.
-  admin_pass = var.admin_pass == null ? (startswith(random_password.admin_password[0].result, "-") ? "J${substr(random_password.admin_password[0].result, 1, -1)}" : startswith(random_password.admin_password[0].result, "_") ? "K${substr(random_password.admin_password[0].result, 1, -1)}" : random_password.admin_password[0].result) : var.admin_pass
+  generated_admin_password = startswith(random_password.admin_password[0].result, "-") ? "J${substr(random_password.admin_password[0].result, 1, -1)}" : startswith(random_password.admin_password[0].result, "_") ? "K${substr(random_password.admin_password[0].result, 1, -1)}" : random_password.admin_password[0].result
+
+  # admin password to use
+  admin_pass = var.admin_pass == null ? local.generated_admin_password : var.admin_pass
 }
 
 #######################################################################################################################
@@ -250,8 +253,8 @@ module "redis_instance_crn_parser" {
 
 # Existing instance local vars
 locals {
-  existing_redis_guid   = var.existing_db_instance_crn != null ? module.es_instance_crn_parser[0].service_instance : null
-  existing_redis_region = var.existing_db_instance_crn != null ? module.es_instance_crn_parser[0].region : null
+  existing_redis_guid   = var.existing_db_instance_crn != null ? module.redis_instance_crn_parser[0].service_instance : null
+  existing_redis_region = var.existing_db_instance_crn != null ? module.redis_instance_crn_parser[0].region : null
 
   # Validate the region input matches region detected in existing instance CRN (approach based on https://github.com/hashicorp/terraform/issues/25609#issuecomment-1057614400)
   # tflint-ignore: terraform_unused_declarations
@@ -261,7 +264,7 @@ locals {
 # Do a data lookup on the resource GUID to get more info that is needed for the 'ibm_database' data lookup below
 data "ibm_resource_instance" "existing_instance_resource" {
   count      = var.existing_db_instance_crn != null ? 1 : 0
-  identifier = local.existing_elasticsearch_guid
+  identifier = local.existing_redis_guid
 }
 
 # Lookup details of existing instance
@@ -288,7 +291,7 @@ module "redis" {
   source                            = "../../modules/fscloud"
   depends_on                        = [time_sleep.wait_for_authorization_policy, time_sleep.wait_for_backup_kms_authorization_policy]
   resource_group_id                 = module.resource_group.resource_group_id
-  instance_name                     = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.name}" : var.name
+  name                              = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.name}" : var.name
   region                            = var.region
   redis_version                     = var.redis_version
   skip_iam_authorization_policy     = var.skip_redis_kms_auth_policy
@@ -319,12 +322,30 @@ locals {
   redis_crn      = var.existing_db_instance_crn != null ? var.existing_db_instance_crn : module.redis[0].crn
   redis_hostname = var.existing_db_instance_crn != null ? data.ibm_database_connection.existing_connection[0].https[0].hosts[0].hostname : module.redis[0].hostname
   redis_port     = var.existing_db_instance_crn != null ? data.ibm_database_connection.existing_connection[0].https[0].hosts[0].port : module.redis[0].port
-  redis_cert     = var.existing_db_instance_crn != null ? data.ibm_database_connection.existing_connection[0].https[0].certificate[0].certificate_base64 : module.redis[0].certificate_base64
-  redis_username = var.existing_db_instance_crn != null ? data.ibm_database.existing_db_instance[0].adminuser : "admin"
 }
 
+#######################################################################################################################
+# Secrets management
+#######################################################################################################################
+
 locals {
+  ## Variable validation (approach based on https://github.com/hashicorp/terraform/issues/25609#issuecomment-1057614400)
+  # tflint-ignore: terraform_unused_declarations
+  validate_sm_crn = length(local.service_credential_secrets) > 0 && var.existing_secrets_manager_instance_crn == null ? tobool("`existing_secrets_manager_instance_crn` is required when adding service credentials to a secrets manager secret.") : false
+  # tflint-ignore: terraform_unused_declarations
+  validate_sm_sg = var.existing_secrets_manager_instance_crn != null && var.admin_pass_sm_secret_group == null ? tobool("`admin_pass_sm_secret_group` is required when `existing_secrets_manager_instance_crn` is set.") : false
+  # tflint-ignore: terraform_unused_declarations
+  validate_sm_sn = var.existing_secrets_manager_instance_crn != null && var.admin_pass_sm_secret_name == null ? tobool("`admin_pass_sm_secret_name` is required when `existing_secrets_manager_instance_crn` is set.") : false
+
   create_sm_auth_policy = var.skip_redis_sm_auth_policy || var.existing_secrets_manager_instance_crn == null ? 0 : 1
+}
+
+# Parse the Secrets Manager CRN
+module "sm_instance_crn_parser" {
+  count   = var.existing_secrets_manager_instance_crn != null ? 1 : 0
+  source  = "terraform-ibm-modules/common-utilities/ibm//modules/crn-parser"
+  version = "1.1.0"
+  crn     = var.existing_secrets_manager_instance_crn
 }
 
 # create a service authorization between Secrets Manager and the target service (Databases for Redis)
@@ -333,7 +354,7 @@ resource "ibm_iam_authorization_policy" "secrets_manager_key_manager" {
   source_service_name         = "secrets-manager"
   source_resource_instance_id = local.existing_secrets_manager_instance_guid
   target_service_name         = "databases-for-redis"
-  target_resource_instance_id = module.redis.guid
+  target_resource_instance_id = module.redis_guid
   roles                       = ["Key Manager"]
   description                 = "Allow Secrets Manager with instance id ${local.existing_secrets_manager_instance_guid} to manage key for the databases-for-redis instance"
 }
@@ -368,12 +389,23 @@ locals {
     }
   ]
 
-  existing_secrets_manager_instance_crn_split = var.existing_secrets_manager_instance_crn != null ? split(":", var.existing_secrets_manager_instance_crn) : null
-  existing_secrets_manager_instance_guid      = var.existing_secrets_manager_instance_crn != null ? element(local.existing_secrets_manager_instance_crn_split, length(local.existing_secrets_manager_instance_crn_split) - 3) : null
-  existing_secrets_manager_instance_region    = var.existing_secrets_manager_instance_crn != null ? element(local.existing_secrets_manager_instance_crn_split, length(local.existing_secrets_manager_instance_crn_split) - 5) : null
+  # Build the structure of the arbitrary credential type secret for admin password
+  admin_pass_secret = [{
+    secret_group_name     = (var.prefix != null && var.prefix != "") && var.admin_pass_sm_secret_group != null ? "${var.prefix}-${var.admin_pass_sm_secret_group}" : var.admin_pass_sm_secret_group
+    existing_secret_group = var.use_existing_admin_pass_sm_secret_group
+    secrets = [{
+      secret_name             = (var.prefix != null && var.prefix != "") && var.admin_pass_sm_secret_name != null ? "${var.prefix}-${var.admin_pass_sm_secret_name}" : var.admin_pass_sm_secret_name
+      secret_type             = "arbitrary"
+      secret_payload_password = local.admin_pass
+      }
+    ]
+  }]
 
-  # tflint-ignore: terraform_unused_declarations
-  validate_sm_crn = length(local.service_credential_secrets) > 0 && var.existing_secrets_manager_instance_crn == null ? tobool("`existing_secrets_manager_instance_crn` is required when adding service credentials to a secrets manager secret.") : false
+  # Concatinate into 1 secrets object
+  secrets = concat(local.service_credential_secrets, local.admin_pass_secret)
+  # Parse Secrets Manager details from the CRN
+  existing_secrets_manager_instance_guid   = var.existing_secrets_manager_instance_crn != null ? module.sm_instance_crn_parser[0].service_instance : null
+  existing_secrets_manager_instance_region = var.existing_secrets_manager_instance_crn != null ? module.sm_instance_crn_parser[0].region : null
 }
 
 module "secrets_manager_service_credentials" {
@@ -384,5 +416,5 @@ module "secrets_manager_service_credentials" {
   existing_sm_instance_guid   = local.existing_secrets_manager_instance_guid
   existing_sm_instance_region = local.existing_secrets_manager_instance_region
   endpoint_type               = var.existing_secrets_manager_endpoint_type
-  secrets                     = local.service_credential_secrets
+  secrets                     = local.secrets
 }
