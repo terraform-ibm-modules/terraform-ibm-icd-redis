@@ -354,7 +354,7 @@ resource "ibm_iam_authorization_policy" "secrets_manager_key_manager" {
   source_service_name         = "secrets-manager"
   source_resource_instance_id = local.existing_secrets_manager_instance_guid
   target_service_name         = "databases-for-redis"
-  target_resource_instance_id = module.redis_guid
+  target_resource_instance_id = local.redis_guid
   roles                       = ["Key Manager"]
   description                 = "Allow Secrets Manager with instance id ${local.existing_secrets_manager_instance_guid} to manage key for the databases-for-redis instance"
 }

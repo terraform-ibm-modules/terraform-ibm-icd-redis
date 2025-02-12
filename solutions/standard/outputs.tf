@@ -22,26 +22,21 @@ output "crn" {
   value       = local.redis_crn
 }
 
-output "cbr_rule_ids" {
-  description = "CBR rule ids created to restrict Redis"
-  value       = module.redis.cbr_rule_ids
-}
-
 output "service_credentials_json" {
   description = "Service credentials json map"
-  value       = module.redis.service_credentials_json
+  value       = var.existing_db_instance_crn != null ? null : module.redis[0].service_credentials_json
   sensitive   = true
 }
 
 output "service_credentials_object" {
   description = "Service credentials object"
-  value       = module.redis.service_credentials_object
+  value       = var.existing_db_instance_crn != null ? null : module.redis[0].service_credentials_object
   sensitive   = true
 }
 
 output "adminuser" {
   description = "Database admin user name"
-  value       = module.redis.adminuser
+  value       = module.redis[0].adminuser
 }
 
 output "hostname" {
@@ -56,7 +51,7 @@ output "port" {
 
 output "certificate_base64" {
   description = "Database connection certificate"
-  value       = module.redis.certificate_base64
+  value       = module.redis[0].certificate_base64
   sensitive   = true
 }
 
