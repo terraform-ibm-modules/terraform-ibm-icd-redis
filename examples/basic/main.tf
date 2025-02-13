@@ -24,4 +24,10 @@ module "database" {
   member_host_flavor = var.member_host_flavor
   tags               = var.resource_tags
   redis_version      = var.redis_version
+  service_credential_names = {
+    "elasticsearch_admin" : "Administrator",
+    "elasticsearch_operator" : "Operator",
+    "elasticsearch_viewer" : "Viewer",
+    "elasticsearch_editor" : "Editor",
+  }
 }

@@ -6,6 +6,11 @@ output "id" {
   value       = module.database.id
 }
 
+output "redis_crn" {
+  description = "Redis CRN"
+  value       = module.database.crn
+}
+
 output "version" {
   description = "Redis instance version"
   value       = module.database.version
