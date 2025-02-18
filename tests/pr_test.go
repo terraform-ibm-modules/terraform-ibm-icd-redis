@@ -147,6 +147,63 @@ func TestRunStandardUpgradeSolution(t *testing.T) {
 	}
 }
 
+func TestPlanValidation(t *testing.T) {
+	options := testhelper.TestOptionsDefault(&testhelper.TestOptions{
+		Testing:       t,
+		TerraformDir:  standardSolutionTerraformDir,
+		Prefix:        "validate-plan",
+		ResourceGroup: resourceGroup,
+		Region:        "us-south", // skip VPC region picker
+	})
+	options.TestSetup()
+	options.TerraformOptions.NoColor = true
+	options.TerraformOptions.Logger = logger.Discard
+	options.TerraformOptions.Vars = map[string]interface{}{
+		"prefix":              options.Prefix,
+		"region":              "us-south",
+		"redis_version":       "7.2",
+		"provider_visibility": "public",
+		"resource_group_name": options.Prefix,
+	}
+
+	// Test the DA when using an existing KMS instance
+	var standardSolutionWithExistingKms = map[string]interface{}{
+		"access_tags":               permanentResources["accessTags"],
+		"existing_kms_instance_crn": permanentResources["hpcs_south_crn"],
+	}
+
+	// Test the DA when using IBM owned encryption key
+	var standardSolutionWithUseIbmOwnedEncKey = map[string]interface{}{
+		"use_ibm_owned_encryption_key": true,
+	}
+
+	// Create a map of the variables
+	tfVarsMap := map[string]map[string]interface{}{
+		"standardSolutionWithExistingKms":       standardSolutionWithExistingKms,
+		"standardSolutionWithUseIbmOwnedEncKey": standardSolutionWithUseIbmOwnedEncKey,
+	}
+
+	_, initErr := terraform.InitE(t, options.TerraformOptions)
+	if assert.Nil(t, initErr, "This should not have errored") {
+		// Iterate over the slice of maps
+		for name, tfVars := range tfVarsMap {
+			t.Run(name, func(t *testing.T) {
+				// Iterate over the keys and values in each map
+				for key, value := range tfVars {
+					options.TerraformOptions.Vars[key] = value
+				}
+				output, err := terraform.PlanE(t, options.TerraformOptions)
+				assert.Nil(t, err, "This should not have errored")
+				assert.NotNil(t, output, "Expected some output")
+				// Delete the keys from the map
+				for key := range tfVars {
+					delete(options.TerraformOptions.Vars, key)
+				}
+			})
+		}
+	}
+}
+
 func TestRunExistingInstance(t *testing.T) {
 	t.Parallel()
 	prefix := fmt.Sprintf("redis-t-%s", strings.ToLower(random.UniqueId()))
