@@ -46,16 +46,16 @@ output "adminuser" {
 
 output "hostname" {
   description = "Database connection hostname"
-  value       = data.ibm_database_connection.database_connection.https[0].hosts[0].hostname
+  value       = data.ibm_database_connection.database_connection.rediss[0].hosts[0].hostname
 }
 
 output "port" {
   description = "Database connection port"
-  value       = data.ibm_database_connection.database_connection.https[0].hosts[0].port
+  value       = data.ibm_database_connection.database_connection.rediss[0].hosts[0].port
 }
 
 output "certificate_base64" {
   description = "Database connection certificate"
-  value       = data.ibm_database_connection.database_connection.https[0].certificate[0].certificate_base64
+  value       = data.ibm_database_connection.database_connection.rediss[0].certificate[0].certificate_base64
   sensitive   = true
 }
