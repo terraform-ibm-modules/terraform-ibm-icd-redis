@@ -320,8 +320,8 @@ locals {
   redis_id       = var.existing_db_instance_crn != null ? data.ibm_database.existing_db_instance[0].id : module.redis[0].id
   redis_version  = var.existing_db_instance_crn != null ? data.ibm_database.existing_db_instance[0].version : module.redis[0].version
   redis_crn      = var.existing_db_instance_crn != null ? var.existing_db_instance_crn : module.redis[0].crn
-  redis_hostname = var.existing_db_instance_crn != null ? data.ibm_database_connection.existing_connection[0].https[0].hosts[0].hostname : module.redis[0].hostname
-  redis_port     = var.existing_db_instance_crn != null ? data.ibm_database_connection.existing_connection[0].https[0].hosts[0].port : module.redis[0].port
+  redis_hostname = var.existing_db_instance_crn != null ? data.ibm_database_connection.existing_connection[0].rediss[0].hosts[0].hostname : module.redis[0].hostname
+  redis_port     = var.existing_db_instance_crn != null ? data.ibm_database_connection.existing_connection[0].rediss[0].hosts[0].port : module.redis[0].port
 }
 
 #######################################################################################################################

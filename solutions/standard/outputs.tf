@@ -34,11 +34,6 @@ output "service_credentials_object" {
   sensitive   = true
 }
 
-output "adminuser" {
-  description = "Database admin user name"
-  value       = module.redis[0].adminuser
-}
-
 output "hostname" {
   description = "Database connection hostname"
   value       = local.redis_hostname
@@ -47,12 +42,6 @@ output "hostname" {
 output "port" {
   description = "Database connection port"
   value       = local.redis_port
-}
-
-output "certificate_base64" {
-  description = "Database connection certificate"
-  value       = module.redis[0].certificate_base64
-  sensitive   = true
 }
 
 output "secrets_manager_secrets" {
