@@ -22,10 +22,10 @@ variable "resource_group" {
   default     = null
 }
 
-variable "redis_version" {
-  description = "Version of the Redis instance to provision. If no value is passed, the current preferred version of IBM Cloud Databases is used."
-  type        = string
-  default     = null
+variable "resource_tags" {
+  type        = list(string)
+  description = "Optional list of tags to be added to created resources"
+  default     = []
 }
 
 variable "access_tags" {
@@ -34,16 +34,16 @@ variable "access_tags" {
   default     = []
 }
 
-variable "resource_tags" {
-  type        = list(string)
-  description = "Optional list of tags to be added to created resources"
-  default     = []
+variable "redis_version" {
+  description = "Version of the Redis instance. If no value is passed, the current preferred version of IBM Cloud Databases is used."
+  type        = string
+  default     = null
 }
 
 variable "admin_pass" {
   type        = string
-  default     = null
   sensitive   = true
+  default     = null
   description = "The password for the database administrator. If the admin password is null then the admin user ID cannot be accessed. More users can be specified in a user block."
 }
 
