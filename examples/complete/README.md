@@ -1,4 +1,4 @@
-# Advanced example
+# Complete example
 
 This example creates an IBM Cloud Database for Redis instance with KMS encryption enabled and CBR rules configured.
 
