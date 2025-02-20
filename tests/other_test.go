@@ -88,3 +88,23 @@ func TestPlanICDVersions(t *testing.T) {
 		t.Run(version, func(t *testing.T) { testPlanICDVersions(t, version) })
 	}
 }
+
+func TestRunCompleteExample(t *testing.T) {
+	t.Parallel()
+
+	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
+		Testing:            t,
+		TerraformDir:       "examples/complete",
+		Prefix:             "redis-complete",
+		BestRegionYAMLPath: regionSelectionPath,
+		ResourceGroup:      resourceGroup,
+		TerraformVars: map[string]interface{}{
+			"redis_version": "7.2",
+		},
+		CloudInfoService: sharedInfoSvc,
+	})
+
+	output, err := options.RunTestConsistency()
+	assert.Nil(t, err, "This should not have errored")
+	assert.NotNil(t, output, "Expected some output")
+}
