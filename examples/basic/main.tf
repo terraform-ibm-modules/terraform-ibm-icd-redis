@@ -25,9 +25,9 @@ module "database" {
   tags               = var.resource_tags
   redis_version      = var.redis_version
   service_credential_names = {
-    "elasticsearch_admin" : "Administrator",
-    "elasticsearch_operator" : "Operator",
-    "elasticsearch_viewer" : "Viewer",
-    "elasticsearch_editor" : "Editor",
+    "redis_admin" : "Administrator",
+    "redis_operator" : "Operator",
+    "redis_viewer" : "Viewer",
+    "redis_editor" : "Editor",
   }
 }
