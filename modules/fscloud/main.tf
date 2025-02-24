@@ -4,8 +4,8 @@ module "redis" {
   redis_version                     = var.redis_version
   region                            = var.region
   skip_iam_authorization_policy     = var.skip_iam_authorization_policy
-  instance_name                     = var.instance_name
-  endpoints                         = "private"
+  name                              = var.name
+  service_endpoints                 = "private"
   cbr_rules                         = var.cbr_rules
   configuration                     = var.configuration
   cpu_count                         = var.cpu_count
