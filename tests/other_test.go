@@ -2,6 +2,7 @@
 package test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -52,6 +53,26 @@ func TestRunStandardSolutionIBMKeys(t *testing.T) {
 		"resource_group_name":          options.Prefix,
 		"use_ibm_owned_encryption_key": true,
 	}
+
+	output, err := options.RunTestConsistency()
+	assert.Nil(t, err, "This should not have errored")
+	assert.NotNil(t, output, "Expected some output")
+}
+
+func TestRunRestoredDBExample(t *testing.T) {
+	t.Parallel()
+
+	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
+		Testing:       t,
+		TerraformDir:  "examples/backup-restore",
+		Prefix:        "redis-restored",
+		Region:        fmt.Sprint(permanentResources["redisRegion"]),
+		ResourceGroup: resourceGroup,
+		TerraformVars: map[string]interface{}{
+			"existing_database_crn": permanentResources["redisCrn"],
+		},
+		CloudInfoService: sharedInfoSvc,
+	})
 
 	output, err := options.RunTestConsistency()
 	assert.Nil(t, err, "This should not have errored")
