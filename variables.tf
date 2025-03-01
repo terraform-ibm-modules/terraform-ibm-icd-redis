@@ -189,6 +189,17 @@ variable "use_default_backup_encryption_key" {
   type        = bool
   description = "When `use_ibm_owned_encryption_key` is set to false, backups will be encrypted with either the key specified in `kms_key_crn`, or in `backup_encryption_key_crn` if a value is passed. If you do not want to use your own key for backups encryption, you can set this to `true` to use the IBM Cloud Databases default encryption for backups. Alternatively set `use_ibm_owned_encryption_key` to true to use the default encryption for both backups and deployment data."
   default     = false
+
+  validation {
+
+    condition = alltrue([
+      !var.use_ibm_owned_encryption_key || (var.kms_key_crn == null && var.backup_encryption_key_crn == null),
+      var.use_ibm_owned_encryption_key || var.kms_key_crn != null,
+      (var.use_ibm_owned_encryption_key || var.backup_encryption_key_crn != null) || (var.use_default_backup_encryption_key || var.use_same_kms_key_for_backups),
+      (var.use_ibm_owned_encryption_key || var.backup_encryption_key_crn == null) || (!var.use_same_kms_key_for_backups)
+    ])
+    error_message = "If IBM owned encryption is used then 'kms_key_crn' and 'backup_encryption_key_crn' should be null. If not, 'kms_key_crn' should be provided and if 'backup_encryption_key_crn' is not provided 'use_same_kms_key_for_backups' or 'use_default_backup_encryption_key' should be true.If 'backup_encryption_key_crn' is provided then 'use_same_kms_key_for_backups' should be set to false"
+  }
 }
 
 variable "kms_key_crn" {
