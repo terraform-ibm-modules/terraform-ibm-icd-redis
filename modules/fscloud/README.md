@@ -13,7 +13,7 @@ The IBM Cloud Framework for Financial Services mandates the application of an in
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | >=1.70.0, <2.0.0 |
 
 ### Modules
@@ -39,11 +39,11 @@ No resources.
 | <a name="input_configuration"></a> [configuration](#input\_configuration) | Database Configuration. | <pre>object({<br/>    maxmemory                   = optional(number)<br/>    maxmemory-policy            = optional(string)<br/>    appendonly                  = optional(string)<br/>    maxmemory-samples           = optional(number)<br/>    stop-writes-on-bgsave-error = optional(string)<br/>  })</pre> | `null` | no |
 | <a name="input_cpu_count"></a> [cpu\_count](#input\_cpu\_count) | Allocated dedicated CPU per member. For shared CPU, set to 0. For more information, see https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-resources-scaling | `number` | `3` | no |
 | <a name="input_disk_mb"></a> [disk\_mb](#input\_disk\_mb) | Allocated disk per member. For more information, see https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-resources-scaling | `number` | `1024` | no |
-| <a name="input_instance_name"></a> [instance\_name](#input\_instance\_name) | The name to give the Redis instance. | `string` | n/a | yes |
 | <a name="input_kms_key_crn"></a> [kms\_key\_crn](#input\_kms\_key\_crn) | The CRN of a Key Protect or Hyper Protect Crypto Services encryption key to encrypt your data. Applies only if `use_ibm_owned_encryption_key` is false. By default this key is used for both deployment data and backups, but this behaviour can be altered using the `use_same_kms_key_for_backups` and `backup_encryption_key_crn` inputs. Bare in mind that backups encryption is only available in certain regions. See [Bring your own key for backups](https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-key-protect&interface=ui#key-byok) and [Using the HPCS Key for Backup encryption](https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-hpcs#use-hpcs-backups). | `string` | `null` | no |
 | <a name="input_member_host_flavor"></a> [member\_host\_flavor](#input\_member\_host\_flavor) | Allocated host flavor per member. [Learn more](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/database#host_flavor). | `string` | `null` | no |
 | <a name="input_members"></a> [members](#input\_members) | Allocated number of members. Members can be scaled up but not down. | `number` | `2` | no |
 | <a name="input_memory_mb"></a> [memory\_mb](#input\_memory\_mb) | Allocated memory per member. For more information, see https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-resources-scaling | `number` | `4096` | no |
+| <a name="input_name"></a> [name](#input\_name) | The name to give the Redis instance. | `string` | n/a | yes |
 | <a name="input_redis_version"></a> [redis\_version](#input\_redis\_version) | The version of redis. If null, the current default ICD redis version is used. | `string` | `null` | no |
 | <a name="input_region"></a> [region](#input\_region) | The region where you want to deploy your instance. Must be the same region as the Hyper Protect Crypto Services instance. | `string` | `"us-south"` | no |
 | <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id) | The resource group ID where the Redis instance will be created. | `string` | n/a | yes |

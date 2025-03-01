@@ -2,66 +2,12 @@
 package test
 
 import (
+	"fmt"
 	"testing"
 
-	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testhelper"
 )
-
-func TestRunBasicExample(t *testing.T) {
-	t.Parallel()
-
-	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
-		Testing:       t,
-		TerraformDir:  "examples/basic",
-		Prefix:        "redis",
-		ResourceGroup: resourceGroup,
-		TerraformVars: map[string]interface{}{
-			"redis_version": "6.2", // Always lock to the lowest supported Redis version
-		},
-		CloudInfoService: sharedInfoSvc,
-	})
-
-	output, err := options.RunTestConsistency()
-	assert.Nil(t, err, "This should not have errored")
-	assert.NotNil(t, output, "Expected some output")
-}
-
-func TestRunRedisFSCloudExample(t *testing.T) {
-	t.Parallel()
-
-	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
-		Testing:      t,
-		TerraformDir: "examples/fscloud",
-		Prefix:       "fs-redis",
-		Region:       "us-south", // For FSCloud locking into us-south since that is where the HPCS permanent instance is
-		/*
-		 Comment out the 'ResourceGroup' input to force this tests to create a unique resource group to ensure tests do
-		 not clash. This is due to the fact that an auth policy may already exist in this resource group since we are
-		 re-using a permanent HPCS instance. By using a new resource group, the auth policy will not already exist
-		 since this module scopes auth policies by resource group.
-		*/
-		//ResourceGroup: resourceGroup,
-		TerraformVars: map[string]interface{}{
-			"redis_version": "7.2", // Always lock this test into the latest supported Redis version
-			"access_tags":   permanentResources["accessTags"],
-			"kms_key_crn":   permanentResources["hpcs_south_root_key_crn"],
-		},
-		CloudInfoService: sharedInfoSvc,
-	})
-	options.SkipTestTearDown = true
-	output, err := options.RunTestConsistency()
-	assert.Nil(t, err, "This should not have errored")
-	assert.NotNil(t, output, "Expected some output")
-
-	// check if outputs exist
-	outputs := terraform.OutputAll(options.Testing, options.TerraformOptions)
-	expectedOutputs := []string{"port", "hostname"}
-	_, outputErr := testhelper.ValidateTerraformOutputs(outputs, expectedOutputs...)
-	assert.NoErrorf(t, outputErr, "Some outputs not found or nil")
-	options.TestTearDown()
-}
 
 func testPlanICDVersions(t *testing.T, version string) {
 	t.Parallel()
@@ -89,17 +35,41 @@ func TestPlanICDVersions(t *testing.T) {
 	}
 }
 
-func TestRunCompleteExample(t *testing.T) {
+// Test the DA when using IBM owned encryption keys
+func TestRunStandardSolutionIBMKeys(t *testing.T) {
+	t.Parallel()
+
+	options := testhelper.TestOptionsDefault(&testhelper.TestOptions{
+		Testing:       t,
+		TerraformDir:  standardSolutionTerraformDir,
+		Region:        "us-south",
+		Prefix:        "redis-key",
+		ResourceGroup: resourceGroup,
+	})
+
+	options.TerraformVars = map[string]interface{}{
+		"redis_version":                "7.2",
+		"provider_visibility":          "public",
+		"resource_group_name":          options.Prefix,
+		"use_ibm_owned_encryption_key": true,
+	}
+
+	output, err := options.RunTestConsistency()
+	assert.Nil(t, err, "This should not have errored")
+	assert.NotNil(t, output, "Expected some output")
+}
+
+func TestRunRestoredDBExample(t *testing.T) {
 	t.Parallel()
 
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
-		Testing:            t,
-		TerraformDir:       "examples/complete",
-		Prefix:             "redis-complete",
-		BestRegionYAMLPath: regionSelectionPath,
-		ResourceGroup:      resourceGroup,
+		Testing:       t,
+		TerraformDir:  "examples/backup-restore",
+		Prefix:        "redis-restored",
+		Region:        fmt.Sprint(permanentResources["redisRegion"]),
+		ResourceGroup: resourceGroup,
 		TerraformVars: map[string]interface{}{
-			"redis_version": "7.2",
+			"existing_database_crn": permanentResources["redisCrn"],
 		},
 		CloudInfoService: sharedInfoSvc,
 	})
