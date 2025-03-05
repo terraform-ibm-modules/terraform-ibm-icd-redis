@@ -159,7 +159,7 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
-		{Name: "access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
+		{Name: "database_access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
 		{Name: "existing_kms_instance_crn", Value: permanentResources["hpcs_south_crn"], DataType: "string"},
 		{Name: "kms_endpoint_type", Value: "private", DataType: "string"},
 		{Name: "redis_version", Value: "7.2", DataType: "string"}, // Always lock this test into the latest supported Redis version
@@ -167,7 +167,7 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
-		{Name: "admin_pass", Value: GetRandomAdminPassword(t), DataType: "string"},
+		{Name: "admin_password", Value: GetRandomAdminPassword(t), DataType: "string"},
 	}
 	err = options.RunSchematicTest()
 	assert.Nil(t, err, "This should not have errored")
@@ -185,7 +185,7 @@ func TestRunStandardUpgradeSolution(t *testing.T) {
 	})
 
 	options.TerraformVars = map[string]interface{}{
-		"access_tags":               permanentResources["accessTags"],
+		"database_access_tags":      permanentResources["accessTags"],
 		"existing_kms_instance_crn": permanentResources["hpcs_south_crn"],
 		"kms_endpoint_type":         "public",
 		"provider_visibility":       "public",
@@ -220,7 +220,7 @@ func TestPlanValidation(t *testing.T) {
 
 	// Test the DA when using an existing KMS instance
 	var standardSolutionWithExistingKms = map[string]interface{}{
-		"access_tags":               permanentResources["accessTags"],
+		"database_access_tags":      permanentResources["accessTags"],
 		"existing_kms_instance_crn": permanentResources["hpcs_south_crn"],
 	}
 
@@ -257,7 +257,7 @@ func TestPlanValidation(t *testing.T) {
 }
 
 func GetRandomAdminPassword(t *testing.T) string {
-	// Generate a 15 char long random string for the admin_pass
+	// Generate a 15 char long random string for the admin_password
 	randomBytes := make([]byte, 13)
 	_, randErr := rand.Read(randomBytes)
 	require.Nil(t, randErr) // do not proceed if we can't gen a random password
