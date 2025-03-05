@@ -245,7 +245,7 @@ module "redis" {
   source                            = "../../modules/fscloud"
   depends_on                        = [time_sleep.wait_for_authorization_policy, time_sleep.wait_for_backup_kms_authorization_policy]
   resource_group_id                 = module.resource_group.resource_group_id
-  instance_name                     = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.database_name}" : var.database_name
+  instance_name                     = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.redis_instance_name}" : var.redis_instance_name
   region                            = var.region
   redis_version                     = var.redis_version
   skip_iam_authorization_policy     = var.skip_redis_kms_iam_auth_policy
@@ -254,8 +254,8 @@ module "redis" {
   backup_encryption_key_crn         = local.backup_kms_key_crn
   use_same_kms_key_for_backups      = local.use_same_kms_key_for_backups
   use_default_backup_encryption_key = var.use_default_backup_encryption_key
-  access_tags                       = var.database_access_tags
-  tags                              = var.database_tags
+  access_tags                       = var.redis_instance_access_tags
+  tags                              = var.redis_instance_tags
   admin_pass                        = local.admin_pass
   users                             = var.users
   members                           = var.members

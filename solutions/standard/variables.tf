@@ -25,7 +25,7 @@ variable "prefix" {
   default     = "dev"
 }
 
-variable "database_name" {
+variable "redis_instance_name" {
   type        = string
   description = "The name of the Databases for Redis instance. If a prefix input variable is specified, the prefix is added to the name in the `<prefix>-<name>` format."
   default     = "redis"
@@ -120,13 +120,13 @@ variable "users" {
   description = "A list of users that you want to create on the database. Users block is supported by Redis version >= 6.0. Multiple blocks are allowed. The user password must be in the range of 10-32 characters. Be warned that in most case using IAM service credentials (via the var.service_credential_names) is sufficient to control access to the Redis instance. This blocks creates native redis database users. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/solutions/standard/DA-types.md#users)"
 }
 
-variable "database_tags" {
+variable "redis_instance_tags" {
   type        = list(string)
   description = "The list of tags to be added to the Databases for Redis instance."
   default     = []
 }
 
-variable "database_access_tags" {
+variable "redis_instance_access_tags" {
   type        = list(string)
   description = "A list of access tags to apply to the Databases for Redis instance created by the solution. [Learn more](https://cloud.ibm.com/docs/account?topic=account-access-tags-tutorial)."
   default     = []
