@@ -7,6 +7,7 @@ variable "ibmcloud_api_key" {
   description = "The IBM Cloud API key to deploy resources."
   sensitive   = true
 }
+
 variable "use_existing_resource_group" {
   type        = bool
   description = "Whether to use an existing resource group."
@@ -24,7 +25,7 @@ variable "prefix" {
   default     = "dev"
 }
 
-variable "name" {
+variable "database_name" {
   type        = string
   description = "The name of the Databases for Redis instance. If a prefix input variable is specified, the prefix is added to the name in the `<prefix>-<name>` format."
   default     = "redis"
@@ -100,7 +101,7 @@ variable "service_credential_names" {
   default     = {}
 }
 
-variable "admin_pass" {
+variable "admin_password" {
   type        = string
   description = "The password for the database administrator. If the admin password is null then the admin user ID cannot be accessed. More users can be specified in a user block."
   default     = null
@@ -119,13 +120,13 @@ variable "users" {
   description = "A list of users that you want to create on the database. Users block is supported by Redis version >= 6.0. Multiple blocks are allowed. The user password must be in the range of 10-32 characters. Be warned that in most case using IAM service credentials (via the var.service_credential_names) is sufficient to control access to the Redis instance. This blocks creates native redis database users. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/solutions/standard/DA-types.md#users)"
 }
 
-variable "tags" {
+variable "database_tags" {
   type        = list(string)
   description = "The list of tags to be added to the Databases for Redis instance."
   default     = []
 }
 
-variable "access_tags" {
+variable "database_access_tags" {
   type        = list(string)
   description = "A list of access tags to apply to the Databases for Redis instance created by the solution. [Learn more](https://cloud.ibm.com/docs/account?topic=account-access-tags-tutorial)."
   default     = []
@@ -163,7 +164,7 @@ variable "kms_endpoint_type" {
   }
 }
 
-variable "skip_redis_kms_auth_policy" {
+variable "skip_redis_kms_iam_auth_policy" {
   type        = bool
   description = "Whether to create an IAM authorization policy that permits all Databases for Redis instances in the resource group to read the encryption key from the Hyper Protect Crypto Services instance specified in the `existing_kms_instance_crn` variable."
   default     = false
@@ -176,13 +177,13 @@ variable "ibmcloud_kms_api_key" {
   default     = null
 }
 
-variable "key_ring_name" {
+variable "redis_key_ring_name" {
   type        = string
   default     = "redis-key-ring"
   description = "The name for the key ring created for the Databases for Redis key. Applies only if not specifying an existing key. If a prefix input variable is specified, the prefix is added to the name in the `<prefix>-<name>` format."
 }
 
-variable "key_name" {
+variable "redis_key_name" {
   type        = string
   default     = "redis-key"
   description = "The name for the key created for the Databases for Redis key. Applies only if not specifying an existing key. If a prefix input variable is specified, the prefix is added to the name in the `<prefix>-<name>` format."
@@ -307,7 +308,7 @@ variable "service_credential_secrets" {
   }
 }
 
-variable "skip_redis_sm_auth_policy" {
+variable "skip_redis_secrets_manager_iam_auth_policy" {
   type        = bool
   default     = false
   description = "Whether an IAM authorization policy is created for Secrets Manager instance to create a service credential secrets for Databases for Redis. If set to false, the Secrets Manager instance passed by the user is granted the Key Manager access to the Redis instance created by the Deployable Architecture. Set to `true` to use an existing policy. The value of this is ignored if any value for 'existing_secrets_manager_instance_crn' is not passed."

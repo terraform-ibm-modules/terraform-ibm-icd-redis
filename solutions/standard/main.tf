@@ -29,8 +29,8 @@ locals {
 
 locals {
   create_new_kms_key  = !var.use_ibm_owned_encryption_key && var.existing_kms_key_crn == null ? true : false # no need to create any KMS resources if passing an existing key, or using IBM owned keys
-  redis_key_name      = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.key_name}" : var.key_name
-  redis_key_ring_name = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.key_ring_name}" : var.key_ring_name
+  redis_key_name      = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.redis_key_name}" : var.redis_key_name
+  redis_key_ring_name = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.redis_key_ring_name}" : var.redis_key_ring_name
 }
 
 module "kms" {
@@ -99,8 +99,8 @@ data "ibm_iam_account_settings" "iam_account_settings" {
 
 locals {
   account_id                                  = data.ibm_iam_account_settings.iam_account_settings.account_id
-  create_cross_account_kms_auth_policy        = !var.skip_redis_kms_auth_policy && var.ibmcloud_kms_api_key != null && !var.use_ibm_owned_encryption_key
-  create_cross_account_backup_kms_auth_policy = !var.skip_redis_kms_auth_policy && var.ibmcloud_kms_api_key != null && !var.use_ibm_owned_encryption_key && var.existing_backup_kms_key_crn != null
+  create_cross_account_kms_auth_policy        = !var.skip_redis_kms_iam_auth_policy && var.ibmcloud_kms_api_key != null && !var.use_ibm_owned_encryption_key
+  create_cross_account_backup_kms_auth_policy = !var.skip_redis_kms_iam_auth_policy && var.ibmcloud_kms_api_key != null && !var.use_ibm_owned_encryption_key && var.existing_backup_kms_key_crn != null
 
   # If KMS encryption enabled (and existing ES instance is not being passed), parse details from the existing key if being passed, otherwise get it from the key that the DA creates
   kms_account_id    = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].account_id : module.kms_instance_crn_parser[0].account_id
@@ -221,7 +221,7 @@ resource "time_sleep" "wait_for_backup_kms_authorization_policy" {
 #######################################################################################################################
 
 resource "random_password" "admin_password" {
-  count            = var.admin_pass == null ? 1 : 0
+  count            = var.admin_password == null ? 1 : 0
   length           = 32
   special          = true
   override_special = "-_"
@@ -233,7 +233,7 @@ locals {
   # if - replace first char with J
   # elseif _ replace first char with K
   # else use asis.
-  admin_pass = var.admin_pass == null ? (startswith(random_password.admin_password[0].result, "-") ? "J${substr(random_password.admin_password[0].result, 1, -1)}" : startswith(random_password.admin_password[0].result, "_") ? "K${substr(random_password.admin_password[0].result, 1, -1)}" : random_password.admin_password[0].result) : var.admin_pass
+  admin_pass = var.admin_password == null ? (startswith(random_password.admin_password[0].result, "-") ? "J${substr(random_password.admin_password[0].result, 1, -1)}" : startswith(random_password.admin_password[0].result, "_") ? "K${substr(random_password.admin_password[0].result, 1, -1)}" : random_password.admin_password[0].result) : var.admin_password
 }
 
 #######################################################################################################################
@@ -245,17 +245,17 @@ module "redis" {
   source                            = "../../modules/fscloud"
   depends_on                        = [time_sleep.wait_for_authorization_policy, time_sleep.wait_for_backup_kms_authorization_policy]
   resource_group_id                 = module.resource_group.resource_group_id
-  instance_name                     = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.name}" : var.name
+  instance_name                     = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.database_name}" : var.database_name
   region                            = var.region
   redis_version                     = var.redis_version
-  skip_iam_authorization_policy     = var.skip_redis_kms_auth_policy
+  skip_iam_authorization_policy     = var.skip_redis_kms_iam_auth_policy
   use_ibm_owned_encryption_key      = var.use_ibm_owned_encryption_key
   kms_key_crn                       = local.kms_key_crn
   backup_encryption_key_crn         = local.backup_kms_key_crn
   use_same_kms_key_for_backups      = local.use_same_kms_key_for_backups
   use_default_backup_encryption_key = var.use_default_backup_encryption_key
-  access_tags                       = var.access_tags
-  tags                              = var.tags
+  access_tags                       = var.database_access_tags
+  tags                              = var.database_tags
   admin_pass                        = local.admin_pass
   users                             = var.users
   members                           = var.members
@@ -270,7 +270,7 @@ module "redis" {
 }
 
 locals {
-  create_sm_auth_policy = var.skip_redis_sm_auth_policy || var.existing_secrets_manager_instance_crn == null ? 0 : 1
+  create_sm_auth_policy = var.skip_redis_secrets_manager_iam_auth_policy || var.existing_secrets_manager_instance_crn == null ? 0 : 1
 }
 
 # create a service authorization between Secrets Manager and the target service (Databases for Redis)

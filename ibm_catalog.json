@@ -104,35 +104,9 @@
               "key": "ibmcloud_api_key"
             },
             {
-              "key": "provider_visibility",
-              "options": [
-                {
-                  "displayname": "private",
-                  "value": "private"
-                },
-                {
-                  "displayname": "public",
-                  "value": "public"
-                },
-                {
-                  "displayname": "public-and-private",
-                  "value": "public-and-private"
-                }
-              ]
-            },
-            {
-              "key": "use_existing_resource_group"
-            },
-            {
-              "key": "resource_group_name"
-            },
-            {
               "key": "prefix",
               "required": true,
               "description":"Prefix to add to all resources created by this solution. To not use any prefix value, you can enter the string `__NULL__`."
-            },
-            {
-              "key": "name"
             },
             {
               "key": "region",
@@ -189,6 +163,34 @@
               ]
             },
             {
+              "key": "use_existing_resource_group",
+              "required": true
+            },
+            {
+              "key": "resource_group_name",
+              "required": true
+            },
+            {
+              "key": "provider_visibility",
+              "options": [
+                {
+                  "displayname": "private",
+                  "value": "private"
+                },
+                {
+                  "displayname": "public",
+                  "value": "public"
+                },
+                {
+                  "displayname": "public-and-private",
+                  "value": "public-and-private"
+                }
+              ]
+            },
+            {
+              "key": "database_name"
+            },
+            {
               "key": "redis_version",
               "required": false,
               "default_value": "__NULL__",
@@ -229,13 +231,13 @@
               "key": "service_credential_names"
             },
             {
-              "key": "admin_pass"
+              "key": "admin_password"
             },
             {
               "key": "users"
             },
             {
-              "key": "tags",
+              "key": "database_tags",
               "custom_config": {
                   "grouping": "deployment",
                   "original_grouping": "deployment",
@@ -245,7 +247,7 @@
               }
             },
             {
-              "key": "access_tags",
+              "key": "database_access_tags",
               "custom_config": {
                   "grouping": "deployment",
                   "original_grouping": "deployment",
@@ -253,6 +255,9 @@
                       "type": "string"
                   }
               }
+            },
+            {
+              "key": "backup_crn"
             },
             {
               "key": "use_ibm_owned_encryption_key"
@@ -268,6 +273,12 @@
               "key": "existing_kms_key_crn"
             },
             {
+              "key": "existing_backup_kms_key_crn"
+            },
+            {
+              "key": "use_default_backup_encryption_key"
+            },
+            {
               "key": "kms_endpoint_type",
               "options": [
                 {
@@ -281,13 +292,13 @@
               ]
             },
             {
-              "key": "skip_redis_kms_auth_policy"
+              "key": "redis_key_ring_name"
             },
             {
-              "key": "key_ring_name"
+              "key": "redis_key_name"
             },
             {
-              "key": "key_name"
+              "key": "skip_redis_kms_iam_auth_policy"
             },
             {
               "key": "auto_scaling"
@@ -312,16 +323,7 @@
               "key": "service_credential_secrets"
             },
             {
-              "key": "skip_redis_sm_auth_policy"
-            },
-            {
-              "key": "backup_crn"
-            },
-            {
-              "key": "existing_backup_kms_key_crn"
-            },
-            {
-              "key": "use_default_backup_encryption_key"
+              "key": "skip_redis_secrets_manager_iam_auth_policy"
             }
           ]
         }
