@@ -238,7 +238,7 @@
               "key": "admin_pass_secret_manager_secret_name"
             },
             {
-              "key": "existing_db_instance_crn"
+              "key": "existing_redis_instance_crn"
             },
             {
               "key": "skip_redis_kms_auth_policy"
