@@ -56,7 +56,7 @@ module "cbr_zone" {
 module "redis" {
   source                    = "../../modules/fscloud"
   resource_group_id         = module.resource_group.resource_group_id
-  instance_name             = "${var.prefix}-redis"
+  name                      = "${var.prefix}-redis"
   region                    = var.region
   redis_version             = var.redis_version
   access_tags               = var.access_tags
