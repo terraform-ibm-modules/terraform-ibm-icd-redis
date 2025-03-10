@@ -4,60 +4,44 @@
 
 output "id" {
   description = "Redis instance id"
-  value       = module.redis.id
+  value       = local.redis_id
 }
 
 output "version" {
   description = "Redis instance version"
-  value       = module.redis.version
+  value       = local.redis_version
 }
 
 output "guid" {
   description = "Redis instance guid"
-  value       = module.redis.guid
+  value       = local.redis_guid
 }
 
 output "crn" {
   description = "Redis instance crn"
-  value       = module.redis.crn
-}
-
-output "cbr_rule_ids" {
-  description = "CBR rule ids created to restrict Redis"
-  value       = module.redis.cbr_rule_ids
+  value       = local.redis_crn
 }
 
 output "service_credentials_json" {
   description = "Service credentials json map"
-  value       = module.redis.service_credentials_json
+  value       = var.existing_redis_instance_crn != null ? null : module.redis[0].service_credentials_json
   sensitive   = true
 }
 
 output "service_credentials_object" {
   description = "Service credentials object"
-  value       = module.redis.service_credentials_object
+  value       = var.existing_redis_instance_crn != null ? null : module.redis[0].service_credentials_object
   sensitive   = true
-}
-
-output "adminuser" {
-  description = "Database admin user name"
-  value       = module.redis.adminuser
 }
 
 output "hostname" {
   description = "Database connection hostname"
-  value       = module.redis.hostname
+  value       = local.redis_hostname
 }
 
 output "port" {
   description = "Database connection port"
-  value       = module.redis.port
-}
-
-output "certificate_base64" {
-  description = "Database connection certificate"
-  value       = module.redis.certificate_base64
-  sensitive   = true
+  value       = local.redis_port
 }
 
 output "secrets_manager_secrets" {

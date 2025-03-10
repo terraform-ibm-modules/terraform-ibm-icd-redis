@@ -36,6 +36,12 @@ variable "region" {
   default     = "us-south"
 }
 
+variable "existing_redis_instance_crn" {
+  type        = string
+  default     = null
+  description = "The CRN of an existing Databases for Redis instance. If no value is specified, a new instance is created."
+}
+
 variable "redis_version" {
   description = "The version of the Databases for Redis instance. If no value is specified, the current preferred version of Databases for Redis is used."
   type        = string
@@ -311,4 +317,22 @@ variable "skip_redis_sm_auth_policy" {
   type        = bool
   default     = false
   description = "Whether an IAM authorization policy is created for Secrets Manager instance to create a service credential secrets for Databases for Redis. If set to false, the Secrets Manager instance passed by the user is granted the Key Manager access to the Redis instance created by the Deployable Architecture. Set to `true` to use an existing policy. The value of this is ignored if any value for 'existing_secrets_manager_instance_crn' is not passed."
+}
+
+variable "admin_pass_secret_manager_secret_group" {
+  type        = string
+  description = "The name of a new or existing secrets manager secret group for admin password. To use existing secret group, `use_existing_admin_pass_sm_secret_group` must be set to `true`. If a prefix input variable is specified, the prefix is added to the name in the `<prefix>-<name>` format."
+  default     = "redis-secrets"
+}
+
+variable "use_existing_admin_pass_secret_manager_secret_group" {
+  type        = bool
+  description = "Whether to use an existing secrets manager secret group for admin password."
+  default     = false
+}
+
+variable "admin_pass_secret_manager_secret_name" {
+  type        = string
+  description = "The name of a new redis administrator secret. If a prefix input variable is specified, the prefix is added to the name in the `<prefix>-<name>` format."
+  default     = "redis-admin-password"
 }

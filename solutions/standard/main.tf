@@ -18,9 +18,9 @@ module "resource_group" {
 
 locals {
   # tflint-ignore: terraform_unused_declarations
-  validate_kms_1 = var.use_ibm_owned_encryption_key && (var.existing_kms_instance_crn != null || var.existing_kms_key_crn != null || var.existing_backup_kms_key_crn != null) ? tobool("When setting values for 'existing_kms_instance_crn', 'existing_kms_key_crn' or 'existing_backup_kms_key_crn', the 'use_ibm_owned_encryption_key' input must be set to false.") : true
+  validate_kms_1 = var.existing_redis_instance_crn != null ? true : var.use_ibm_owned_encryption_key && (var.existing_kms_instance_crn != null || var.existing_kms_key_crn != null || var.existing_backup_kms_key_crn != null) ? tobool("When setting values for 'existing_kms_instance_crn', 'existing_kms_key_crn' or 'existing_backup_kms_key_crn', the 'use_ibm_owned_encryption_key' input must be set to false.") : true
   # tflint-ignore: terraform_unused_declarations
-  validate_kms_2 = !var.use_ibm_owned_encryption_key && (var.existing_kms_instance_crn == null && var.existing_kms_key_crn == null) ? tobool("When 'use_ibm_owned_encryption_key' is false, a value is required for either 'existing_kms_instance_crn' (to create a new key), or 'existing_kms_key_crn' to use an existing key.") : true
+  validate_kms_2 = var.existing_redis_instance_crn != null ? true : !var.use_ibm_owned_encryption_key && (var.existing_kms_instance_crn == null && var.existing_kms_key_crn == null) ? tobool("When 'use_ibm_owned_encryption_key' is false, a value is required for either 'existing_kms_instance_crn' (to create a new key), or 'existing_kms_key_crn' to use an existing key.") : true
 }
 
 #######################################################################################################################
@@ -28,7 +28,7 @@ locals {
 #######################################################################################################################
 
 locals {
-  create_new_kms_key  = !var.use_ibm_owned_encryption_key && var.existing_kms_key_crn == null ? true : false # no need to create any KMS resources if passing an existing key, or using IBM owned keys
+  create_new_kms_key  = var.existing_redis_instance_crn == null && !var.use_ibm_owned_encryption_key && var.existing_kms_key_crn == null ? true : false # no need to create any KMS resources if passing an existing key, or using IBM owned keys
   redis_key_name      = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.key_name}" : var.key_name
   redis_key_ring_name = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.key_ring_name}" : var.key_ring_name
 }
@@ -99,23 +99,23 @@ data "ibm_iam_account_settings" "iam_account_settings" {
 
 locals {
   account_id                                  = data.ibm_iam_account_settings.iam_account_settings.account_id
-  create_cross_account_kms_auth_policy        = !var.skip_redis_kms_auth_policy && var.ibmcloud_kms_api_key != null && !var.use_ibm_owned_encryption_key
-  create_cross_account_backup_kms_auth_policy = !var.skip_redis_kms_auth_policy && var.ibmcloud_kms_api_key != null && !var.use_ibm_owned_encryption_key && var.existing_backup_kms_key_crn != null
+  create_cross_account_kms_auth_policy        = var.existing_redis_instance_crn == null && !var.skip_redis_kms_auth_policy && var.ibmcloud_kms_api_key != null && !var.use_ibm_owned_encryption_key
+  create_cross_account_backup_kms_auth_policy = var.existing_redis_instance_crn == null && !var.skip_redis_kms_auth_policy && var.ibmcloud_kms_api_key != null && !var.use_ibm_owned_encryption_key && var.existing_backup_kms_key_crn != null
 
   # If KMS encryption enabled (and existing ES instance is not being passed), parse details from the existing key if being passed, otherwise get it from the key that the DA creates
-  kms_account_id    = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].account_id : module.kms_instance_crn_parser[0].account_id
-  kms_service       = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].service_name : module.kms_instance_crn_parser[0].service_name
-  kms_instance_guid = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].service_instance : module.kms_instance_crn_parser[0].service_instance
-  kms_key_crn       = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? var.existing_kms_key_crn : module.kms[0].keys[format("%s.%s", local.redis_key_ring_name, local.redis_key_name)].crn
-  kms_key_id        = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].resource : module.kms[0].keys[format("%s.%s", local.redis_key_ring_name, local.redis_key_name)].key_id
-  kms_region        = var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].region : module.kms_instance_crn_parser[0].region
+  kms_account_id    = var.existing_redis_instance_crn != null || var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].account_id : module.kms_instance_crn_parser[0].account_id
+  kms_service       = var.existing_redis_instance_crn != null || var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].service_name : module.kms_instance_crn_parser[0].service_name
+  kms_instance_guid = var.existing_redis_instance_crn != null || var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].service_instance : module.kms_instance_crn_parser[0].service_instance
+  kms_key_crn       = var.existing_redis_instance_crn != null || var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? var.existing_kms_key_crn : module.kms[0].keys[format("%s.%s", local.redis_key_ring_name, local.redis_key_name)].crn
+  kms_key_id        = var.existing_redis_instance_crn != null || var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].resource : module.kms[0].keys[format("%s.%s", local.redis_key_ring_name, local.redis_key_name)].key_id
+  kms_region        = var.existing_redis_instance_crn != null || var.use_ibm_owned_encryption_key ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].region : module.kms_instance_crn_parser[0].region
 
   # If creating KMS cross account policy for backups, parse backup key details from passed in key CRN
   backup_kms_account_id    = local.create_cross_account_backup_kms_auth_policy ? module.kms_backup_key_crn_parser[0].account_id : local.kms_account_id
   backup_kms_service       = local.create_cross_account_backup_kms_auth_policy ? module.kms_backup_key_crn_parser[0].service_name : local.kms_service
   backup_kms_instance_guid = local.create_cross_account_backup_kms_auth_policy ? module.kms_backup_key_crn_parser[0].service_instance : local.kms_instance_guid
   backup_kms_key_id        = local.create_cross_account_backup_kms_auth_policy ? module.kms_backup_key_crn_parser[0].resource : local.kms_key_id
-  backup_kms_key_crn       = var.use_ibm_owned_encryption_key ? null : var.existing_backup_kms_key_crn
+  backup_kms_key_crn       = var.existing_redis_instance_crn != null || var.use_ibm_owned_encryption_key ? null : var.existing_backup_kms_key_crn
   # Always use same key for backups unless user explicially passed a value for 'existing_backup_kms_key_crn'
   use_same_kms_key_for_backups = var.existing_backup_kms_key_crn == null ? true : false
 }
@@ -233,19 +233,65 @@ locals {
   # if - replace first char with J
   # elseif _ replace first char with K
   # else use asis.
-  admin_pass = var.admin_pass == null ? (startswith(random_password.admin_password[0].result, "-") ? "J${substr(random_password.admin_password[0].result, 1, -1)}" : startswith(random_password.admin_password[0].result, "_") ? "K${substr(random_password.admin_password[0].result, 1, -1)}" : random_password.admin_password[0].result) : var.admin_pass
+  generated_admin_password = startswith(random_password.admin_password[0].result, "-") ? "J${substr(random_password.admin_password[0].result, 1, -1)}" : startswith(random_password.admin_password[0].result, "_") ? "K${substr(random_password.admin_password[0].result, 1, -1)}" : random_password.admin_password[0].result
+
+  # admin password to use
+  admin_pass = var.admin_pass == null ? local.generated_admin_password : var.admin_pass
 }
 
 #######################################################################################################################
 # Redis
 #######################################################################################################################
 
+# Look up existing instance details if user passes one
+module "redis_instance_crn_parser" {
+  count   = var.existing_redis_instance_crn != null ? 1 : 0
+  source  = "terraform-ibm-modules/common-utilities/ibm//modules/crn-parser"
+  version = "1.1.0"
+  crn     = var.existing_redis_instance_crn
+}
+
+# Existing instance local vars
+locals {
+  existing_redis_guid   = var.existing_redis_instance_crn != null ? module.redis_instance_crn_parser[0].service_instance : null
+  existing_redis_region = var.existing_redis_instance_crn != null ? module.redis_instance_crn_parser[0].region : null
+
+  # Validate the region input matches region detected in existing instance CRN (approach based on https://github.com/hashicorp/terraform/issues/25609#issuecomment-1057614400)
+  # tflint-ignore: terraform_unused_declarations
+  validate_existing_instance_region = var.existing_redis_instance_crn != null && var.region != local.existing_redis_region ? tobool("The region detected in the 'existing_redis_instance_crn' value must match the value of the 'region' input variable when passing an existing instance.") : true
+}
+
+# Do a data lookup on the resource GUID to get more info that is needed for the 'ibm_database' data lookup below
+data "ibm_resource_instance" "existing_instance_resource" {
+  count      = var.existing_redis_instance_crn != null ? 1 : 0
+  identifier = local.existing_redis_guid
+}
+
+# Lookup details of existing instance
+data "ibm_database" "existing_db_instance" {
+  count             = var.existing_redis_instance_crn != null ? 1 : 0
+  name              = data.ibm_resource_instance.existing_instance_resource[0].name
+  resource_group_id = data.ibm_resource_instance.existing_instance_resource[0].resource_group_id
+  location          = var.region
+  service           = "databases-for-redis"
+}
+
+# Lookup existing instance connection details
+data "ibm_database_connection" "existing_connection" {
+  count         = var.existing_redis_instance_crn != null ? 1 : 0
+  endpoint_type = "private"
+  deployment_id = data.ibm_database.existing_db_instance[0].id
+  user_id       = data.ibm_database.existing_db_instance[0].adminuser
+  user_type     = "database"
+}
+
 # Create new instance
 module "redis" {
+  count                             = var.existing_redis_instance_crn != null ? 0 : 1
   source                            = "../../modules/fscloud"
   depends_on                        = [time_sleep.wait_for_authorization_policy, time_sleep.wait_for_backup_kms_authorization_policy]
   resource_group_id                 = module.resource_group.resource_group_id
-  instance_name                     = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.name}" : var.name
+  name                              = (var.prefix != null && var.prefix != "") ? "${var.prefix}-${var.name}" : var.name
   region                            = var.region
   redis_version                     = var.redis_version
   skip_iam_authorization_policy     = var.skip_redis_kms_auth_policy
@@ -270,7 +316,36 @@ module "redis" {
 }
 
 locals {
+  redis_guid     = var.existing_redis_instance_crn != null ? data.ibm_database.existing_db_instance[0].guid : module.redis[0].guid
+  redis_id       = var.existing_redis_instance_crn != null ? data.ibm_database.existing_db_instance[0].id : module.redis[0].id
+  redis_version  = var.existing_redis_instance_crn != null ? data.ibm_database.existing_db_instance[0].version : module.redis[0].version
+  redis_crn      = var.existing_redis_instance_crn != null ? var.existing_redis_instance_crn : module.redis[0].crn
+  redis_hostname = var.existing_redis_instance_crn != null ? data.ibm_database_connection.existing_connection[0].rediss[0].hosts[0].hostname : module.redis[0].hostname
+  redis_port     = var.existing_redis_instance_crn != null ? data.ibm_database_connection.existing_connection[0].rediss[0].hosts[0].port : module.redis[0].port
+}
+
+#######################################################################################################################
+# Secrets management
+#######################################################################################################################
+
+locals {
+  ## Variable validation (approach based on https://github.com/hashicorp/terraform/issues/25609#issuecomment-1057614400)
+  # tflint-ignore: terraform_unused_declarations
+  validate_sm_crn = length(local.service_credential_secrets) > 0 && var.existing_secrets_manager_instance_crn == null ? tobool("`existing_secrets_manager_instance_crn` is required when adding service credentials to a secrets manager secret.") : false
+  # tflint-ignore: terraform_unused_declarations
+  validate_sm_sg = var.existing_secrets_manager_instance_crn != null && var.admin_pass_secret_manager_secret_group == null ? tobool("`admin_pass_secret_manager_secret_group` is required when `existing_secrets_manager_instance_crn` is set.") : false
+  # tflint-ignore: terraform_unused_declarations
+  validate_sm_sn = var.existing_secrets_manager_instance_crn != null && var.admin_pass_secret_manager_secret_name == null ? tobool("`admin_pass_secret_manager_secret_name` is required when `existing_secrets_manager_instance_crn` is set.") : false
+
   create_sm_auth_policy = var.skip_redis_sm_auth_policy || var.existing_secrets_manager_instance_crn == null ? 0 : 1
+}
+
+# Parse the Secrets Manager CRN
+module "sm_instance_crn_parser" {
+  count   = var.existing_secrets_manager_instance_crn != null ? 1 : 0
+  source  = "terraform-ibm-modules/common-utilities/ibm//modules/crn-parser"
+  version = "1.1.0"
+  crn     = var.existing_secrets_manager_instance_crn
 }
 
 # create a service authorization between Secrets Manager and the target service (Databases for Redis)
@@ -279,7 +354,7 @@ resource "ibm_iam_authorization_policy" "secrets_manager_key_manager" {
   source_service_name         = "secrets-manager"
   source_resource_instance_id = local.existing_secrets_manager_instance_guid
   target_service_name         = "databases-for-redis"
-  target_resource_instance_id = module.redis.guid
+  target_resource_instance_id = local.redis_guid
   roles                       = ["Key Manager"]
   description                 = "Allow Secrets Manager with instance id ${local.existing_secrets_manager_instance_guid} to manage key for the databases-for-redis instance"
 }
@@ -307,19 +382,30 @@ locals {
           service_credentials_ttl                     = secret.service_credentials_ttl
           service_credential_secret_description       = secret.service_credential_secret_description
           service_credentials_source_service_role_crn = secret.service_credentials_source_service_role_crn
-          service_credentials_source_service_crn      = module.redis.crn
+          service_credentials_source_service_crn      = local.redis_crn
           secret_type                                 = "service_credentials" #checkov:skip=CKV_SECRET_6
         }
       ]
     }
   ]
 
-  existing_secrets_manager_instance_crn_split = var.existing_secrets_manager_instance_crn != null ? split(":", var.existing_secrets_manager_instance_crn) : null
-  existing_secrets_manager_instance_guid      = var.existing_secrets_manager_instance_crn != null ? element(local.existing_secrets_manager_instance_crn_split, length(local.existing_secrets_manager_instance_crn_split) - 3) : null
-  existing_secrets_manager_instance_region    = var.existing_secrets_manager_instance_crn != null ? element(local.existing_secrets_manager_instance_crn_split, length(local.existing_secrets_manager_instance_crn_split) - 5) : null
+  # Build the structure of the arbitrary credential type secret for admin password
+  admin_pass_secret = [{
+    secret_group_name     = (var.prefix != null && var.prefix != "") && var.admin_pass_secret_manager_secret_group != null ? "${var.prefix}-${var.admin_pass_secret_manager_secret_group}" : var.admin_pass_secret_manager_secret_group
+    existing_secret_group = var.use_existing_admin_pass_secret_manager_secret_group
+    secrets = [{
+      secret_name             = (var.prefix != null && var.prefix != "") && var.admin_pass_secret_manager_secret_name != null ? "${var.prefix}-${var.admin_pass_secret_manager_secret_name}" : var.admin_pass_secret_manager_secret_name
+      secret_type             = "arbitrary"
+      secret_payload_password = local.admin_pass
+      }
+    ]
+  }]
 
-  # tflint-ignore: terraform_unused_declarations
-  validate_sm_crn = length(local.service_credential_secrets) > 0 && var.existing_secrets_manager_instance_crn == null ? tobool("`existing_secrets_manager_instance_crn` is required when adding service credentials to a secrets manager secret.") : false
+  # Concatinate into 1 secrets object
+  secrets = concat(local.service_credential_secrets, local.admin_pass_secret)
+  # Parse Secrets Manager details from the CRN
+  existing_secrets_manager_instance_guid   = var.existing_secrets_manager_instance_crn != null ? module.sm_instance_crn_parser[0].service_instance : null
+  existing_secrets_manager_instance_region = var.existing_secrets_manager_instance_crn != null ? module.sm_instance_crn_parser[0].region : null
 }
 
 module "secrets_manager_service_credentials" {
@@ -330,5 +416,5 @@ module "secrets_manager_service_credentials" {
   existing_sm_instance_guid   = local.existing_secrets_manager_instance_guid
   existing_sm_instance_region = local.existing_secrets_manager_instance_region
   endpoint_type               = var.existing_secrets_manager_endpoint_type
-  secrets                     = local.service_credential_secrets
+  secrets                     = local.secrets
 }
