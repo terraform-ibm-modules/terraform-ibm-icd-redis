@@ -2,10 +2,12 @@
 package test
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand"
+	"math/big"
 	"os"
 	"strings"
 	"testing"
@@ -35,7 +37,7 @@ const regionSelectionPath = "../common-dev-assets/common-go-assets/icd-region-pr
 // Define a struct with fields that match the structure of the YAML data
 const yamlLocation = "../common-dev-assets/common-go-assets/common-permanent-resources.yaml"
 
-var permanentResources map[string]interface{}
+var permanentResources map[string]any
 
 var sharedInfoSvc *cloudinfo.CloudInfoService
 var validICDRegions = []string{
@@ -76,7 +78,7 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 		WaitJobCompleteMinutes: 60,
 	})
 
-	serviceCredentialSecrets := []map[string]interface{}{
+	serviceCredentialSecrets := []map[string]any{
 		{
 			"secret_group_name": fmt.Sprintf("%s-secret-group", options.Prefix),
 			"service_credentials": []map[string]string{
@@ -116,6 +118,7 @@ func TestRunStandardSolutionSchematics(t *testing.T) {
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
 		{Name: "admin_pass_sm_secret_group", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass_sm_secret_name", Value: options.Prefix, DataType: "string"},
+		{Name: "admin_pass", Value: GetRandomAdminPassword(t), DataType: "string"},
 	}
 	err = options.RunSchematicTest()
 	assert.Nil(t, err, "This should not have errored")
@@ -132,7 +135,7 @@ func TestRunStandardUpgradeSolution(t *testing.T) {
 		ResourceGroup:      resourceGroup,
 	})
 
-	options.TerraformVars = map[string]interface{}{
+	options.TerraformVars = map[string]any{
 		"access_tags":               permanentResources["accessTags"],
 		"existing_kms_instance_crn": permanentResources["hpcs_south_crn"],
 		"kms_endpoint_type":         "public",
@@ -158,7 +161,7 @@ func TestPlanValidation(t *testing.T) {
 	options.TestSetup()
 	options.TerraformOptions.NoColor = true
 	options.TerraformOptions.Logger = logger.Discard
-	options.TerraformOptions.Vars = map[string]interface{}{
+	options.TerraformOptions.Vars = map[string]any{
 		"prefix":              options.Prefix,
 		"region":              "us-south",
 		"redis_version":       "7.2",
@@ -167,18 +170,18 @@ func TestPlanValidation(t *testing.T) {
 	}
 
 	// Test the DA when using an existing KMS instance
-	var standardSolutionWithExistingKms = map[string]interface{}{
+	var standardSolutionWithExistingKms = map[string]any{
 		"access_tags":               permanentResources["accessTags"],
 		"existing_kms_instance_crn": permanentResources["hpcs_south_crn"],
 	}
 
 	// Test the DA when using IBM owned encryption key
-	var standardSolutionWithUseIbmOwnedEncKey = map[string]interface{}{
+	var standardSolutionWithUseIbmOwnedEncKey = map[string]any{
 		"use_ibm_owned_encryption_key": true,
 	}
 
 	// Create a map of the variables
-	tfVarsMap := map[string]map[string]interface{}{
+	tfVarsMap := map[string]map[string]any{
 		"standardSolutionWithExistingKms":       standardSolutionWithExistingKms,
 		"standardSolutionWithUseIbmOwnedEncKey": standardSolutionWithUseIbmOwnedEncKey,
 	}
@@ -209,7 +212,12 @@ func TestRunExistingInstance(t *testing.T) {
 	prefix := fmt.Sprintf("redis-t-%s", strings.ToLower(random.UniqueId()))
 	realTerraformDir := ".."
 	tempTerraformDir, _ := files.CopyTerraformFolderToTemp(realTerraformDir, fmt.Sprintf(prefix+"-%s", strings.ToLower(random.UniqueId())))
-	region := validICDRegions[rand.Intn(len(validICDRegions))]
+
+	index, err := rand.Int(rand.Reader, big.NewInt(int64(len(validICDRegions))))
+	if err != nil {
+		log.Fatalf("Failed to generate a secure random index: %v", err)
+	}
+	region := validICDRegions[index.Int64()]
 
 	// Verify ibmcloud_api_key variable is set
 	checkVariable := "TF_VAR_ibmcloud_api_key"
@@ -220,7 +228,7 @@ func TestRunExistingInstance(t *testing.T) {
 	logger.Log(t, "Tempdir: ", tempTerraformDir)
 	existingTerraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: tempTerraformDir + "/examples/basic",
-		Vars: map[string]interface{}{
+		Vars: map[string]any{
 			"prefix":            prefix,
 			"region":            region,
 			"redis_version":     latestVersion,
@@ -276,5 +284,13 @@ func TestRunExistingInstance(t *testing.T) {
 		terraform.WorkspaceDelete(t, existingTerraformOptions, prefix)
 		logger.Log(t, "END: Destroy (existing resources)")
 	}
+}
 
+func GetRandomAdminPassword(t *testing.T) string {
+	// Generate a 15 char long random string for the admin_pass
+	randomBytes := make([]byte, 13)
+	_, randErr := rand.Read(randomBytes)
+	require.Nil(t, randErr) // do not proceed if we can't gen a random password
+	randomPass := "A1" + base64.URLEncoding.EncodeToString(randomBytes)[:13]
+	return randomPass
 }
