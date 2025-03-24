@@ -247,15 +247,7 @@
               "key": "skip_redis_kms_auth_policy"
             },
             {
-              "key": "users",
-              "custom_config": {
-                  "type": "multiline_secure_value",
-                  "grouping": "deployment",
-                  "original_grouping": "deployment",
-                  "config_constraints": {
-                      "type": "mixed"
-                  }
-              }
+              "key": "users"
             },
             {
               "key": "tags",
