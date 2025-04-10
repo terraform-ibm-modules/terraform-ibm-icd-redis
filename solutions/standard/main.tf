@@ -10,20 +10,6 @@ module "resource_group" {
 }
 
 #######################################################################################################################
-# KMS related variable validation
-# (approach based on https://github.com/hashicorp/terraform/issues/25609#issuecomment-1057614400)
-#
-# TODO: Replace with terraform cross variable validation: https://github.ibm.com/GoldenEye/issues/issues/10836
-#######################################################################################################################
-
-locals {
-  # tflint-ignore: terraform_unused_declarations
-  validate_kms_1 = var.existing_redis_instance_crn != null ? true : var.use_ibm_owned_encryption_key && (var.existing_kms_instance_crn != null || var.existing_kms_key_crn != null || var.existing_backup_kms_key_crn != null) ? tobool("When setting values for 'existing_kms_instance_crn', 'existing_kms_key_crn' or 'existing_backup_kms_key_crn', the 'use_ibm_owned_encryption_key' input must be set to false.") : true
-  # tflint-ignore: terraform_unused_declarations
-  validate_kms_2 = var.existing_redis_instance_crn != null ? true : !var.use_ibm_owned_encryption_key && (var.existing_kms_instance_crn == null && var.existing_kms_key_crn == null) ? tobool("When 'use_ibm_owned_encryption_key' is false, a value is required for either 'existing_kms_instance_crn' (to create a new key), or 'existing_kms_key_crn' to use an existing key.") : true
-}
-
-#######################################################################################################################
 # KMS encryption key
 #######################################################################################################################
 
@@ -326,14 +312,6 @@ locals {
 #######################################################################################################################
 
 locals {
-  ## Variable validation (approach based on https://github.com/hashicorp/terraform/issues/25609#issuecomment-1057614400)
-  # tflint-ignore: terraform_unused_declarations
-  validate_sm_crn = length(local.service_credential_secrets) > 0 && var.existing_secrets_manager_instance_crn == null ? tobool("`existing_secrets_manager_instance_crn` is required when adding service credentials to a secrets manager secret.") : false
-  # tflint-ignore: terraform_unused_declarations
-  validate_sm_sg = var.existing_secrets_manager_instance_crn != null && var.admin_pass_secret_manager_secret_group == null ? tobool("`admin_pass_secret_manager_secret_group` is required when `existing_secrets_manager_instance_crn` is set.") : false
-  # tflint-ignore: terraform_unused_declarations
-  validate_sm_sn = var.existing_secrets_manager_instance_crn != null && var.admin_pass_secret_manager_secret_name == null ? tobool("`admin_pass_secret_manager_secret_name` is required when `existing_secrets_manager_instance_crn` is set.") : false
-
   create_sm_auth_policy = var.skip_redis_sm_auth_policy || var.existing_secrets_manager_instance_crn == null ? 0 : 1
 }
 
