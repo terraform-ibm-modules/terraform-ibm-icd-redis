@@ -34,6 +34,11 @@ variable "region" {
   description = "The region where you want to deploy your instance."
   type        = string
   default     = "us-south"
+
+  validation {
+    condition     = var.existing_redis_instance_crn != null && var.region != local.existing_redis_region ? false : true
+    error_message = "The region detected in the 'existing_redis_instance_crn' value must match the value of the 'region' input variable when passing an existing instance."
+  }
 }
 
 variable "existing_redis_instance_crn" {
@@ -148,15 +153,15 @@ variable "use_ibm_owned_encryption_key" {
 
   # this validation ensures IBM-owned key is not used when KMS details are provided
   validation {
-    condition = !(
-      var.use_ibm_owned_encryption_key &&
-      (
+    condition = (
+      var.existing_redis_instance_crn != null ||
+      !(var.use_ibm_owned_encryption_key && (
         var.existing_kms_instance_crn != null ||
         var.existing_kms_key_crn != null ||
         var.existing_backup_kms_key_crn != null
-      )
+      ))
     )
-    error_message = "When setting values for 'existing_kms_instance_crn', 'existing_kms_key_crn', or 'existing_backup_kms_key_crn', 'use_ibm_owned_encryption_key' must be set to false."
+    error_message = "When setting values for 'existing_kms_instance_crn', 'existing_kms_key_crn' or 'existing_backup_kms_key_crn', the 'use_ibm_owned_encryption_key' input must be set to false."
   }
 
   # this validation ensures key info is provided when IBM-owned key is disabled and no Redis instance is given

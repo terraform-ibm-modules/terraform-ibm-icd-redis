@@ -238,10 +238,6 @@ module "redis_instance_crn_parser" {
 locals {
   existing_redis_guid   = var.existing_redis_instance_crn != null ? module.redis_instance_crn_parser[0].service_instance : null
   existing_redis_region = var.existing_redis_instance_crn != null ? module.redis_instance_crn_parser[0].region : null
-
-  # Validate the region input matches region detected in existing instance CRN (approach based on https://github.com/hashicorp/terraform/issues/25609#issuecomment-1057614400)
-  # tflint-ignore: terraform_unused_declarations
-  validate_existing_instance_region = var.existing_redis_instance_crn != null && var.region != local.existing_redis_region ? tobool("The region detected in the 'existing_redis_instance_crn' value must match the value of the 'region' input variable when passing an existing instance.") : true
 }
 
 # Do a data lookup on the resource GUID to get more info that is needed for the 'ibm_database' data lookup below
