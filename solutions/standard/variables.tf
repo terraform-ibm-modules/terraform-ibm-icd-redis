@@ -321,7 +321,7 @@ variable "skip_redis_sm_auth_policy" {
 
 variable "admin_pass_secret_manager_secret_group" {
   type        = string
-  description = "The name of a new or existing secrets manager secret group for admin password. To use existing secret group, `use_existing_admin_pass_sm_secret_group` must be set to `true`. If a prefix input variable is specified, the prefix is added to the name in the `<prefix>-<name>` format."
+  description = "The name of a new or existing secrets manager secret group for admin password. To use existing secret group, `use_existing_admin_pass_secret_manager_secret_group` must be set to `true`. If a prefix input variable is specified, the prefix is added to the name in the `<prefix>-<name>` format."
   default     = "redis-secrets"
 }
 
