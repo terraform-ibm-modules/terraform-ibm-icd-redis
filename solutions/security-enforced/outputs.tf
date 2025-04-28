@@ -24,13 +24,13 @@ output "crn" {
 
 output "service_credentials_json" {
   description = "Service credentials json map"
-  value       = var.existing_redis_instance_crn != null ? null : module.redis.service_credentials_json
+  value       = module.redis.service_credentials_json
   sensitive   = true
 }
 
 output "service_credentials_object" {
   description = "Service credentials object"
-  value       = var.existing_redis_instance_crn != null ? null : module.redis.service_credentials_object
+  value       = module.redis.service_credentials_object
   sensitive   = true
 }
 
