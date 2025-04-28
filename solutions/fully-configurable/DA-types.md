@@ -123,12 +123,12 @@ If you can't use the IAM-enabled `service_credential_names` input variable for a
 [
   {
     "name": "es_admin",
-    "password": "securepassword123",
+    "password": "securepassword123", # pragma: allowlist secret
     "type": "database",
   },
   {
     "name": "es_reader",
-    "password": "readpassword123",
+    "password": "readpassword123", # pragma: allowlist secret
     "type": "ops_manager"
   }
 ]
