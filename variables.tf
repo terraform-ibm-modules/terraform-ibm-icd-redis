@@ -205,6 +205,7 @@ variable "use_ibm_owned_encryption_key" {
 
   validation {
     condition = (
+      !var.kms_encryption_enabled ||
       var.use_ibm_owned_encryption_key ||
       var.backup_encryption_key_crn == null ||
       (!var.use_default_backup_encryption_key && !var.use_same_kms_key_for_backups)
