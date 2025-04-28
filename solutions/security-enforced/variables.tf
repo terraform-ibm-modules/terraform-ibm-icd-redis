@@ -7,21 +7,18 @@ variable "ibmcloud_api_key" {
   description = "The IBM Cloud API key to deploy resources."
   sensitive   = true
 }
-variable "use_existing_resource_group" {
-  type        = bool
-  description = "Whether to use an existing resource group."
-  default     = false
-}
 
-variable "resource_group_name" {
+variable "existing_resource_group_name" {
   type        = string
-  description = "The name of a new or an existing resource group to provision the Databases for Redis in. If a prefix input variable is specified, the prefix is added to the name in the `<prefix>-<name>` format."
+  description = "The name of an existing resource group to provision resource in."
+  default     = "Default"
+  nullable    = false
 }
 
 variable "prefix" {
   type        = string
   description = "Prefix to add to all resources created by this solution. To not use any prefix value, you can set this value to `null` or an empty string."
-  default     = "dev"
+  default     = "andrej-redis-2"
 }
 
 variable "name" {
@@ -34,11 +31,6 @@ variable "region" {
   description = "The region where you want to deploy your instance."
   type        = string
   default     = "us-south"
-
-  validation {
-    condition     = var.existing_redis_instance_crn != null && var.region != local.existing_redis_region ? false : true
-    error_message = "The region detected in the 'existing_redis_instance_crn' value must match the value of the 'region' input variable when passing an existing instance."
-  }
 }
 
 variable "existing_redis_instance_crn" {
@@ -88,7 +80,7 @@ variable "member_host_flavor" {
 }
 
 variable "configuration" {
-  description = "Database Configuration for Redis instance. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/solutions/standard/DA-types.md#configuration)."
+  description = "Database Configuration for Redis instance. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/solutions/fully-configurable/DA-types.md#configuration)."
   type = object({
     maxmemory                   = optional(number)
     maxmemory-policy            = optional(string)
@@ -106,7 +98,7 @@ variable "configuration" {
 }
 
 variable "service_credential_names" {
-  description = "Map of name, role for service credentials that you want to create for the database. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/solutions/standard/DA-types.md#svc-credential-name)"
+  description = "Map of name, role for service credentials that you want to create for the database. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/solutions/fully-configurable/DA-types.md#svc-credential-name)"
   type        = map(string)
   default     = {}
 }
@@ -127,7 +119,7 @@ variable "users" {
   }))
   default     = []
   sensitive   = true
-  description = "A list of users that you want to create on the database. Users block is supported by Redis version >= 6.0. Multiple blocks are allowed. The user password must be in the range of 10-32 characters. Be warned that in most case using IAM service credentials (via the var.service_credential_names) is sufficient to control access to the Redis instance. This blocks creates native redis database users. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/solutions/standard/DA-types.md#users)"
+  description = "A list of users that you want to create on the database. Users block is supported by Redis version >= 6.0. Multiple blocks are allowed. The user password must be in the range of 10-32 characters. Be warned that in most case using IAM service credentials (via the var.service_credential_names) is sufficient to control access to the Redis instance. This blocks creates native redis database users. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/solutions/fully-configurable/DA-types.md#users)"
 }
 
 variable "tags" {
@@ -150,30 +142,6 @@ variable "use_ibm_owned_encryption_key" {
   type        = bool
   description = "IBM Cloud Databases will secure your deployment's data at rest automatically with an encryption key that IBM hold. Alternatively, you may select your own Key Management System instance and encryption key (Key Protect or Hyper Protect Crypto Services) by setting this to false. If setting to false, a value must be passed for `existing_kms_instance_crn` to create a new key, or `existing_kms_key_crn` and/or `existing_backup_kms_key_crn` to use an existing key."
   default     = false
-
-  # this validation ensures IBM-owned key is not used when KMS details are provided
-  validation {
-    condition = (
-      var.existing_redis_instance_crn != null ||
-      !(var.use_ibm_owned_encryption_key && (
-        var.existing_kms_instance_crn != null ||
-        var.existing_kms_key_crn != null ||
-        var.existing_backup_kms_key_crn != null
-      ))
-    )
-    error_message = "When setting values for 'existing_kms_instance_crn', 'existing_kms_key_crn' or 'existing_backup_kms_key_crn', the 'use_ibm_owned_encryption_key' input must be set to false."
-  }
-
-  # this validation ensures key info is provided when IBM-owned key is disabled and no Redis instance is given
-  validation {
-    condition = !(
-      var.existing_redis_instance_crn == null &&
-      var.use_ibm_owned_encryption_key == false &&
-      var.existing_kms_instance_crn == null &&
-      var.existing_kms_key_crn == null
-    )
-    error_message = "When 'use_ibm_owned_encryption_key' is false, you must provide either 'existing_kms_instance_crn' (to create a new key) or 'existing_kms_key_crn' (to use an existing key)."
-  }
 }
 
 variable "existing_kms_instance_crn" {
@@ -186,16 +154,6 @@ variable "existing_kms_key_crn" {
   type        = string
   description = "The CRN of a Key Protect or Hyper Protect Crypto Services encryption key to encrypt your data. Applies only if `use_ibm_owned_encryption_key` is false. By default this key is used for both deployment data and backups, but this behaviour can be altered using the optional `existing_backup_kms_key_crn` input. If no value is passed a new key will be created in the instance specified in the `existing_kms_instance_crn` input. Bare in mind that backups encryption is only available in certain regions. See [Bring your own key for backups](https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-key-protect&interface=ui#key-byok) and [Using the HPCS Key for Backup encryption](https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-hpcs#use-hpcs-backups)."
   default     = null
-}
-
-variable "kms_endpoint_type" {
-  type        = string
-  description = "The type of endpoint to use for communicating with the Key Protect or Hyper Protect Crypto Services instance. Possible values: `public`, `private`. Applies only if `existing_kms_key_crn` is not specified."
-  default     = "private"
-  validation {
-    condition     = can(regex("public|private", var.kms_endpoint_type))
-    error_message = "The kms_endpoint_type value must be 'public' or 'private'."
-  }
 }
 
 variable "skip_redis_kms_auth_policy" {
@@ -248,16 +206,6 @@ variable "backup_crn" {
     error_message = "backup_crn must be null OR starts with 'crn:' and contains ':backup:'"
   }
 }
-variable "provider_visibility" {
-  description = "Set the visibility value for the IBM terraform provider. Supported values are `public`, `private`, `public-and-private`. [Learn more](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/guides/custom-service-endpoints)."
-  type        = string
-  default     = "private"
-
-  validation {
-    condition     = contains(["public", "private", "public-and-private"], var.provider_visibility)
-    error_message = "Invalid visibility option. Allowed values are 'public', 'private', or 'public-and-private'."
-  }
-}
 
 ##############################################################
 # Auto Scaling
@@ -286,7 +234,7 @@ variable "auto_scaling" {
       rate_units               = optional(string, "mb")
     })
   })
-  description = "Optional rules to allow the database to increase resources in response to usage. Only a single autoscaling block is allowed. Make sure you understand the effects of autoscaling, especially for production environments. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/solutions/standard/DA-types.md#autoscaling)"
+  description = "Optional rules to allow the database to increase resources in response to usage. Only a single autoscaling block is allowed. Make sure you understand the effects of autoscaling, especially for production environments. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/solutions/fully-configurable/DA-types.md#autoscaling)"
   default     = null
 }
 
@@ -298,16 +246,6 @@ variable "existing_secrets_manager_instance_crn" {
   type        = string
   default     = null
   description = "The CRN of existing secrets manager to use to create service credential secrets for Databases for Redis instance."
-}
-
-variable "existing_secrets_manager_endpoint_type" {
-  type        = string
-  description = "The endpoint type to use if `existing_secrets_manager_instance_crn` is specified. Possible values: public, private."
-  default     = "private"
-  validation {
-    condition     = contains(["public", "private"], var.existing_secrets_manager_endpoint_type)
-    error_message = "Only \"public\" and \"private\" are allowed values for 'existing_secrets_endpoint_type'."
-  }
 }
 
 variable "service_credential_secrets" {
@@ -328,7 +266,7 @@ variable "service_credential_secrets" {
     }))
   }))
   default     = []
-  description = "Service credential secrets configuration for Databases for Redis. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/solutions/standard/DA-types.md#service-credential-secrets)."
+  description = "Service credential secrets configuration for Databases for Redis. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/solutions/fully-configurable/DA-types.md#service-credential-secrets)."
 
   validation {
     # Service roles CRNs can be found at https://cloud.ibm.com/iam/roles, select the IBM Cloud Database and select the role
