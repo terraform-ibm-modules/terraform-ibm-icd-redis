@@ -300,6 +300,7 @@ module "redis" {
   service_credential_names          = var.service_credential_names
   backup_crn                        = var.backup_crn
   kms_encryption_enabled            = var.kms_encryption_enabled
+  service_endpoints                 = var.service_endpoints
 }
 
 locals {
@@ -316,7 +317,7 @@ locals {
 #######################################################################################################################
 
 locals {
-  create_sm_auth_policy = var.skip_redis_sm_auth_policy || var.existing_secrets_manager_instance_crn == null ? 0 : 1
+  create_secrets_manager_auth_policy = var.skip_redis_secrets_manager_auth_policy || var.existing_secrets_manager_instance_crn == null ? 0 : 1
 }
 
 # Parse the Secrets Manager CRN
@@ -329,7 +330,7 @@ module "sm_instance_crn_parser" {
 
 # create a service authorization between Secrets Manager and the target service (Databases for Redis)
 resource "ibm_iam_authorization_policy" "secrets_manager_key_manager" {
-  count                       = local.create_sm_auth_policy
+  count                       = local.create_secrets_manager_auth_policy
   source_service_name         = "secrets-manager"
   source_resource_instance_id = local.existing_secrets_manager_instance_guid
   target_service_name         = "databases-for-redis"
@@ -340,7 +341,7 @@ resource "ibm_iam_authorization_policy" "secrets_manager_key_manager" {
 
 # workaround for https://github.com/IBM-Cloud/terraform-provider-ibm/issues/4478
 resource "time_sleep" "wait_for_redis_authorization_policy" {
-  count           = local.create_sm_auth_policy
+  count           = local.create_secrets_manager_auth_policy
   depends_on      = [ibm_iam_authorization_policy.secrets_manager_key_manager]
   create_duration = "30s"
 }
@@ -370,10 +371,10 @@ locals {
 
   # Build the structure of the arbitrary credential type secret for admin password
   admin_pass_secret = [{
-    secret_group_name     = "${local.prefix}${var.admin_pass_secret_manager_secret_group}"
-    existing_secret_group = var.use_existing_admin_pass_secret_manager_secret_group
+    secret_group_name     = "${local.prefix}${var.admin_pass_secrets_manager_secret_group}"
+    existing_secret_group = var.use_existing_admin_pass_secrets_manager_secret_group
     secrets = [{
-      secret_name             = "${local.prefix}${var.admin_pass_secret_manager_secret_name}"
+      secret_name             = "${local.prefix}${var.admin_pass_secrets_manager_secret_name}"
       secret_type             = "arbitrary"
       secret_payload_password = local.admin_pass
       }
