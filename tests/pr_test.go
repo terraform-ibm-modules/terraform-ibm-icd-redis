@@ -113,8 +113,8 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
-		{Name: "admin_pass_secret_manager_secret_group", Value: options.Prefix, DataType: "string"},
-		{Name: "admin_pass_secret_manager_secret_name", Value: options.Prefix, DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_group", Value: options.Prefix, DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: GetRandomAdminPassword(t), DataType: "string"},
 	}
 	err = options.RunSchematicTest()
@@ -179,8 +179,8 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
-		{Name: "admin_pass_secret_manager_secret_group", Value: options.Prefix, DataType: "string"},
-		{Name: "admin_pass_secret_manager_secret_name", Value: options.Prefix, DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_group", Value: options.Prefix, DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: GetRandomAdminPassword(t), DataType: "string"},
 	}
 	err = options.RunSchematicTest()
@@ -240,8 +240,8 @@ func TestRunStandardUpgradeSolution(t *testing.T) {
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
-		{Name: "admin_pass_secret_manager_secret_group", Value: options.Prefix, DataType: "string"},
-		{Name: "admin_pass_secret_manager_secret_name", Value: options.Prefix, DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_group", Value: options.Prefix, DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: GetRandomAdminPassword(t), DataType: "string"},
 	}
 
@@ -349,10 +349,10 @@ func TestPlanPositiveValidation(t *testing.T) {
 	}
 
 	var securityEnforcedSMsecretGroupRequired = map[string]any{
-		"use_ibm_owned_encryption_key":           false,
-		"existing_kms_instance_crn":              permanentResources["hpcs_south_crn"],
-		"existing_secrets_manager_instance_crn":  permanentResources["secretsManagerCRN"],
-		"admin_pass_secret_manager_secret_group": "test-group",
+		"use_ibm_owned_encryption_key":            false,
+		"existing_kms_instance_crn":               permanentResources["hpcs_south_crn"],
+		"existing_secrets_manager_instance_crn":   permanentResources["secretsManagerCRN"],
+		"admin_pass_secrets_manager_secret_group": "test-group",
 		"service_credential_secrets": []map[string]any{
 			{
 				"secret_group_name": fmt.Sprintf("%s-secret-group", options.Prefix),
@@ -367,10 +367,10 @@ func TestPlanPositiveValidation(t *testing.T) {
 	}
 
 	var securityEnforcedSMsecretNameRequired = map[string]any{
-		"use_ibm_owned_encryption_key":          false,
-		"existing_kms_instance_crn":             permanentResources["hpcs_south_crn"],
-		"existing_secrets_manager_instance_crn": permanentResources["secretsManagerCRN"],
-		"admin_pass_secret_manager_secret_name": "secret-name",
+		"use_ibm_owned_encryption_key":           false,
+		"existing_kms_instance_crn":              permanentResources["hpcs_south_crn"],
+		"existing_secrets_manager_instance_crn":  permanentResources["secretsManagerCRN"],
+		"admin_pass_secrets_manager_secret_name": "secret-name",
 		"service_credential_secrets": []map[string]any{
 			{
 				"secret_group_name": fmt.Sprintf("%s-secret-group", options.Prefix),
@@ -542,10 +542,10 @@ func TestPlanNegativeValidation(t *testing.T) {
 	}
 
 	var securityEnforcedSMsecretGroupRequired = map[string]any{
-		"use_ibm_owned_encryption_key":           false,
-		"existing_kms_instance_crn":              permanentResources["hpcs_south_crn"],
-		"existing_secrets_manager_instance_crn":  permanentResources["secretsManagerCRN"],
-		"admin_pass_secret_manager_secret_group": nil,
+		"use_ibm_owned_encryption_key":            false,
+		"existing_kms_instance_crn":               permanentResources["hpcs_south_crn"],
+		"existing_secrets_manager_instance_crn":   permanentResources["secretsManagerCRN"],
+		"admin_pass_secrets_manager_secret_group": nil,
 		"service_credential_secrets": []map[string]any{
 			{
 				"secret_group_name": fmt.Sprintf("%s-secret-group", options.Prefix),
@@ -557,14 +557,14 @@ func TestPlanNegativeValidation(t *testing.T) {
 				},
 			},
 		},
-		"error_message": "`admin_pass_secret_manager_secret_group` is required when `existing_secrets_manager_instance_crn` is set.",
+		"error_message": "`admin_pass_secrets_manager_secret_group` is required when `existing_secrets_manager_instance_crn` is set.",
 	}
 
 	var securityEnforcedSMsecretNameRequired = map[string]any{
-		"use_ibm_owned_encryption_key":          false,
-		"existing_kms_instance_crn":             permanentResources["hpcs_south_crn"],
-		"existing_secrets_manager_instance_crn": permanentResources["secretsManagerCRN"],
-		"admin_pass_secret_manager_secret_name": nil,
+		"use_ibm_owned_encryption_key":           false,
+		"existing_kms_instance_crn":              permanentResources["hpcs_south_crn"],
+		"existing_secrets_manager_instance_crn":  permanentResources["secretsManagerCRN"],
+		"admin_pass_secrets_manager_secret_name": nil,
 		"service_credential_secrets": []map[string]any{
 			{
 				"secret_group_name": fmt.Sprintf("%s-secret-group", options.Prefix),
@@ -576,7 +576,7 @@ func TestPlanNegativeValidation(t *testing.T) {
 				},
 			},
 		},
-		"error_message": "`admin_pass_secret_manager_secret_name` is required when `existing_secrets_manager_instance_crn` is set.",
+		"error_message": "`admin_pass_secrets_manager_secret_name` is required when `existing_secrets_manager_instance_crn` is set.",
 	}
 
 	// Create a map of the variables
