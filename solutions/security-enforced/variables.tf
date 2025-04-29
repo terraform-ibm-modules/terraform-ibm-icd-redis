@@ -253,7 +253,7 @@ variable "service_credential_secrets" {
     secret_group_name        = string
     secret_group_description = optional(string)
     existing_secret_group    = optional(bool)
-    service_credentials = list(object({
+    service_credentials = list(object({ # pragma: allowlist secret
       secret_name                                 = string
       service_credentials_source_service_role_crn = string
       secret_labels                               = optional(list(string))
