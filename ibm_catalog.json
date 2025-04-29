@@ -238,13 +238,30 @@
               "key": "admin_pass"
             },
             {
-              "key": "admin_pass_secret_manager_secret_group"
+              "key": "service_endpoints",
+              "options": [
+                {
+                  "displayname": "private",
+                  "value": "private"
+                },
+                {
+                  "displayname": "public",
+                  "value": "public"
+                },
+                {
+                  "displayname": "public-and-private",
+                  "value": "public-and-private"
+                }
+              ]
             },
             {
-              "key": "admin_pass_secret_manager_secret_name"
+              "key": "admin_pass_secrets_manager_secret_group"
             },
             {
-              "key": "use_existing_admin_pass_secret_manager_secret_group"
+              "key": "admin_pass_secrets_manager_secret_name"
+            },
+            {
+              "key": "use_existing_admin_pass_secrets_manager_secret_group"
             },
             {
               "key": "existing_redis_instance_crn"
@@ -333,7 +350,7 @@
               "key": "service_credential_secrets"
             },
             {
-              "key": "skip_redis_sm_auth_policy"
+              "key": "skip_redis_secrets_manager_auth_policy"
             },
             {
               "key": "backup_crn"
@@ -521,13 +538,13 @@
               "key": "admin_pass"
             },
             {
-              "key": "admin_pass_secret_manager_secret_group"
+              "key": "admin_pass_secrets_manager_secret_group"
             },
             {
-              "key": "admin_pass_secret_manager_secret_name"
+              "key": "admin_pass_secrets_manager_secret_name"
             },
             {
-              "key": "use_existing_admin_pass_secret_manager_secret_group"
+              "key": "use_existing_admin_pass_secrets_manager_secret_group"
             },
             {
               "key": "existing_redis_instance_crn"
@@ -587,7 +604,7 @@
               "key": "service_credential_secrets"
             },
             {
-              "key": "skip_redis_sm_auth_policy"
+              "key": "skip_redis_secrets_manager_auth_policy"
             },
             {
               "key": "backup_crn"
