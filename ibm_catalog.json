@@ -9,7 +9,8 @@
         "target_terraform",
         "terraform",
         "data_management",
-        "solution"
+        "solution",
+        "security"
       ],
       "keywords": [
         "redis",
@@ -22,7 +23,7 @@
         "in memory"
       ],
       "short_description": "Creates and configures an instance of IBM Cloud Databases for Redis.",
-      "long_description": "This architecture supports creating and configuring an instance of Databases for Redis with KMS encryption.",
+      "long_description": "This architecture supports creating and configuring an instance of [Databases for Redis](https://www.ibm.com/products/databases-for-redis), with optional KMS encryption. This Terraform-based automation is part of a broader suite of IBM-maintained Infrastructure as Code (IaC) asset collection, each following the naming pattern \"Cloud automation for *servicename*\" and focusing on single IBM Cloud service. These single-service deployable architectures can be used on their own to streamline and automate service deployments through an [IaC approach](https://cloud.ibm.com/docs/secure-enterprise?topic=secure-enterprise-understanding-projects), or assembled together into a broader [automated IaC stack](https://cloud.ibm.com/docs/secure-enterprise?topic=secure-enterprise-config-stack) to automate the deployment of an end-to-end solution architecture.",
       "offering_docs_url": "https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/README.md",
       "offering_icon_url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-icd-redis/main/images/redis_icon.svg",
       "provider_name": "IBM",
@@ -118,7 +119,8 @@
                   "displayname": "public-and-private",
                   "value": "public-and-private"
                 }
-              ]
+              ],
+              "hidden": true
             },
             {
               "key": "existing_resource_group_name",
