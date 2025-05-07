@@ -192,25 +192,24 @@ variable "use_ibm_owned_encryption_key" {
 
   validation {
     condition = (
-      !var.kms_encryption_enabled || !var.use_ibm_owned_encryption_key ||
-      (var.kms_key_crn == null && var.backup_encryption_key_crn == null)
+      !var.use_ibm_owned_encryption_key ||
+      (var.kms_key_crn == null && var.backup_encryption_key_crn == null && var.kms_encryption_enabled)
     )
-    error_message = "When 'kms_encryption_enabled' and 'use_ibm_owned_encryption_key' is true, 'kms_key_crn' and 'backup_encryption_key_crn' must both be null."
+    error_message = "When 'use_ibm_owned_encryption_key' is true, 'kms_key_crn', 'backup_encryption_key_crn' must both be null and 'kms_encryption_enabled' must be false."
   }
 
   validation {
-    condition     = !var.kms_encryption_enabled || var.use_ibm_owned_encryption_key || var.kms_key_crn != null
-    error_message = "When 'kms_encryption_enabled' is true and 'use_ibm_owned_encryption_key' is false, you must provide a value for 'kms_key_crn'."
+    condition     = var.use_ibm_owned_encryption_key || (var.kms_key_crn != null && var.kms_encryption_enabled)
+    error_message = "When 'use_ibm_owned_encryption_key' is false, you must provide a value for 'kms_key_crn' and 'kms_encryption_enabled' must be true."
   }
 
   validation {
     condition = (
-      !var.kms_encryption_enabled ||
       var.use_ibm_owned_encryption_key ||
       var.backup_encryption_key_crn == null ||
       (!var.use_default_backup_encryption_key && !var.use_same_kms_key_for_backups)
     )
-    error_message = "When 'kms_encryption_enabled' is true and 'backup_encryption_key_crn' is set, you must not set 'use_default_backup_encryption_key' to true or 'use_ibm_owned_encryption_key' to false."
+    error_message = "When 'backup_encryption_key_crn' is set, you must not set 'use_default_backup_encryption_key' to true or 'use_ibm_owned_encryption_key' to false."
   }
 
   validation {
