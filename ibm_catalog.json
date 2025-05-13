@@ -81,7 +81,6 @@
             }
           ],
           "architecture": {
-            "descriptions": "This architecture creates an instance of IBM CLoud Databases for Redis instance with KMS encryption. Supports autoscaling.",
             "features": [
               {
                 "title": " Creates an instance of Databases for Redis",
@@ -193,8 +192,8 @@
               "default_value": "__NULL__",
               "options": [
                 {
-                "displayname": "preferred",
-                "value": "__NULL__"
+                  "displayname": "preferred",
+                  "value": "__NULL__"
                 },
                 {
                   "displayname": "6.2",
@@ -251,21 +250,21 @@
             {
               "key": "tags",
               "custom_config": {
-                  "grouping": "deployment",
-                  "original_grouping": "deployment",
-                  "config_constraints": {
-                      "type": "string"
-                  }
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "type": "string"
+                }
               }
             },
             {
               "key": "access_tags",
               "custom_config": {
-                  "grouping": "deployment",
-                  "original_grouping": "deployment",
-                  "config_constraints": {
-                      "type": "string"
-                  }
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "type": "string"
+                }
               }
             },
             {
