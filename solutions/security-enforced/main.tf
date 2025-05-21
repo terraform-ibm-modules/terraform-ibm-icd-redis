@@ -17,7 +17,7 @@ module "redis" {
   admin_pass                                           = var.admin_pass
   users                                                = var.users
   configuration                                        = var.configuration
-  tags                                                 = var.tags
+  resource_tags                                        = var.resource_tags
   access_tags                                          = var.access_tags
   kms_encryption_enabled                               = true
   use_ibm_owned_encryption_key                         = var.use_ibm_owned_encryption_key
