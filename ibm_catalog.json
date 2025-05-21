@@ -9,8 +9,8 @@
         "target_terraform",
         "terraform",
         "data_management",
-        "solution",
-        "security"
+        "database",
+        "solution"
       ],
       "keywords": [
         "redis",
@@ -18,7 +18,6 @@
         "infrastructure as code",
         "terraform",
         "solution",
-        "redis standard",
         "cache",
         "in memory"
       ],
@@ -76,10 +75,17 @@
             },
             {
               "role_crns": [
-                "crn:v1:bluemix:public:iam::::serviceRole:Manager",
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
-              "service_name": "kms"
+              "service_name": "kms",
+              "notes": "[Optional] Manager and Editor access are required to create keys. They are required only if KMS encryption is enabled."
+            },
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ],
+              "service_name": "hs-crypto",
+              "notes": "[Optional] Manager and Editor access are required to create keys in HPCS. They are required only if KMS encryption is enabled."
             }
           ],
           "architecture": {
@@ -135,11 +141,7 @@
               }
             },
             {
-              "key": "prefix",
-              "required": true
-            },
-            {
-              "key": "name"
+              "key": "prefix"
             },
             {
               "key": "region",
@@ -197,13 +199,8 @@
             },
             {
               "key": "redis_version",
-              "required": false,
-              "default_value": "__NULL__",
+              "required": true,
               "options": [
-                {
-                "displayname": "preferred",
-                "value": "__NULL__"
-                },
                 {
                   "displayname": "6.2",
                   "value": "6.2"
@@ -213,6 +210,31 @@
                   "value": "7.2"
                 }
               ]
+            },
+            {
+              "key": "name"
+            },
+            {
+              "key": "resource_tags",
+              "type": "array",
+              "custom_config": {
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                      "type": "string"
+                  }
+              }
+            },
+            {
+              "key": "access_tags",
+              "type": "array",
+              "custom_config": {
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                      "type": "string"
+                  }
+              }
             },
             {
               "key": "members"
@@ -230,13 +252,10 @@
               "key": "member_host_flavor"
             },
             {
+              "key": "auto_scaling"
+            },
+            {
               "key": "configuration"
-            },
-            {
-              "key": "service_credential_names"
-            },
-            {
-              "key": "admin_pass"
             },
             {
               "key": "service_endpoints",
@@ -256,6 +275,34 @@
               ]
             },
             {
+              "key": "service_credential_names"
+            },
+            {
+              "key": "service_credential_secrets"
+            },
+            {
+              "key": "admin_pass"
+            },
+            {
+              "key": "existing_secrets_manager_instance_crn"
+            },
+            {
+              "key": "existing_secrets_manager_endpoint_type",
+              "options": [
+                {
+                  "displayname": "public",
+                  "value": "public"
+                },
+                {
+                  "displayname": "private",
+                  "value": "private"
+                }
+              ]
+            },
+            {
+              "key": "skip_redis_secrets_manager_auth_policy"
+            },
+            {
               "key": "admin_pass_secrets_manager_secret_group"
             },
             {
@@ -265,30 +312,7 @@
               "key": "use_existing_admin_pass_secrets_manager_secret_group"
             },
             {
-              "key": "existing_redis_instance_crn"
-            },
-            {
               "key": "users"
-            },
-            {
-              "key": "tags",
-              "custom_config": {
-                  "grouping": "deployment",
-                  "original_grouping": "deployment",
-                  "config_constraints": {
-                      "type": "string"
-                  }
-              }
-            },
-            {
-              "key": "access_tags",
-              "custom_config": {
-                  "grouping": "deployment",
-                  "original_grouping": "deployment",
-                  "config_constraints": {
-                      "type": "string"
-                  }
-              }
             },
             {
               "key": "use_ibm_owned_encryption_key"
@@ -326,34 +350,6 @@
               "key": "key_name"
             },
             {
-              "key": "skip_redis_kms_auth_policy"
-            },
-            {
-              "key": "auto_scaling"
-            },
-            {
-              "key": "existing_secrets_manager_instance_crn"
-            },
-            {
-              "key": "existing_secrets_manager_endpoint_type",
-              "options": [
-                {
-                  "displayname": "public",
-                  "value": "public"
-                },
-                {
-                  "displayname": "private",
-                  "value": "private"
-                }
-              ]
-            },
-            {
-              "key": "service_credential_secrets"
-            },
-            {
-              "key": "skip_redis_secrets_manager_auth_policy"
-            },
-            {
               "key": "backup_crn"
             },
             {
@@ -361,6 +357,12 @@
             },
             {
               "key": "use_default_backup_encryption_key"
+            },
+            {
+              "key": "skip_redis_kms_auth_policy"
+            },
+            {
+              "key": "existing_redis_instance_crn"
             }
           ]
         },
@@ -393,14 +395,20 @@
             },
             {
               "role_crns": [
-                "crn:v1:bluemix:public:iam::::serviceRole:Manager",
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
-              "service_name": "kms"
+              "service_name": "kms",
+              "notes": "[Optional] Manager and Editor access are required to create keys. They are required only if KMS encryption is enabled."
+            },
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ],
+              "service_name": "hs-crypto",
+              "notes": "[Optional] Manager and Editor access are required to create keys in HPCS. They are required only if KMS encryption is enabled."
             }
           ],
           "architecture": {
-            "descriptions": "This architecture creates an instance of IBM CLoud Databases for Redis instance with KMS encryption. Supports autoscaling.",
             "features": [
               {
                 "title": " Creates an instance of Databases for Redis",
@@ -435,11 +443,7 @@
               }
             },
             {
-              "key": "prefix",
-              "required": true
-            },
-            {
-              "key": "name"
+              "key": "prefix"
             },
             {
               "key": "region",
@@ -497,13 +501,8 @@
             },
             {
               "key": "redis_version",
-              "required": false,
-              "default_value": "__NULL__",
+              "required": true,
               "options": [
-                {
-                  "displayname": "preferred",
-                  "value": "__NULL__"
-                },
                 {
                   "displayname": "6.2",
                   "value": "6.2"
@@ -513,6 +512,31 @@
                   "value": "7.2"
                 }
               ]
+            },
+            {
+              "key": "name"
+            },
+            {
+              "key": "resource_tags",
+              "type": "array",
+              "custom_config": {
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                      "type": "string"
+                  }
+              }
+            },
+            {
+              "key": "access_tags",
+              "type": "array",
+              "custom_config": {
+                  "grouping": "deployment",
+                  "original_grouping": "deployment",
+                  "config_constraints": {
+                      "type": "string"
+                  }
+              }
             },
             {
               "key": "members"
@@ -530,13 +554,25 @@
               "key": "member_host_flavor"
             },
             {
+              "key": "auto_scaling"
+            },
+            {
               "key": "configuration"
             },
             {
               "key": "service_credential_names"
             },
             {
+              "key": "service_credential_secrets"
+            },
+            {
               "key": "admin_pass"
+            },
+            {
+              "key": "existing_secrets_manager_instance_crn"
+            },
+            {
+              "key": "skip_redis_secrets_manager_auth_policy"
             },
             {
               "key": "admin_pass_secrets_manager_secret_group"
@@ -548,33 +584,7 @@
               "key": "use_existing_admin_pass_secrets_manager_secret_group"
             },
             {
-              "key": "existing_redis_instance_crn"
-            },
-            {
-              "key": "skip_redis_kms_auth_policy"
-            },
-            {
               "key": "users"
-            },
-            {
-              "key": "tags",
-              "custom_config": {
-                "grouping": "deployment",
-                "original_grouping": "deployment",
-                "config_constraints": {
-                  "type": "string"
-                }
-              }
-            },
-            {
-              "key": "access_tags",
-              "custom_config": {
-                "grouping": "deployment",
-                "original_grouping": "deployment",
-                "config_constraints": {
-                  "type": "string"
-                }
-              }
             },
             {
               "key": "use_ibm_owned_encryption_key"
@@ -596,18 +606,6 @@
               "key": "key_name"
             },
             {
-              "key": "auto_scaling"
-            },
-            {
-              "key": "existing_secrets_manager_instance_crn"
-            },
-            {
-              "key": "service_credential_secrets"
-            },
-            {
-              "key": "skip_redis_secrets_manager_auth_policy"
-            },
-            {
               "key": "backup_crn"
             },
             {
@@ -615,6 +613,12 @@
             },
             {
               "key": "use_default_backup_encryption_key"
+            },
+            {
+              "key": "skip_redis_kms_auth_policy"
+            },
+            {
+              "key": "existing_redis_instance_crn"
             }
           ]
         }
