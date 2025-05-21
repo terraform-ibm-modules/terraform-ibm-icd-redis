@@ -20,7 +20,7 @@ This solution supports provisioning and configuring the following infrastructure
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
-| <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | 1.78.0 |
+| <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | 1.78.2 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | 3.7.2 |
 | <a name="requirement_time"></a> [time](#requirement\_time) | 0.13.1 |
 
@@ -28,31 +28,31 @@ This solution supports provisioning and configuring the following infrastructure
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_kms"></a> [kms](#module\_kms) | terraform-ibm-modules/kms-all-inclusive/ibm | 5.0.2 |
+| <a name="module_kms"></a> [kms](#module\_kms) | terraform-ibm-modules/kms-all-inclusive/ibm | 5.1.5 |
 | <a name="module_kms_backup_key_crn_parser"></a> [kms\_backup\_key\_crn\_parser](#module\_kms\_backup\_key\_crn\_parser) | terraform-ibm-modules/common-utilities/ibm//modules/crn-parser | 1.1.0 |
 | <a name="module_kms_instance_crn_parser"></a> [kms\_instance\_crn\_parser](#module\_kms\_instance\_crn\_parser) | terraform-ibm-modules/common-utilities/ibm//modules/crn-parser | 1.1.0 |
 | <a name="module_kms_key_crn_parser"></a> [kms\_key\_crn\_parser](#module\_kms\_key\_crn\_parser) | terraform-ibm-modules/common-utilities/ibm//modules/crn-parser | 1.1.0 |
 | <a name="module_redis"></a> [redis](#module\_redis) | ../.. | n/a |
 | <a name="module_redis_instance_crn_parser"></a> [redis\_instance\_crn\_parser](#module\_redis\_instance\_crn\_parser) | terraform-ibm-modules/common-utilities/ibm//modules/crn-parser | 1.1.0 |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | terraform-ibm-modules/resource-group/ibm | 1.2.0 |
-| <a name="module_secrets_manager_service_credentials"></a> [secrets\_manager\_service\_credentials](#module\_secrets\_manager\_service\_credentials) | terraform-ibm-modules/secrets-manager/ibm//modules/secrets | 2.2.6 |
+| <a name="module_secrets_manager_service_credentials"></a> [secrets\_manager\_service\_credentials](#module\_secrets\_manager\_service\_credentials) | terraform-ibm-modules/secrets-manager/ibm//modules/secrets | 2.2.9 |
 | <a name="module_sm_instance_crn_parser"></a> [sm\_instance\_crn\_parser](#module\_sm\_instance\_crn\_parser) | terraform-ibm-modules/common-utilities/ibm//modules/crn-parser | 1.1.0 |
 
 ### Resources
 
 | Name | Type |
 |------|------|
-| [ibm_iam_authorization_policy.backup_kms_policy](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.0/docs/resources/iam_authorization_policy) | resource |
-| [ibm_iam_authorization_policy.kms_policy](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.0/docs/resources/iam_authorization_policy) | resource |
-| [ibm_iam_authorization_policy.secrets_manager_key_manager](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.0/docs/resources/iam_authorization_policy) | resource |
+| [ibm_iam_authorization_policy.backup_kms_policy](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.2/docs/resources/iam_authorization_policy) | resource |
+| [ibm_iam_authorization_policy.kms_policy](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.2/docs/resources/iam_authorization_policy) | resource |
+| [ibm_iam_authorization_policy.secrets_manager_key_manager](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.2/docs/resources/iam_authorization_policy) | resource |
 | [random_password.admin_password](https://registry.terraform.io/providers/hashicorp/random/3.7.2/docs/resources/password) | resource |
 | [time_sleep.wait_for_authorization_policy](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) | resource |
 | [time_sleep.wait_for_backup_kms_authorization_policy](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) | resource |
 | [time_sleep.wait_for_redis_authorization_policy](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) | resource |
-| [ibm_database.existing_db_instance](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.0/docs/data-sources/database) | data source |
-| [ibm_database_connection.existing_connection](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.0/docs/data-sources/database_connection) | data source |
-| [ibm_iam_account_settings.iam_account_settings](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.0/docs/data-sources/iam_account_settings) | data source |
-| [ibm_resource_instance.existing_instance_resource](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.0/docs/data-sources/resource_instance) | data source |
+| [ibm_database.existing_db_instance](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.2/docs/data-sources/database) | data source |
+| [ibm_database_connection.existing_connection](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.2/docs/data-sources/database_connection) | data source |
+| [ibm_iam_account_settings.iam_account_settings](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.2/docs/data-sources/iam_account_settings) | data source |
+| [ibm_resource_instance.existing_instance_resource](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.2/docs/data-sources/resource_instance) | data source |
 
 ### Inputs
 
@@ -88,12 +88,12 @@ This solution supports provisioning and configuring the following infrastructure
 | <a name="input_provider_visibility"></a> [provider\_visibility](#input\_provider\_visibility) | Set the visibility value for the IBM terraform provider. Supported values are `public`, `private`, `public-and-private`. [Learn more](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/guides/custom-service-endpoints). | `string` | `"private"` | no |
 | <a name="input_redis_version"></a> [redis\_version](#input\_redis\_version) | The version of the Databases for Redis instance. If no value is specified, the current preferred version of Databases for Redis is used. | `string` | `null` | no |
 | <a name="input_region"></a> [region](#input\_region) | The region where you want to deploy your instance. | `string` | `"us-south"` | no |
+| <a name="input_resource_tags"></a> [resource\_tags](#input\_resource\_tags) | The list of resource tags to be added to the Databases for Redis instance. | `list(string)` | `[]` | no |
 | <a name="input_service_credential_names"></a> [service\_credential\_names](#input\_service\_credential\_names) | Map of name, role for service credentials that you want to create for the database. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/solutions/fully-configurable/DA-types.md#svc-credential-name) | `map(string)` | `{}` | no |
 | <a name="input_service_credential_secrets"></a> [service\_credential\_secrets](#input\_service\_credential\_secrets) | Service credential secrets configuration for Databases for Redis. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/solutions/fully-configurable/DA-types.md#service-credential-secrets). | <pre>list(object({<br/>    secret_group_name        = string<br/>    secret_group_description = optional(string)<br/>    existing_secret_group    = optional(bool)<br/>    service_credentials = list(object({ # pragma: allowlist secret<br/>      secret_name                                 = string<br/>      service_credentials_source_service_role_crn = string<br/>      secret_labels                               = optional(list(string))<br/>      secret_auto_rotation                        = optional(bool)<br/>      secret_auto_rotation_unit                   = optional(string)<br/>      secret_auto_rotation_interval               = optional(number)<br/>      service_credentials_ttl                     = optional(string)<br/>      service_credential_secret_description       = optional(string)<br/><br/>    }))<br/>  }))</pre> | `[]` | no |
 | <a name="input_service_endpoints"></a> [service\_endpoints](#input\_service\_endpoints) | The type of endpoint of the database instance. Possible values: `public`, `private`, `public-and-private`. | `string` | `"public"` | no |
 | <a name="input_skip_redis_kms_auth_policy"></a> [skip\_redis\_kms\_auth\_policy](#input\_skip\_redis\_kms\_auth\_policy) | Whether to create an IAM authorization policy that permits all Databases for Redis instances in the resource group to read the encryption key from the Hyper Protect Crypto Services instance specified in the `existing_kms_instance_crn` variable. | `bool` | `false` | no |
 | <a name="input_skip_redis_secrets_manager_auth_policy"></a> [skip\_redis\_secrets\_manager\_auth\_policy](#input\_skip\_redis\_secrets\_manager\_auth\_policy) | Whether an IAM authorization policy is created for Secrets Manager instance to create a service credential secrets for Databases for Redis. If set to false, the Secrets Manager instance passed by the user is granted the Key Manager access to the Redis instance created by the Deployable Architecture. Set to `true` to use an existing policy. The value of this is ignored if any value for 'existing\_secrets\_manager\_instance\_crn' is not passed. | `bool` | `false` | no |
-| <a name="input_tags"></a> [tags](#input\_tags) | The list of tags to be added to the Databases for Redis instance. | `list(string)` | `[]` | no |
 | <a name="input_use_default_backup_encryption_key"></a> [use\_default\_backup\_encryption\_key](#input\_use\_default\_backup\_encryption\_key) | When `use_ibm_owned_encryption_key` is set to false, backups will be encrypted with either the key specified in `existing_kms_key_crn`, in `existing_backup_kms_key_crn`, or with a new key that will be created in the instance specified in the `existing_kms_instance_crn` input. If you do not want to use your own key for backups encryption, you can set this to `true` to use the IBM Cloud Databases default encryption for backups. Alternatively set `use_ibm_owned_encryption_key` to true to use the default encryption for both backups and deployment data. | `bool` | `false` | no |
 | <a name="input_use_existing_admin_pass_secrets_manager_secret_group"></a> [use\_existing\_admin\_pass\_secrets\_manager\_secret\_group](#input\_use\_existing\_admin\_pass\_secrets\_manager\_secret\_group) | Whether to use an existing secrets manager secret group for admin password. | `bool` | `false` | no |
 | <a name="input_use_ibm_owned_encryption_key"></a> [use\_ibm\_owned\_encryption\_key](#input\_use\_ibm\_owned\_encryption\_key) | IBM Cloud Databases will secure your deployment's data at rest automatically with an encryption key that IBM hold. Alternatively, you may select your own Key Management System instance and encryption key (Key Protect or Hyper Protect Crypto Services) by setting this to false. If setting to false, a value must be passed for `existing_kms_instance_crn` to create a new key, or `existing_kms_key_crn` and/or `existing_backup_kms_key_crn` to use an existing key. | `bool` | `false` | no |
