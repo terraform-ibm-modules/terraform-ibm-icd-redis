@@ -9,3 +9,4 @@ CRA_TARGETS:
       TF_VAR_existing_resource_group_name: "geretain-test-redis"
       TF_VAR_kms_encryption_enabled: true
       TF_VAR_provider_visibility: "public"
+      TF_VAR_prefix: "test"
