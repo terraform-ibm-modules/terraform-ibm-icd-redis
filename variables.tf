@@ -185,6 +185,43 @@ variable "kms_encryption_enabled" {
   default     = false
 }
 
+variable "use_ibm_owned_encryption_key" {
+  type        = bool
+  description = "IBM Cloud Databases will secure your deployment's data at rest automatically with an encryption key that IBM hold. Alternatively, you may select your own Key Management System instance and encryption key (Key Protect or Hyper Protect Crypto Services) by setting this to false. If setting to false, a value must be passed for the `kms_key_crn` input."
+  default     = true
+
+  validation {
+    condition = !(
+      var.use_ibm_owned_encryption_key == true &&
+      (var.kms_key_crn != null || var.backup_encryption_key_crn != null)
+    )
+    error_message = "When 'use_ibm_owned_encryption_key' is true, 'kms_key_crn' and 'backup_encryption_key_crn' must both be null."
+  }
+
+  validation {
+    condition     = var.use_ibm_owned_encryption_key || var.kms_key_crn != null
+    error_message = "When setting 'use_ibm_owned_encryption_key' to false, a value must be passed for 'kms_key_crn'."
+  }
+
+  validation {
+    condition = (
+      var.use_ibm_owned_encryption_key ||
+      var.backup_encryption_key_crn == null ||
+      (!var.use_default_backup_encryption_key && !var.use_same_kms_key_for_backups)
+    )
+    error_message = "When passing a value for 'backup_encryption_key_crn' you cannot set 'use_default_backup_encryption_key' to true or 'use_ibm_owned_encryption_key' to false."
+  }
+
+  validation {
+    condition = (
+      var.use_ibm_owned_encryption_key ||
+      var.backup_encryption_key_crn != null ||
+      var.use_same_kms_key_for_backups
+    )
+    error_message = "When 'use_same_kms_key_for_backups' is set to false, a value needs to be passed for 'backup_encryption_key_crn'."
+  }
+}
+
 variable "use_default_backup_encryption_key" {
   type        = bool
   description = "When `use_ibm_owned_encryption_key` is set to false, backups will be encrypted with either the key specified in `kms_key_crn`, or in `backup_encryption_key_crn` if a value is passed. If you do not want to use your own key for backups encryption, you can set this to `true` to use the IBM Cloud Databases default encryption for backups. Alternatively set `use_ibm_owned_encryption_key` to true to use the default encryption for both backups and deployment data."
