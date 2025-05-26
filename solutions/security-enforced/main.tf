@@ -4,7 +4,7 @@ module "redis" {
   existing_resource_group_name                         = var.existing_resource_group_name
   prefix                                               = var.prefix
   name                                                 = var.name
-  provider_visibility                                  = "public"
+  provider_visibility                                  = "private"
   region                                               = var.region
   existing_redis_instance_crn                          = var.existing_redis_instance_crn
   redis_version                                        = var.redis_version
@@ -20,7 +20,7 @@ module "redis" {
   resource_tags                                        = var.resource_tags
   access_tags                                          = var.access_tags
   kms_encryption_enabled                               = true
-  use_ibm_owned_encryption_key                         = var.use_ibm_owned_encryption_key
+  use_ibm_owned_encryption_key                         = false
   existing_kms_instance_crn                            = var.existing_kms_instance_crn
   existing_kms_key_crn                                 = var.existing_kms_key_crn
   kms_endpoint_type                                    = "private"
@@ -29,7 +29,7 @@ module "redis" {
   key_ring_name                                        = var.key_ring_name
   key_name                                             = var.key_name
   existing_backup_kms_key_crn                          = var.existing_backup_kms_key_crn
-  use_default_backup_encryption_key                    = var.use_default_backup_encryption_key
+  use_default_backup_encryption_key                    = false
   backup_crn                                           = var.backup_crn
   auto_scaling                                         = var.auto_scaling
   existing_secrets_manager_instance_crn                = var.existing_secrets_manager_instance_crn
