@@ -91,7 +91,7 @@
           "architecture": {
             "features": [
               {
-                "title": " Creates an instance of Databases for Redis",
+                "title": "Creates an instance of Databases for Redis",
                 "description": "This architecture creates an instance of IBM Cloud Databases for Redis with KMS encryption. It accepts or creates a resource group, and provides autoscaling rules."
               }
             ],
@@ -398,7 +398,7 @@
           "architecture": {
             "features": [
               {
-                "title": " Creates an instance of Databases for Redis",
+                "title": "Creates an instance of Databases for Redis",
                 "description": "This architecture creates an instance of IBM Cloud Databases for Redis with KMS encryption. It accepts or creates a resource group, and provides autoscaling rules."
               }
             ],
@@ -574,14 +574,10 @@
               "key": "users"
             },
             {
-              "key": "use_ibm_owned_encryption_key"
-            },
-            {
               "key": "ibmcloud_kms_api_key"
             },
             {
-              "key": "existing_kms_instance_crn",
-              "required": true
+              "key": "existing_kms_instance_crn"
             },
             {
               "key": "existing_kms_key_crn"
@@ -597,9 +593,6 @@
             },
             {
               "key": "existing_backup_kms_key_crn"
-            },
-            {
-              "key": "use_default_backup_encryption_key"
             },
             {
               "key": "skip_redis_kms_auth_policy"

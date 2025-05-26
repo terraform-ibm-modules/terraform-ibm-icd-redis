@@ -48,7 +48,7 @@ module "kms" {
           standard_key             = false
           rotation_interval_month  = 3
           dual_auth_delete_enabled = false
-          force_delete             = true
+          force_delete             = true # Force delete must be set to true, or the terraform destroy will fail since the service does not de-register itself from the key until the reclamation period has expired.
         }
       ]
     }
@@ -225,8 +225,10 @@ locals {
   # _- are invalid first characters
   # if - replace first char with J
   # elseif _ replace first char with K
-  # else use asis.
-  admin_pass = var.admin_pass == null ? (startswith(random_password.admin_password[0].result, "-") ? "J${substr(random_password.admin_password[0].result, 1, -1)}" : startswith(random_password.admin_password[0].result, "_") ? "K${substr(random_password.admin_password[0].result, 1, -1)}" : random_password.admin_password[0].result) : var.admin_pass
+  # else use asis
+  generated_admin_password = (length(random_password.admin_password) > 0 ? (startswith(random_password.admin_password[0].result, "-") ? "J${substr(random_password.admin_password[0].result, 1, -1)}" : startswith(random_password.admin_password[0].result, "_") ? "K${substr(random_password.admin_password[0].result, 1, -1)}" : random_password.admin_password[0].result) : null)
+  # admin password to use
+  admin_pass = var.admin_pass == null ? local.generated_admin_password : var.admin_pass
 }
 
 #######################################################################################################################
@@ -245,10 +247,6 @@ module "redis_instance_crn_parser" {
 locals {
   existing_redis_guid   = var.existing_redis_instance_crn != null ? module.redis_instance_crn_parser[0].service_instance : null
   existing_redis_region = var.existing_redis_instance_crn != null ? module.redis_instance_crn_parser[0].region : null
-
-  # Validate the region input matches region detected in existing instance CRN (approach based on https://github.com/hashicorp/terraform/issues/25609#issuecomment-1057614400)
-  # tflint-ignore: terraform_unused_declarations
-  # validate_existing_instance_region = var.existing_redis_instance_crn != null && var.region != local.existing_redis_region ? tobool("The region detected in the 'existing_redis_instance_crn' value must match the value of the 'region' input variable when passing an existing instance.") : true
 }
 
 # Do a data lookup on the resource GUID to get more info that is needed for the 'ibm_database' data lookup below

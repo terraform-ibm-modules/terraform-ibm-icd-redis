@@ -20,7 +20,7 @@ This solution supports provisioning and configuring the following infrastructure
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
-| <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | 1.78.2 |
+| <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | 1.78.3 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | 3.7.2 |
 | <a name="requirement_time"></a> [time](#requirement\_time) | 0.13.1 |
 
@@ -28,31 +28,31 @@ This solution supports provisioning and configuring the following infrastructure
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_kms"></a> [kms](#module\_kms) | terraform-ibm-modules/kms-all-inclusive/ibm | 5.1.5 |
+| <a name="module_kms"></a> [kms](#module\_kms) | terraform-ibm-modules/kms-all-inclusive/ibm | 5.1.7 |
 | <a name="module_kms_backup_key_crn_parser"></a> [kms\_backup\_key\_crn\_parser](#module\_kms\_backup\_key\_crn\_parser) | terraform-ibm-modules/common-utilities/ibm//modules/crn-parser | 1.1.0 |
 | <a name="module_kms_instance_crn_parser"></a> [kms\_instance\_crn\_parser](#module\_kms\_instance\_crn\_parser) | terraform-ibm-modules/common-utilities/ibm//modules/crn-parser | 1.1.0 |
 | <a name="module_kms_key_crn_parser"></a> [kms\_key\_crn\_parser](#module\_kms\_key\_crn\_parser) | terraform-ibm-modules/common-utilities/ibm//modules/crn-parser | 1.1.0 |
 | <a name="module_redis"></a> [redis](#module\_redis) | ../.. | n/a |
 | <a name="module_redis_instance_crn_parser"></a> [redis\_instance\_crn\_parser](#module\_redis\_instance\_crn\_parser) | terraform-ibm-modules/common-utilities/ibm//modules/crn-parser | 1.1.0 |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | terraform-ibm-modules/resource-group/ibm | 1.2.0 |
-| <a name="module_secrets_manager_service_credentials"></a> [secrets\_manager\_service\_credentials](#module\_secrets\_manager\_service\_credentials) | terraform-ibm-modules/secrets-manager/ibm//modules/secrets | 2.2.9 |
+| <a name="module_secrets_manager_service_credentials"></a> [secrets\_manager\_service\_credentials](#module\_secrets\_manager\_service\_credentials) | terraform-ibm-modules/secrets-manager/ibm//modules/secrets | 2.3.1 |
 | <a name="module_sm_instance_crn_parser"></a> [sm\_instance\_crn\_parser](#module\_sm\_instance\_crn\_parser) | terraform-ibm-modules/common-utilities/ibm//modules/crn-parser | 1.1.0 |
 
 ### Resources
 
 | Name | Type |
 |------|------|
-| [ibm_iam_authorization_policy.backup_kms_policy](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.2/docs/resources/iam_authorization_policy) | resource |
-| [ibm_iam_authorization_policy.kms_policy](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.2/docs/resources/iam_authorization_policy) | resource |
-| [ibm_iam_authorization_policy.secrets_manager_key_manager](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.2/docs/resources/iam_authorization_policy) | resource |
+| [ibm_iam_authorization_policy.backup_kms_policy](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.3/docs/resources/iam_authorization_policy) | resource |
+| [ibm_iam_authorization_policy.kms_policy](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.3/docs/resources/iam_authorization_policy) | resource |
+| [ibm_iam_authorization_policy.secrets_manager_key_manager](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.3/docs/resources/iam_authorization_policy) | resource |
 | [random_password.admin_password](https://registry.terraform.io/providers/hashicorp/random/3.7.2/docs/resources/password) | resource |
 | [time_sleep.wait_for_authorization_policy](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) | resource |
 | [time_sleep.wait_for_backup_kms_authorization_policy](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) | resource |
 | [time_sleep.wait_for_redis_authorization_policy](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) | resource |
-| [ibm_database.existing_db_instance](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.2/docs/data-sources/database) | data source |
-| [ibm_database_connection.existing_connection](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.2/docs/data-sources/database_connection) | data source |
-| [ibm_iam_account_settings.iam_account_settings](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.2/docs/data-sources/iam_account_settings) | data source |
-| [ibm_resource_instance.existing_instance_resource](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.2/docs/data-sources/resource_instance) | data source |
+| [ibm_database.existing_db_instance](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.3/docs/data-sources/database) | data source |
+| [ibm_database_connection.existing_connection](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.3/docs/data-sources/database_connection) | data source |
+| [ibm_iam_account_settings.iam_account_settings](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.3/docs/data-sources/iam_account_settings) | data source |
+| [ibm_resource_instance.existing_instance_resource](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.78.3/docs/data-sources/resource_instance) | data source |
 
 ### Inputs
 
