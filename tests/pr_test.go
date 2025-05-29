@@ -70,7 +70,7 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 		},
 		TemplateFolder:     fullyConfigurableSolutionTerraformDir,
 		BestRegionYAMLPath: regionSelectionPath,
-		Prefix:             "redis-fc-da",
+		Prefix:             "r-fc-da",
 		// ResourceGroup:          resourceGroup,
 		DeleteWorkspaceOnFail:  false,
 		WaitJobCompleteMinutes: 60,
