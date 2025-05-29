@@ -115,6 +115,7 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "prefix", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: GetRandomAdminPassword(t), DataType: "string"},
+		{Name: "use_ibm_owned_encryption_key", Value: true, DataType: "bool"},
 	}
 	err = options.RunSchematicTest()
 	assert.Nil(t, err, "This should not have errored")
