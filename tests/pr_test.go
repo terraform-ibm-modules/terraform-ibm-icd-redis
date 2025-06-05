@@ -71,9 +71,10 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 		TemplateFolder:     fullyConfigurableSolutionTerraformDir,
 		BestRegionYAMLPath: regionSelectionPath,
 		Prefix:             "r-fc-da",
-		// ResourceGroup:          resourceGroup,
-		DeleteWorkspaceOnFail:  false,
-		WaitJobCompleteMinutes: 60,
+		// ResourceGroup:              resourceGroup,
+		DeleteWorkspaceOnFail:      false,
+		CheckApplyResultForUpgrade: true,
+		WaitJobCompleteMinutes:     60,
 	})
 
 	serviceCredentialSecrets := []map[string]any{
@@ -107,7 +108,7 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 		{Name: "access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
 		{Name: "existing_resource_group_name", Value: resourceGroup, DataType: "string"},
-		{Name: "redis_version", Value: "7.2", DataType: "string"}, // Always lock this test into the latest supported Redis version
+		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
@@ -136,9 +137,10 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 		TemplateFolder:     securityEnforcedTerraformDir,
 		BestRegionYAMLPath: regionSelectionPath,
 		Prefix:             "r-se-da",
-		// ResourceGroup:          resourceGroup,
-		DeleteWorkspaceOnFail:  false,
-		WaitJobCompleteMinutes: 60,
+		// ResourceGroup:              resourceGroup,
+		DeleteWorkspaceOnFail:      false,
+		CheckApplyResultForUpgrade: true,
+		WaitJobCompleteMinutes:     60,
 	})
 	fmt.Print(options)
 
