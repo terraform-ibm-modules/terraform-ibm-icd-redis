@@ -9,6 +9,7 @@
         "target_terraform",
         "terraform",
         "data_management",
+        "database",
         "solution"
       ],
       "keywords": [
@@ -17,12 +18,11 @@
         "infrastructure as code",
         "terraform",
         "solution",
-        "redis standard",
         "cache",
         "in memory"
       ],
       "short_description": "Creates and configures an instance of IBM Cloud Databases for Redis.",
-      "long_description": "This architecture supports creating and configuring an instance of Databases for Redis with KMS encryption.",
+      "long_description": "This architecture supports creating and configuring an instance of [Databases for Redis](https://www.ibm.com/products/databases-for-redis), with optional KMS encryption. This Terraform-based automation is part of a broader suite of IBM-maintained Infrastructure as Code (IaC) asset collection, each following the naming pattern \"Cloud automation for *servicename*\" and focusing on single IBM Cloud service. These single-service deployable architectures can be used on their own to streamline and automate service deployments through an [IaC approach](https://cloud.ibm.com/docs/secure-enterprise?topic=secure-enterprise-understanding-projects), or assembled together into a broader [automated IaC stack](https://cloud.ibm.com/docs/secure-enterprise?topic=secure-enterprise-config-stack) to automate the deployment of an end-to-end solution architecture.",
       "offering_docs_url": "https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/README.md",
       "offering_icon_url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-icd-redis/main/images/redis_icon.svg",
       "provider_name": "IBM",
@@ -40,16 +40,20 @@
           "description": "Provides the autoscaling to allow the database to increase resources in response to usage."
         },
         {
+          "title": "Attaches access tags",
+          "description": "Attaches access tags to the Elasticsearch instance."
+        },
+        {
           "title": "Supports backup restoration",
           "description": "Provides database restoration using a backup created by a deployment with the same service ID."
         }
       ],
       "flavors": [
         {
-          "label": "Standard",
-          "name": "standard",
+          "label": "Fully configurable",
+          "name": "fully-configurable",
           "install_type": "fullstack",
-          "working_directory": "solutions/standard",
+          "working_directory": "solutions/fully-configurable",
           "compliance": {
             "authority": "scc-v3",
             "profiles": [
@@ -74,16 +78,23 @@
             },
             {
               "role_crns": [
-                "crn:v1:bluemix:public:iam::::serviceRole:Manager",
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
-              "service_name": "kms"
+              "service_name": "kms",
+              "notes": "[Optional] Manager and Editor access are required to create keys. They are required only if KMS encryption is enabled."
+            },
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ],
+              "service_name": "hs-crypto",
+              "notes": "[Optional] Manager and Editor access are required to create keys in HPCS. They are required only if KMS encryption is enabled."
             }
           ],
           "architecture": {
             "features": [
               {
-                "title": " Creates an instance of Databases for Redis",
+                "title": "Creates an instance of Databases for Redis",
                 "description": "This architecture creates an instance of IBM Cloud Databases for Redis with KMS encryption. It accepts or creates a resource group, and provides autoscaling rules."
               }
             ],
@@ -104,6 +115,7 @@
             },
             {
               "key": "provider_visibility",
+              "hidden": true,
               "options": [
                 {
                   "displayname": "private",
@@ -120,17 +132,19 @@
               ]
             },
             {
-              "key": "use_existing_resource_group"
+              "key": "existing_resource_group_name",
+              "required": true,
+              "custom_config": {
+                "type": "resource_group",
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "identifier": "rg_name"
+                }
+              }
             },
             {
-              "key": "resource_group_name"
-            },
-            {
-              "key": "prefix",
-              "required": true
-            },
-            {
-              "key": "name"
+              "key": "prefix"
             },
             {
               "key": "region",
@@ -188,13 +202,8 @@
             },
             {
               "key": "redis_version",
-              "required": false,
-              "default_value": "__NULL__",
+              "required": true,
               "options": [
-                {
-                  "displayname": "preferred",
-                  "value": "__NULL__"
-                },
                 {
                   "displayname": "6.2",
                   "value": "6.2"
@@ -204,6 +213,31 @@
                   "value": "7.2"
                 }
               ]
+            },
+            {
+              "key": "name"
+            },
+            {
+              "key": "resource_tags",
+              "type": "array",
+              "custom_config": {
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "key": "access_tags",
+              "type": "array",
+              "custom_config": {
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "type": "string"
+                }
+              }
             },
             {
               "key": "members"
@@ -221,51 +255,67 @@
               "key": "member_host_flavor"
             },
             {
+              "key": "auto_scaling"
+            },
+            {
               "key": "configuration"
+            },
+            {
+              "key": "service_endpoints",
+              "options": [
+                {
+                  "displayname": "private",
+                  "value": "private"
+                },
+                {
+                  "displayname": "public",
+                  "value": "public"
+                },
+                {
+                  "displayname": "public-and-private",
+                  "value": "public-and-private"
+                }
+              ]
             },
             {
               "key": "service_credential_names"
             },
             {
+              "key": "service_credential_secrets"
+            },
+            {
               "key": "admin_pass"
             },
             {
-              "key": "admin_pass_secret_manager_secret_group"
+              "key": "existing_secrets_manager_instance_crn"
             },
             {
-              "key": "admin_pass_secret_manager_secret_name"
+              "key": "existing_secrets_manager_endpoint_type",
+              "options": [
+                {
+                  "displayname": "public",
+                  "value": "public"
+                },
+                {
+                  "displayname": "private",
+                  "value": "private"
+                }
+              ]
             },
             {
-              "key": "use_existing_admin_pass_secret_manager_secret_group"
+              "key": "skip_redis_secrets_manager_auth_policy"
             },
             {
-              "key": "existing_redis_instance_crn"
+              "key": "admin_pass_secrets_manager_secret_group"
             },
             {
-              "key": "skip_redis_kms_auth_policy"
+              "key": "admin_pass_secrets_manager_secret_name"
+            },
+            {
+              "key": "use_existing_admin_pass_secrets_manager_secret_group"
             },
             {
               "key": "users"
-            },
-            {
-              "key": "tags",
-              "custom_config": {
-                "grouping": "deployment",
-                "original_grouping": "deployment",
-                "config_constraints": {
-                  "type": "string"
-                }
-              }
-            },
-            {
-              "key": "access_tags",
-              "custom_config": {
-                "grouping": "deployment",
-                "original_grouping": "deployment",
-                "config_constraints": {
-                  "type": "string"
-                }
-              }
             },
             {
               "key": "use_ibm_owned_encryption_key"
@@ -274,8 +324,10 @@
               "key": "ibmcloud_kms_api_key"
             },
             {
-              "key": "existing_kms_instance_crn",
-              "required": true
+              "key": "kms_encryption_enabled"
+            },
+            {
+              "key": "existing_kms_instance_crn"
             },
             {
               "key": "existing_kms_key_crn"
@@ -300,29 +352,256 @@
               "key": "key_name"
             },
             {
+              "key": "backup_crn"
+            },
+            {
+              "key": "existing_backup_kms_key_crn"
+            },
+            {
+              "key": "use_default_backup_encryption_key"
+            },
+            {
+              "key": "skip_redis_kms_auth_policy"
+            },
+            {
+              "key": "existing_redis_instance_crn"
+            }
+          ]
+        },
+        {
+          "label": "Security-enforced",
+          "name": "security-enforced",
+          "install_type": "fullstack",
+          "working_directory": "solutions/security-enforced",
+          "compliance": {
+            "authority": "scc-v3",
+            "profiles": [
+              {
+                "profile_name": "IBM Cloud Framework for Financial Services",
+                "profile_version": "1.7.0"
+              }
+            ]
+          },
+          "iam_permissions": [
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Administrator"
+              ],
+              "service_name": "all-account-management-services"
+            },
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ],
+              "service_name": "databases-for-redis"
+            },
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ],
+              "service_name": "kms",
+              "notes": "[Optional] Manager and Editor access are required to create keys. They are required only if KMS encryption is enabled."
+            },
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ],
+              "service_name": "hs-crypto",
+              "notes": "[Optional] Manager and Editor access are required to create keys in HPCS. They are required only if KMS encryption is enabled."
+            }
+          ],
+          "architecture": {
+            "features": [
+              {
+                "title": "Creates an instance of Databases for Redis",
+                "description": "This architecture creates an instance of IBM Cloud Databases for Redis with KMS encryption. It accepts or creates a resource group, and provides autoscaling rules."
+              }
+            ],
+            "diagrams": [
+              {
+                "diagram": {
+                  "caption": "Databases for Redis instance on IBM Cloud",
+                  "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-icd-redis/main/reference-architecture/deployable-architecture-redis.svg",
+                  "type": "image/svg+xml"
+                },
+                "description": "This architecture supports creating and configuring an instance of Databases for Redis instance with KMS encryption."
+              }
+            ]
+          },
+          "configuration": [
+            {
+              "key": "ibmcloud_api_key"
+            },
+            {
+              "key": "existing_resource_group_name",
+              "required": true,
+              "custom_config": {
+                "type": "resource_group",
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "identifier": "rg_name"
+                }
+              }
+            },
+            {
+              "key": "prefix"
+            },
+            {
+              "key": "region",
+              "required": true,
+              "options": [
+                {
+                  "displayname": "Chennai (che01)",
+                  "value": "che01"
+                },
+                {
+                  "displayname": "Dallas (us-south)",
+                  "value": "us-south"
+                },
+                {
+                  "displayname": "Frankfurt (eu-de)",
+                  "value": "eu-de"
+                },
+                {
+                  "displayname": "London (eu-gb)",
+                  "value": "eu-gb"
+                },
+                {
+                  "displayname": "Madrid (eu-es)",
+                  "value": "eu-es"
+                },
+                {
+                  "displayname": "Osaka (jp-osa)",
+                  "value": "jp-osa"
+                },
+                {
+                  "displayname": "Paris (par01)",
+                  "value": "par01"
+                },
+                {
+                  "displayname": "Sao Paulo (br-sao)",
+                  "value": "br-sao"
+                },
+                {
+                  "displayname": "Sydney (au-syd)",
+                  "value": "au-syd"
+                },
+                {
+                  "displayname": "Toronto (ca-tor)",
+                  "value": "ca-tor"
+                },
+                {
+                  "displayname": "Tokyo (jp-tok)",
+                  "value": "jp-tok"
+                },
+                {
+                  "displayname": "Washington (us-east)",
+                  "value": "us-east"
+                }
+              ]
+            },
+            {
+              "key": "redis_version",
+              "required": true,
+              "options": [
+                {
+                  "displayname": "6.2",
+                  "value": "6.2"
+                },
+                {
+                  "displayname": "7.2",
+                  "value": "7.2"
+                }
+              ]
+            },
+            {
+              "key": "name"
+            },
+            {
+              "key": "resource_tags",
+              "type": "array",
+              "custom_config": {
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "key": "access_tags",
+              "type": "array",
+              "custom_config": {
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "key": "members"
+            },
+            {
+              "key": "member_memory_mb"
+            },
+            {
+              "key": "member_cpu_count"
+            },
+            {
+              "key": "member_disk_mb"
+            },
+            {
+              "key": "member_host_flavor"
+            },
+            {
               "key": "auto_scaling"
             },
             {
-              "key": "existing_secrets_manager_instance_crn"
+              "key": "configuration"
             },
             {
-              "key": "existing_secrets_manager_endpoint_type",
-              "options": [
-                {
-                  "displayname": "public",
-                  "value": "public"
-                },
-                {
-                  "displayname": "private",
-                  "value": "private"
-                }
-              ]
+              "key": "service_credential_names"
             },
             {
               "key": "service_credential_secrets"
             },
             {
-              "key": "skip_redis_sm_auth_policy"
+              "key": "admin_pass"
+            },
+            {
+              "key": "existing_secrets_manager_instance_crn"
+            },
+            {
+              "key": "skip_redis_secrets_manager_auth_policy"
+            },
+            {
+              "key": "admin_pass_secrets_manager_secret_group"
+            },
+            {
+              "key": "admin_pass_secrets_manager_secret_name"
+            },
+            {
+              "key": "use_existing_admin_pass_secrets_manager_secret_group"
+            },
+            {
+              "key": "users"
+            },
+            {
+              "key": "ibmcloud_kms_api_key"
+            },
+            {
+              "key": "existing_kms_instance_crn"
+            },
+            {
+              "key": "existing_kms_key_crn"
+            },
+            {
+              "key": "key_ring_name"
+            },
+            {
+              "key": "key_name"
             },
             {
               "key": "backup_crn"
@@ -331,7 +610,10 @@
               "key": "existing_backup_kms_key_crn"
             },
             {
-              "key": "use_default_backup_encryption_key"
+              "key": "skip_redis_kms_auth_policy"
+            },
+            {
+              "key": "existing_redis_instance_crn"
             }
           ]
         }
