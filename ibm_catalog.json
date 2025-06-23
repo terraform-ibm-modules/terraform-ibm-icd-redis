@@ -22,7 +22,7 @@
         "in memory"
       ],
       "short_description": "Creates and configures an instance of IBM Cloud Databases for Redis.",
-      "long_description": "This architecture supports creating and configuring an instance of [Databases for Redis](https://www.ibm.com/products/databases-for-redis), with optional KMS encryption. This Terraform-based automation is part of a broader suite of IBM-maintained Infrastructure as Code (IaC) asset collection, each following the naming pattern \"Cloud automation for *servicename*\" and focusing on single IBM Cloud service. These single-service deployable architectures can be used on their own to streamline and automate service deployments through an [IaC approach](https://cloud.ibm.com/docs/secure-enterprise?topic=secure-enterprise-understanding-projects), or assembled together into a broader [automated IaC stack](https://cloud.ibm.com/docs/secure-enterprise?topic=secure-enterprise-config-stack) to automate the deployment of an end-to-end solution architecture.",
+      "long_description": "This architecture supports creating and configuring an instance of [Databases for Redis](https://www.ibm.com/products/databases-for-redis), with optional KMS encryption.\n\nℹ️ This Terraform-based automation is part of a broader suite of IBM-maintained Infrastructure as Code (IaC) assets, each following the naming pattern \"Cloud automation for *servicename*\" and focusing on single IBM Cloud service. These single-service deployable architectures can be used on their own to streamline and automate service deployments through an [IaC approach](https://cloud.ibm.com/docs/secure-enterprise?topic=secure-enterprise-understanding-projects), or assembled together into a broader [automated IaC stack](https://cloud.ibm.com/docs/secure-enterprise?topic=secure-enterprise-config-stack) to automate the deployment of an end-to-end solution architecture.",
       "offering_docs_url": "https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/README.md",
       "offering_icon_url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-icd-redis/main/images/redis_icon.svg",
       "provider_name": "IBM",
@@ -66,13 +66,15 @@
               "role_crns": [
                 "crn:v1:bluemix:public:iam::::role:Administrator"
               ],
-              "service_name": "all-account-management-services"
+              "service_name": "all-account-management-services",
+              "notes": "Required for Account Management Services."
             },
             {
               "role_crns": [
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
-              "service_name": "databases-for-redis"
+              "service_name": "databases-for-redis",
+              "notes": "Required for working with Databases for Redis."
             },
             {
               "role_crns": [
@@ -327,9 +329,6 @@
                 "grouping": "deployment",
                 "original_grouping": "deployment"
               }
-            },
-            {
-              "key": "use_ibm_owned_encryption_key"
             },
             {
               "key": "ibmcloud_kms_api_key"
