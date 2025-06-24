@@ -1,7 +1,7 @@
 ########################################################################################################################
 # Locals
 ########################################################################################################################
-
+# test test
 locals {
   # If no value passed for 'backup_encryption_key_crn' use the value of 'kms_key_crn' and perform validation of 'kms_key_crn' to check if region is supported by backup encryption key.
 
