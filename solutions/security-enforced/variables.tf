@@ -61,7 +61,7 @@ variable "existing_redis_instance_crn" {
 }
 
 variable "redis_version" {
-  description = "The version of the Databases for Redis instance. If no value is specified, the current preferred version of Databases for Redis is used."
+  description = "The version of the Databases for Redis instance."
   type        = string
   default     = null
 }

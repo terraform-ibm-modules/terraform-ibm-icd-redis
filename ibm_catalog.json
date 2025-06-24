@@ -64,31 +64,30 @@
           "iam_permissions": [
             {
               "role_crns": [
-                "crn:v1:bluemix:public:iam::::role:Administrator"
+                "crn:v1:bluemix:public:iam::::role:Viewer"
               ],
-              "service_name": "all-account-management-services",
-              "notes": "Required for Account Management Services."
+              "service_name": "Resource group only",
+              "notes": "Viewer access is required in the resource group you want to provision in."
             },
             {
               "role_crns": [
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
-              "service_name": "databases-for-redis",
-              "notes": "Required for working with Databases for Redis."
+              "service_name": "databases-for-redis"
             },
             {
               "role_crns": [
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
               "service_name": "kms",
-              "notes": "[Optional] Editor access is required to create keys. It is required only if KMS encryption is enabled."
+              "notes": "[Optional] Editor access is required to create keys. It is only required when using Key Protect for encryption."
             },
             {
               "role_crns": [
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
               "service_name": "hs-crypto",
-              "notes": "[Optional] Editor access is required to create keys in HPCS. It is required only if KMS encryption is enabled."
+              "notes": "[Optional] Editor access is required to create keys in HPCS. It is only required when using HPCS for encryption."
             }
           ],
           "architecture": {
@@ -102,7 +101,7 @@
               {
                 "diagram": {
                   "caption": "Databases for Redis instance on IBM Cloud",
-                  "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-icd-redis/5669c83af3849acf4b34c5c16c4477d85772b2ec/reference-architecture/deployable-architecture-redis.svg",
+                  "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-icd-redis/main/reference-architecture/deployable-architecture-redis.svg",
                   "type": "image/svg+xml"
                 },
                 "description": "This architecture supports creating and configuring an instance of Databases for Redis instance with KMS encryption."
@@ -133,7 +132,7 @@
             },
             {
               "key": "existing_resource_group_name",
-              "required": true,
+              "display_name": "resource_group",
               "custom_config": {
                 "type": "resource_group",
                 "grouping": "deployment",
@@ -397,9 +396,10 @@
           "iam_permissions": [
             {
               "role_crns": [
-                "crn:v1:bluemix:public:iam::::role:Administrator"
+                "crn:v1:bluemix:public:iam::::role:Viewer"
               ],
-              "service_name": "all-account-management-services"
+              "service_name": "Resource group only",
+              "notes": "Viewer access is required in the resource group you want to provision in."
             },
             {
               "role_crns": [
@@ -407,7 +407,7 @@
               ],
               "service_name": "databases-for-redis"
             },
-            {
+           {
               "role_crns": [
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
@@ -419,7 +419,7 @@
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
               "service_name": "hs-crypto",
-              "notes": "[Optional] Editor access is required to create keys in HPCS. It is required only if KMS encryption is enabled."
+              "notes": "[Optional] Editor access is required to create keys in HPCS. It is only required when using HPCS for encryption."
             }
           ],
           "architecture": {
@@ -433,7 +433,7 @@
               {
                 "diagram": {
                   "caption": "Databases for Redis instance on IBM Cloud",
-                  "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-icd-redis/5669c83af3849acf4b34c5c16c4477d85772b2ec/reference-architecture/deployable-architecture-redis.svg",
+                  "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-icd-redis/main/reference-architecture/deployable-architecture-redis.svg",
                   "type": "image/svg+xml"
                 },
                 "description": "This architecture supports creating and configuring an instance of Databases for Redis instance with KMS encryption."
@@ -446,7 +446,7 @@
             },
             {
               "key": "existing_resource_group_name",
-              "required": true,
+              "display_name": "resource_group",
               "custom_config": {
                 "type": "resource_group",
                 "grouping": "deployment",

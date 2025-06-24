@@ -301,7 +301,6 @@ module "redis" {
   configuration                     = var.configuration
   service_credential_names          = var.service_credential_names
   backup_crn                        = var.backup_crn
-  kms_encryption_enabled            = var.kms_encryption_enabled
   service_endpoints                 = var.service_endpoints
 }
 
