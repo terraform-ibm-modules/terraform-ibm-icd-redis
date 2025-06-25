@@ -9,6 +9,7 @@
         "target_terraform",
         "terraform",
         "data_management",
+        "database",
         "solution"
       ],
       "keywords": [
@@ -17,40 +18,40 @@
         "infrastructure as code",
         "terraform",
         "solution",
-        "redis standard",
         "cache",
         "in memory"
       ],
       "short_description": "Creates and configures an instance of IBM Cloud Databases for Redis.",
-      "long_description": "This architecture supports creating and configuring an instance of Databases for Redis with KMS encryption.",
+      "long_description": "This architecture supports creating and configuring an instance of [Databases for Redis](https://www.ibm.com/products/databases-for-redis), with optional KMS encryption.\n\nℹ️ This Terraform-based automation is part of a broader suite of IBM-maintained Infrastructure as Code (IaC) assets, each following the naming pattern \"Cloud automation for *servicename*\" and focusing on single IBM Cloud service. These single-service deployable architectures can be used on their own to streamline and automate service deployments through an [IaC approach](https://cloud.ibm.com/docs/secure-enterprise?topic=secure-enterprise-understanding-projects), or assembled together into a broader [automated IaC stack](https://cloud.ibm.com/docs/secure-enterprise?topic=secure-enterprise-config-stack) to automate the deployment of an end-to-end solution architecture.",
       "offering_docs_url": "https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/README.md",
       "offering_icon_url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-icd-redis/main/images/redis_icon.svg",
       "provider_name": "IBM",
       "support_details": "This product is in the community registry, as such support is handled through the originated repo. If you experience issues please open an issue in the repository [https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/issues](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/issues). Please note this product is not supported via the IBM Cloud Support Center.",
       "features": [
         {
-          "title": "Creates an instance of Databases for Redis",
-          "description": "Creates and configures an IBM Cloud Databases for Redis instance."
+          "title": "KMS encryption",
+          "description": "Provides [KMS encryption](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-key-protect&interface=ui) for the data that you store in the database, enhancing data security."
         },
         {
-          "title": "Supports KMS encryption",
-          "description": "Provides KMS encryption for the data that you store in the database."
+          "title": "Autoscaling",
+          "description": "Provides the [autoscaling](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-autoscaling&interface=ui) to allow the database to increase resources in response to usage."
         },
         {
-          "title": "Supports autoscaling",
-          "description": "Provides the autoscaling to allow the database to increase resources in response to usage."
+          "title": "Access tags",
+          "description": "Attaches access tags to the Redis instance."
         },
         {
-          "title": "Supports backup restoration",
-          "description": "Provides database restoration using a backup created by a deployment with the same service ID."
+          "title": "Backup restoration",
+          "description": "Provides [database restoration](https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-dashboard-backups&interface=ui) using a backup created by a deployment with the same service ID."
         }
       ],
       "flavors": [
         {
-          "label": "Standard",
-          "name": "standard",
+          "label": "Fully configurable",
+          "name": "fully-configurable",
+          "index": 1,
           "install_type": "fullstack",
-          "working_directory": "solutions/standard",
+          "working_directory": "solutions/fully-configurable",
           "compliance": {
             "authority": "scc-v3",
             "profiles": [
@@ -63,9 +64,10 @@
           "iam_permissions": [
             {
               "role_crns": [
-                "crn:v1:bluemix:public:iam::::role:Administrator"
+                "crn:v1:bluemix:public:iam::::role:Viewer"
               ],
-              "service_name": "all-account-management-services"
+              "service_name": "Resource group only",
+              "notes": "Viewer access is required in the resource group you want to provision in."
             },
             {
               "role_crns": [
@@ -75,17 +77,24 @@
             },
             {
               "role_crns": [
-                "crn:v1:bluemix:public:iam::::serviceRole:Manager",
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
-              "service_name": "kms"
+              "service_name": "kms",
+              "notes": "[Optional] Editor access is required to create keys. It is only required when using Key Protect for encryption."
+            },
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ],
+              "service_name": "hs-crypto",
+              "notes": "[Optional] Editor access is required to create keys in HPCS. It is only required when using HPCS for encryption."
             }
           ],
           "architecture": {
             "features": [
               {
-                "title": " Creates an instance of Databases for Redis",
-                "description": "This architecture creates an instance of IBM Cloud Databases for Redis with KMS encryption. It accepts or creates a resource group, and provides autoscaling rules."
+                "title": " ",
+                "description": "Configured to use IBM secure by default standards, but can be edited to fit your use case."
               }
             ],
             "diagrams": [
@@ -105,6 +114,7 @@
             },
             {
               "key": "provider_visibility",
+              "hidden": true,
               "options": [
                 {
                   "displayname": "private",
@@ -121,17 +131,19 @@
               ]
             },
             {
-              "key": "use_existing_resource_group"
+              "key": "existing_resource_group_name",
+              "display_name": "resource_group",
+              "custom_config": {
+                "type": "resource_group",
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "identifier": "rg_name"
+                }
+              }
             },
             {
-              "key": "resource_group_name"
-            },
-            {
-              "key": "prefix",
-              "required": true
-            },
-            {
-              "key": "name"
+              "key": "prefix"
             },
             {
               "key": "region",
@@ -189,13 +201,8 @@
             },
             {
               "key": "redis_version",
-              "required": false,
-              "default_value": "__NULL__",
+              "required": true,
               "options": [
-                {
-                  "displayname": "preferred",
-                  "value": "__NULL__"
-                },
                 {
                   "displayname": "6.2",
                   "value": "6.2"
@@ -205,6 +212,31 @@
                   "value": "7.2"
                 }
               ]
+            },
+            {
+              "key": "name"
+            },
+            {
+              "key": "resource_tags",
+              "type": "array",
+              "custom_config": {
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "key": "access_tags",
+              "type": "array",
+              "custom_config": {
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "type": "string"
+                }
+              }
             },
             {
               "key": "members"
@@ -222,67 +254,96 @@
               "key": "member_host_flavor"
             },
             {
+              "key": "auto_scaling"
+            },
+            {
               "key": "configuration"
+            },
+            {
+              "key": "service_endpoints",
+              "options": [
+                {
+                  "displayname": "private",
+                  "value": "private"
+                },
+                {
+                  "displayname": "public",
+                  "value": "public"
+                },
+                {
+                  "displayname": "public-and-private",
+                  "value": "public-and-private"
+                }
+              ]
             },
             {
               "key": "service_credential_names"
             },
             {
+              "key": "service_credential_secrets",
+              "type": "array",
+              "custom_config": {
+                "type": "textarea",
+                "grouping": "deployment",
+                "original_grouping": "deployment"
+              }
+            },
+            {
               "key": "admin_pass"
             },
             {
-              "key": "admin_pass_secret_manager_secret_group"
+              "key": "existing_secrets_manager_instance_crn"
             },
             {
-              "key": "admin_pass_secret_manager_secret_name"
-            },
-            {
-              "key": "use_existing_admin_pass_secret_manager_secret_group"
-            },
-            {
-              "key": "existing_redis_instance_crn"
-            },
-            {
-              "key": "skip_redis_kms_auth_policy"
-            },
-            {
-              "key": "users"
-            },
-            {
-              "key": "tags",
-              "custom_config": {
-                "grouping": "deployment",
-                "original_grouping": "deployment",
-                "config_constraints": {
-                  "type": "string"
+              "key": "existing_secrets_manager_endpoint_type",
+              "hidden": true,
+              "options": [
+                {
+                  "displayname": "public",
+                  "value": "public"
+                },
+                {
+                  "displayname": "private",
+                  "value": "private"
                 }
-              }
+              ]
             },
             {
-              "key": "access_tags",
+              "key": "skip_redis_secrets_manager_auth_policy"
+            },
+            {
+              "key": "admin_pass_secrets_manager_secret_group"
+            },
+            {
+              "key": "admin_pass_secrets_manager_secret_name"
+            },
+            {
+              "key": "use_existing_admin_pass_secrets_manager_secret_group"
+            },
+            {
+              "key": "users",
+              "type": "array",
               "custom_config": {
+                "type": "textarea",
                 "grouping": "deployment",
-                "original_grouping": "deployment",
-                "config_constraints": {
-                  "type": "string"
-                }
+                "original_grouping": "deployment"
               }
-            },
-            {
-              "key": "use_ibm_owned_encryption_key"
             },
             {
               "key": "ibmcloud_kms_api_key"
             },
             {
-              "key": "existing_kms_instance_crn",
-              "required": true
+              "key": "kms_encryption_enabled"
+            },
+            {
+              "key": "existing_kms_instance_crn"
             },
             {
               "key": "existing_kms_key_crn"
             },
             {
               "key": "kms_endpoint_type",
+              "hidden": true,
               "options": [
                 {
                   "displayname": "public",
@@ -301,29 +362,271 @@
               "key": "key_name"
             },
             {
+              "key": "backup_crn"
+            },
+            {
+              "key": "existing_backup_kms_key_crn"
+            },
+            {
+              "key": "use_default_backup_encryption_key"
+            },
+            {
+              "key": "skip_redis_kms_auth_policy"
+            },
+            {
+              "key": "existing_redis_instance_crn"
+            }
+          ]
+        },
+        {
+          "label": "Security-enforced",
+          "name": "security-enforced",
+          "index": 2,
+          "install_type": "fullstack",
+          "working_directory": "solutions/security-enforced",
+          "compliance": {
+            "authority": "scc-v3",
+            "profiles": [
+              {
+                "profile_name": "IBM Cloud Framework for Financial Services",
+                "profile_version": "1.7.0"
+              }
+            ]
+          },
+          "iam_permissions": [
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Viewer"
+              ],
+              "service_name": "Resource group only",
+              "notes": "Viewer access is required in the resource group you want to provision in."
+            },
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ],
+              "service_name": "databases-for-redis"
+            },
+           {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ],
+              "service_name": "kms",
+              "notes": "[Optional] Editor access is required to create keys. It is required only if KMS encryption is enabled."
+            },
+            {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ],
+              "service_name": "hs-crypto",
+              "notes": "[Optional] Editor access is required to create keys in HPCS. It is only required when using HPCS for encryption."
+            }
+          ],
+          "architecture": {
+            "features": [
+              {
+                "title": " ",
+                "description": "Configured to use IBM secure by default standards that can't be changed."
+              }
+            ],
+            "diagrams": [
+              {
+                "diagram": {
+                  "caption": "Databases for Redis instance on IBM Cloud",
+                  "url": "https://raw.githubusercontent.com/terraform-ibm-modules/terraform-ibm-icd-redis/main/reference-architecture/deployable-architecture-redis.svg",
+                  "type": "image/svg+xml"
+                },
+                "description": "This architecture supports creating and configuring an instance of Databases for Redis instance with KMS encryption."
+              }
+            ]
+          },
+          "configuration": [
+            {
+              "key": "ibmcloud_api_key"
+            },
+            {
+              "key": "existing_resource_group_name",
+              "display_name": "resource_group",
+              "custom_config": {
+                "type": "resource_group",
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "identifier": "rg_name"
+                }
+              }
+            },
+            {
+              "key": "prefix"
+            },
+            {
+              "key": "region",
+              "required": true,
+              "options": [
+                {
+                  "displayname": "Chennai (che01)",
+                  "value": "che01"
+                },
+                {
+                  "displayname": "Dallas (us-south)",
+                  "value": "us-south"
+                },
+                {
+                  "displayname": "Frankfurt (eu-de)",
+                  "value": "eu-de"
+                },
+                {
+                  "displayname": "London (eu-gb)",
+                  "value": "eu-gb"
+                },
+                {
+                  "displayname": "Madrid (eu-es)",
+                  "value": "eu-es"
+                },
+                {
+                  "displayname": "Osaka (jp-osa)",
+                  "value": "jp-osa"
+                },
+                {
+                  "displayname": "Paris (par01)",
+                  "value": "par01"
+                },
+                {
+                  "displayname": "Sao Paulo (br-sao)",
+                  "value": "br-sao"
+                },
+                {
+                  "displayname": "Sydney (au-syd)",
+                  "value": "au-syd"
+                },
+                {
+                  "displayname": "Toronto (ca-tor)",
+                  "value": "ca-tor"
+                },
+                {
+                  "displayname": "Tokyo (jp-tok)",
+                  "value": "jp-tok"
+                },
+                {
+                  "displayname": "Washington (us-east)",
+                  "value": "us-east"
+                }
+              ]
+            },
+            {
+              "key": "redis_version",
+              "required": true,
+              "options": [
+                {
+                  "displayname": "6.2",
+                  "value": "6.2"
+                },
+                {
+                  "displayname": "7.2",
+                  "value": "7.2"
+                }
+              ]
+            },
+            {
+              "key": "name"
+            },
+            {
+              "key": "resource_tags",
+              "type": "array",
+              "custom_config": {
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "key": "access_tags",
+              "type": "array",
+              "custom_config": {
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "key": "members"
+            },
+            {
+              "key": "member_memory_mb"
+            },
+            {
+              "key": "member_cpu_count"
+            },
+            {
+              "key": "member_disk_mb"
+            },
+            {
+              "key": "member_host_flavor"
+            },
+            {
               "key": "auto_scaling"
+            },
+            {
+              "key": "configuration"
+            },
+            {
+              "key": "service_credential_names"
+            },
+            {
+              "key": "service_credential_secrets",
+              "type": "array",
+              "custom_config": {
+                "type": "textarea",
+                "grouping": "deployment",
+                "original_grouping": "deployment"
+              }
+            },
+            {
+              "key": "admin_pass"
             },
             {
               "key": "existing_secrets_manager_instance_crn"
             },
             {
-              "key": "existing_secrets_manager_endpoint_type",
-              "options": [
-                {
-                  "displayname": "public",
-                  "value": "public"
-                },
-                {
-                  "displayname": "private",
-                  "value": "private"
-                }
-              ]
+              "key": "skip_redis_secrets_manager_auth_policy"
             },
             {
-              "key": "service_credential_secrets"
+              "key": "admin_pass_secrets_manager_secret_group"
             },
             {
-              "key": "skip_redis_sm_auth_policy"
+              "key": "admin_pass_secrets_manager_secret_name"
+            },
+            {
+              "key": "use_existing_admin_pass_secrets_manager_secret_group"
+            },
+            {
+              "key": "users",
+              "type": "array",
+              "custom_config": {
+                "type": "textarea",
+                "grouping": "deployment",
+                "original_grouping": "deployment"
+              }
+            },
+            {
+              "key": "ibmcloud_kms_api_key"
+            },
+            {
+              "key": "existing_kms_instance_crn",
+              "required": true
+            },
+            {
+              "key": "existing_kms_key_crn"
+            },
+            {
+              "key": "key_ring_name"
+            },
+            {
+              "key": "key_name"
             },
             {
               "key": "backup_crn"
@@ -332,7 +635,10 @@
               "key": "existing_backup_kms_key_crn"
             },
             {
-              "key": "use_default_backup_encryption_key"
+              "key": "skip_redis_kms_auth_policy"
+            },
+            {
+              "key": "existing_redis_instance_crn"
             }
           ]
         }

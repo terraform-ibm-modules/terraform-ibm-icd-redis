@@ -41,7 +41,7 @@ func TestRunStandardSolutionIBMKeys(t *testing.T) {
 
 	options := testhelper.TestOptionsDefault(&testhelper.TestOptions{
 		Testing:       t,
-		TerraformDir:  standardSolutionTerraformDir,
+		TerraformDir:  fullyConfigurableSolutionTerraformDir,
 		Region:        "us-south",
 		Prefix:        "redis-key",
 		ResourceGroup: resourceGroup,
@@ -50,7 +50,7 @@ func TestRunStandardSolutionIBMKeys(t *testing.T) {
 	options.TerraformVars = map[string]interface{}{
 		"redis_version":                "7.2",
 		"provider_visibility":          "public",
-		"resource_group_name":          options.Prefix,
+		"existing_resource_group_name": resourceGroup,
 		"use_ibm_owned_encryption_key": true,
 	}
 
