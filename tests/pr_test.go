@@ -190,19 +190,20 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 	assert.Nil(t, err, "This should not have errored")
 }
 
-func TestRunStandardUpgradeSolution(t *testing.T) {
+func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 	t.Parallel()
 
 	options := testschematic.TestSchematicOptionsDefault(&testschematic.TestSchematicOptions{
 		Testing: t,
 		TarIncludePatterns: []string{
 			"*.tf",
-			fmt.Sprintf("%s/*.tf", fullyConfigurableSolutionTerraformDir),
-			fmt.Sprintf("%s/*.sh", "scripts"),
+			fullyConfigurableSolutionTerraformDir + "/*.tf",
+			securityEnforcedTerraformDir + "/*.tf",
+			"scripts/*.sh",
 		},
-		TemplateFolder:     fullyConfigurableSolutionTerraformDir,
+		TemplateFolder:     securityEnforcedTerraformDir,
 		BestRegionYAMLPath: regionSelectionPath,
-		Prefix:             "r-fc-da-upg",
+		Prefix:             "re-da-upg",
 		// ResourceGroup:          resourceGroup,
 		DeleteWorkspaceOnFail:  false,
 		WaitJobCompleteMinutes: 60,
@@ -237,15 +238,17 @@ func TestRunStandardUpgradeSolution(t *testing.T) {
 
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
+		{Name: "prefix", Value: options.Prefix, DataType: "string"},
 		{Name: "access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
+		{Name: "existing_kms_instance_crn", Value: permanentResources["hpcs_south_crn"], DataType: "string"},
 		{Name: "existing_resource_group_name", Value: resourceGroup, DataType: "string"},
 		{Name: "redis_version", Value: "7.2", DataType: "string"}, // Always lock this test into the latest supported Redis version
-		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
-		{Name: "admin_pass_secrets_manager_secret_group", Value: options.Prefix, DataType: "string"},
+		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
 		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: GetRandomAdminPassword(t), DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_group", Value: fmt.Sprintf("redis-%s-admin-secrets", options.Prefix), DataType: "string"},
 	}
 
 	err = options.RunSchematicUpgradeTest()
