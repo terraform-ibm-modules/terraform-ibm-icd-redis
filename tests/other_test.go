@@ -51,7 +51,8 @@ func TestRunStandardSolutionIBMKeys(t *testing.T) {
 		"redis_version":                "7.2",
 		"provider_visibility":          "public",
 		"existing_resource_group_name": resourceGroup,
-		"use_ibm_owned_encryption_key": true,
+		"prefix":                       options.Prefix,
+		"deletion_protection":          false,
 	}
 
 	output, err := options.RunTestConsistency()
