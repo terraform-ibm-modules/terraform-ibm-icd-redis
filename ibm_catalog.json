@@ -277,6 +277,15 @@
               ]
             },
             {
+              "key": "deletion_protection"
+            },
+            {
+              "key": "timeouts_update"
+            },
+            {
+              "key": "version_upgrade_skip_backup"
+            },
+            {
               "key": "service_credential_names"
             },
             {
@@ -407,7 +416,7 @@
               ],
               "service_name": "databases-for-redis"
             },
-           {
+            {
               "role_crns": [
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
@@ -572,6 +581,12 @@
             },
             {
               "key": "configuration"
+            },
+            {
+              "key": "deletion_protection"
+            },
+            {
+              "key": "timeouts_update"
             },
             {
               "key": "service_credential_names"

@@ -19,14 +19,15 @@ module "database" {
   # remove the above line and uncomment the below 2 lines to consume the module from the registry
   # source            = "terraform-ibm-modules/icd-redis/ibm"
   # version           = "X.Y.Z" # Replace "X.Y.Z" with a release version to lock into a specific release
-  resource_group_id  = module.resource_group.resource_group_id
-  name               = "${var.prefix}-data-store"
-  region             = var.region
-  access_tags        = var.access_tags
-  service_endpoints  = var.service_endpoints
-  member_host_flavor = var.member_host_flavor
-  tags               = var.resource_tags
-  redis_version      = var.redis_version
+  resource_group_id   = module.resource_group.resource_group_id
+  name                = "${var.prefix}-data-store"
+  region              = var.region
+  redis_version       = var.redis_version
+  access_tags         = var.access_tags
+  tags                = var.resource_tags
+  service_endpoints   = var.service_endpoints
+  member_host_flavor  = var.member_host_flavor
+  deletion_protection = false
   service_credential_names = {
     "redis_admin" : "Administrator",
     "redis_operator" : "Operator",

@@ -35,8 +35,8 @@ variable "resource_tags" {
 }
 
 variable "redis_version" {
-  description = "Version of the Redis instance to provision. If no value is passed, the current preferred version of IBM Cloud Databases is used."
   type        = string
+  description = "Version of the Redis instance to provision. If no value is passed, the current preferred version of IBM Cloud Databases is used."
   default     = null
 }
 

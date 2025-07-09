@@ -6,6 +6,9 @@ module "redis" {
   skip_iam_authorization_policy     = var.skip_iam_authorization_policy
   name                              = var.name
   service_endpoints                 = "private"
+  deletion_protection               = var.deletion_protection
+  version_upgrade_skip_backup       = var.version_upgrade_skip_backup
+  timeouts_update                   = var.timeouts_update
   cbr_rules                         = var.cbr_rules
   configuration                     = var.configuration
   cpu_count                         = var.cpu_count
