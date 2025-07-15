@@ -457,8 +457,17 @@
                   "reference_version": true
                 },
                 {
+                  "dependency_input": "service_plan",
+                  "value": "standard"
+                },
+                {
                   "dependency_output": "secrets_manager_crn",
                   "version_input": "existing_secrets_manager_instance_crn"
+                },
+                {
+                  "dependency_input": "region",
+                  "version_input": "region",
+                  "reference_version": true
                 }
               ]
             }
