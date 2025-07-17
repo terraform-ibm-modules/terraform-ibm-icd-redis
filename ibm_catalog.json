@@ -8,9 +8,10 @@
         "ibm_created",
         "target_terraform",
         "terraform",
+        "solution",
         "data_management",
         "database",
-        "solution"
+        "converged_infra"
       ],
       "keywords": [
         "redis",
@@ -407,7 +408,7 @@
               ],
               "service_name": "databases-for-redis"
             },
-           {
+            {
               "role_crns": [
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
