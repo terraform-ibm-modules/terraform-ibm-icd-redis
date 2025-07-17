@@ -6,12 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
-	"math/big"
-	"os"
-	"strings"
-	"testing"
-
+	"github.com/IBM/go-sdk-core/v5/core"
 	"github.com/gruntwork-io/terratest/modules/files"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/random"
@@ -22,6 +17,11 @@ import (
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/common"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testaddons"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testschematic"
+	"log"
+	"math/big"
+	"os"
+	"strings"
+	"testing"
 )
 
 const fullyConfigurableSolutionTerraformDir = "solutions/fully-configurable"
@@ -347,17 +347,110 @@ func GetRandomAdminPassword(t *testing.T) string {
 func TestRunAddonTests(t *testing.T) {
 	testCases := []testaddons.AddonTestCase{
 		{
-			Name:   "Redis-Default-Configuration",
-			Prefix: "redisaddon",
+			Name:   "Redis-Default-Config",
+			Prefix: "redisdef",
+		},
+		{
+			Name:   "Redis-With-Resource-Group-And-Account-Settings",
+			Prefix: "redisrgwaccs",
+			Dependencies: []cloudinfo.AddonConfig{
+				{
+					OfferingName:   "deploy-arch-ibm-account-infra-base",
+					OfferingFlavor: "resource-groups-with-account-settings",
+					Enabled:        core.BoolPtr(true),
+				},
+			},
+			SkipInfrastructureDeployment: true, // Skip infrastructure deployment for this test case
+		},
+		{
+			Name:   "Redis-With-Resource-Group-Only",
+			Prefix: "rediswrgly",
+			Dependencies: []cloudinfo.AddonConfig{
+				{
+					OfferingName:   "deploy-arch-ibm-account-infra-base",
+					OfferingFlavor: "resource-group-only",
+					Enabled:        core.BoolPtr(true),
+				},
+			},
+			SkipInfrastructureDeployment: true, // Skip infrastructure deployment for this test case
+		},
+		{
+			Name:   "Redis-With-KMS-Disabled",
+			Prefix: "redisnokm",
+			Dependencies: []cloudinfo.AddonConfig{
+				{
+					OfferingName:   "deploy-arch-ibm-kms",
+					OfferingFlavor: "fully-configurable",
+					Enabled:        core.BoolPtr(false),
+				},
+			},
+			Inputs: map[string]interface{}{
+				"existing_kms_instance_crn": permanentResources["kp_us_south_root_key_crn"],
+			},
+			SkipInfrastructureDeployment: true, // Skip infrastructure deployment for this test case
+		},
+		{
+			Name:   "Redis-With-Secret-Manager-Disabled",
+			Prefix: "redisnosm",
+			Dependencies: []cloudinfo.AddonConfig{
+				{
+					OfferingName:   "deploy-arch-ibm-secrets-manager",
+					OfferingFlavor: "fully-configurable",
+					Enabled:        core.BoolPtr(false),
+				},
+			},
+			SkipInfrastructureDeployment: true, // Skip infrastructure deployment for this test case
+		},
+		{
+			Name:   "Redis-With-KMS-And-Secret-Manager-Disabled",
+			Prefix: "redisnokmsm",
+			Dependencies: []cloudinfo.AddonConfig{
+				{
+					OfferingName:   "deploy-arch-ibm-kms",
+					OfferingFlavor: "fully-configurable",
+					Enabled:        core.BoolPtr(false),
+				},
+				{
+					OfferingName:   "deploy-arch-ibm-secrets-manager",
+					OfferingFlavor: "fully-configurable",
+					Enabled:        core.BoolPtr(true),
+				},
+			},
+			Inputs: map[string]interface{}{
+				"existing_kms_instance_crn": permanentResources["kp_us_south_root_key_crn"],
+			},
+			SkipInfrastructureDeployment: true, // Skip infrastructure deployment for this test case
+		},
+		{
+			Name:   "Redis-With-All-Optional-Services-Disabled",
+			Prefix: "redisallno",
+			Dependencies: []cloudinfo.AddonConfig{
+				{
+					OfferingName:   "deploy-arch-ibm-secrets-manager",
+					OfferingFlavor: "fully-configurable",
+					Enabled:        core.BoolPtr(false),
+				},
+				{
+					OfferingName:   "deploy-arch-ibm-kms",
+					OfferingFlavor: "fully-configurable",
+					Enabled:        core.BoolPtr(false),
+				},
+			},
+			Inputs: map[string]interface{}{
+				"existing_kms_instance_crn": permanentResources["kp_us_south_root_key_crn"],
+			},
+			SkipInfrastructureDeployment: true,
 		},
 	}
+
 	// Define common options that apply to all test cases
 	baseOptions := testaddons.TestAddonsOptionsDefault(&testaddons.TestAddonOptions{
 		Testing:       t,
-		Prefix:        "redis-matrix", // Test cases will override with their own prefixes
+		Prefix:        "Redis-matrix", // Test cases will override with their own prefixes
 		ResourceGroup: resourceGroup,
 		//SkipLocalChangeCheck: true, // Skip local change check for addon tests
 	})
+
 	matrix := testaddons.AddonTestMatrix{
 		TestCases:   testCases,
 		BaseOptions: baseOptions,
@@ -378,6 +471,5 @@ func TestRunAddonTests(t *testing.T) {
 			)
 		},
 	}
-
 	baseOptions.RunAddonTestMatrix(matrix)
 }

@@ -64,6 +64,13 @@
           "iam_permissions": [
             {
               "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Administrator"
+              ],
+              "service_name": "All Account Management services",
+              "notes": "[Optional] Required when setting up foundational IBM Cloud account components such as IAM settings, trusted profiles, access groups, and resource groups."
+            },
+            {
+              "role_crns": [
                 "crn:v1:bluemix:public:iam::::role:Viewer"
               ],
               "service_name": "Resource group only",
@@ -77,6 +84,7 @@
             },
             {
               "role_crns": [
+                "crn:v1:bluemix:public:iam::::serviceRole:Manager",
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
               "service_name": "kms",
@@ -84,6 +92,7 @@
             },
             {
               "role_crns": [
+                "crn:v1:bluemix:public:iam::::serviceRole:Manager",
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
               "service_name": "hs-crypto",
@@ -379,13 +388,14 @@
           ],
           "dependencies": [
             {
-              "name": "deploy-arch-ibm-account-infra-base",
-              "description": "Cloud automation for Account Configuration organizes your IBM Cloud account with a ready-made set of resource groups by default and, when you enable the \"with Account Settings\" option, it also applies baseline security and governance settings. ",
+            "name": "deploy-arch-ibm-account-infra-base",
+              "description": "Cloud automation for Account Configuration organizes your IBM Cloud account with a ready-made set of resource groups by default and when you enable the \"with Account Settings\" option, it also applies baseline security and governance settings. ",
               "catalog_id": "7a4d68b4-cf8b-40cd-a3d1-f49aff526eb3",
               "flavors": [
                 "resource-group-only",
                 "resource-groups-with-account-settings"
               ],
+              "default_flavor": "resource-group-only",
               "id": "63641cec-6093-4b4f-b7b0-98d2f4185cd6-global",
               "input_mapping": [
                 {
@@ -400,23 +410,24 @@
               ],
               "optional": true,
               "on_by_default": false,
-              "version": "v3.0.11"
+              "version": "v3.0.7"
             },
             {
               "name": "deploy-arch-ibm-kms",
-              "description":"Enable Cloud Automation for Key Protect when you want services to use your own managed encryption keys. If disabled, it will fall back on IBM Cloud's default service-managed encryption. ",
               "id": "2cad4789-fa90-4886-9c9e-857081c273ee-global",
-              "version": "v5.1.4",
+              "description": "Enable Cloud Automation for Key Protect when you want services to use your own managed encryption keys. If disabled, it will fall back on IBM Cloud's default service-managed encryption.",
               "flavors": [
                 "fully-configurable"
               ],
               "catalog_id": "7a4d68b4-cf8b-40cd-a3d1-f49aff526eb3",
-              "optional": true,
-              "on_by_default": true,
               "input_mapping": [
                 {
                   "dependency_output": "kms_instance_crn",
                   "version_input": "existing_kms_instance_crn"
+                },
+                {
+                  "version_input": "kms_encryption_enabled",
+                  "value": true
                 },
                 {
                   "dependency_input": "prefix",
@@ -427,29 +438,19 @@
                   "dependency_input": "region",
                   "version_input": "region",
                   "reference_version": true
-                },
-                {
-                  "dependency_input": "kms_endpoint_type",
-                  "version_input": "kms_endpoint_type",
-                  "reference_version": true
-                },
-                {
-                  "version_input": "kms_encryption_enabled",
-                  "value": true
                 }
-              ]
+              ],
+              "optional": true,
+              "on_by_default": true,
+              "version": "v5.1.4"
             },
             {
               "name": "deploy-arch-ibm-secrets-manager",
-              "description":"Creates and configures a Secrets Manager instance to store the ssh private key for the virtual server instance. ",
+              "description": "Enable to provisions and configures IBM Cloud Secrets Manager for securely storing service credentials.",
               "id": "6d6ebc76-7bbd-42f5-8bc7-78f4fabd5944-global",
-              "version": "v2.4.0",
-              "flavors": [
-                "fully-configurable"
-              ],
+              "flavors": ["fully-configurable"],
               "catalog_id": "7a4d68b4-cf8b-40cd-a3d1-f49aff526eb3",
-              "optional": true,
-              "on_by_default": true,
+              "default_flavor": "fully-configurable",
               "input_mapping": [
                 {
                   "dependency_input": "prefix",
@@ -464,12 +465,15 @@
                   "dependency_output": "secrets_manager_crn",
                   "version_input": "existing_secrets_manager_instance_crn"
                 },
-                {
+                 {
                   "dependency_input": "region",
                   "version_input": "region",
                   "reference_version": true
                 }
-              ]
+              ],
+              "optional": true,
+              "on_by_default": true,
+              "version": "v2.6.1"
             }
           ],
           "dependency_version_2": true,
@@ -491,6 +495,13 @@
             ]
           },
           "iam_permissions": [
+             {
+              "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Administrator"
+              ],
+              "service_name": "All Account Management services",
+              "notes": "[Optional] Required when setting up foundational IBM Cloud account components such as IAM settings, trusted profiles, access groups, and resource groups."
+            },
             {
               "role_crns": [
                 "crn:v1:bluemix:public:iam::::role:Viewer"
@@ -506,13 +517,15 @@
             },
             {
               "role_crns": [
+                "crn:v1:bluemix:public:iam::::serviceRole:Manager",
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
               "service_name": "kms",
-              "notes": "[Optional] Editor access is required to create keys. It is required only if KMS encryption is enabled."
+              "notes": "[Optional] Editor access is required to create keys. It is only required when using Key Protect for encryption."
             },
             {
               "role_crns": [
+                "crn:v1:bluemix:public:iam::::serviceRole:Manager",
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
               "service_name": "hs-crypto",
@@ -740,13 +753,14 @@
           ],
           "dependencies": [
             {
-              "name": "deploy-arch-ibm-account-infra-base",
-              "description": "Cloud automation for Account Configuration organizes your IBM Cloud account with a ready-made set of resource groups by default and, when you enable the \"with Account Settings\" option, it also applies baseline security and governance settings. ",
+            "name": "deploy-arch-ibm-account-infra-base",
+              "description": "Cloud automation for Account Configuration organizes your IBM Cloud account with a ready-made set of resource groups by default and when you enable the \"with Account Settings\" option, it also applies baseline security and governance settings. ",
               "catalog_id": "7a4d68b4-cf8b-40cd-a3d1-f49aff526eb3",
               "flavors": [
                 "resource-group-only",
                 "resource-groups-with-account-settings"
               ],
+              "default_flavor": "resource-group-only",
               "id": "63641cec-6093-4b4f-b7b0-98d2f4185cd6-global",
               "input_mapping": [
                 {
@@ -761,23 +775,24 @@
               ],
               "optional": true,
               "on_by_default": false,
-              "version": "v3.0.11"
+              "version": "v3.0.7"
             },
             {
               "name": "deploy-arch-ibm-kms",
-              "description":"Enable Cloud Automation for Key Protect when you want services to use your own managed encryption keys. If disabled, it will fall back on IBM Cloud's default service-managed encryption. ",
               "id": "2cad4789-fa90-4886-9c9e-857081c273ee-global",
-              "version": "v5.1.4",
+              "description": "Enable Cloud Automation for Key Protect when you want services to use your own managed encryption keys. If disabled, it will fall back on IBM Cloud's default service-managed encryption.",
               "flavors": [
                 "fully-configurable"
               ],
               "catalog_id": "7a4d68b4-cf8b-40cd-a3d1-f49aff526eb3",
-              "optional": true,
-              "on_by_default": true,
               "input_mapping": [
                 {
                   "dependency_output": "kms_instance_crn",
                   "version_input": "existing_kms_instance_crn"
+                },
+                {
+                  "version_input": "kms_encryption_enabled",
+                  "value": true
                 },
                 {
                   "dependency_input": "prefix",
@@ -788,29 +803,19 @@
                   "dependency_input": "region",
                   "version_input": "region",
                   "reference_version": true
-                },
-                {
-                  "dependency_input": "kms_endpoint_type",
-                  "version_input": "kms_endpoint_type",
-                  "reference_version": true
-                },
-                {
-                  "version_input": "kms_encryption_enabled",
-                  "value": true
                 }
-              ]
+              ],
+              "optional": true,
+              "on_by_default": true,
+              "version": "v5.1.4"
             },
             {
               "name": "deploy-arch-ibm-secrets-manager",
-              "description":"Creates and configures a Secrets Manager instance to store the ssh private key for the virtual server instance. ",
+              "description": "Enable to provisions and configures IBM Cloud Secrets Manager for securely storing service credentials.",
               "id": "6d6ebc76-7bbd-42f5-8bc7-78f4fabd5944-global",
-              "version": "v2.4.0",
-              "flavors": [
-                "fully-configurable"
-              ],
+              "flavors": ["fully-configurable"],
               "catalog_id": "7a4d68b4-cf8b-40cd-a3d1-f49aff526eb3",
-              "optional": true,
-              "on_by_default": true,
+              "default_flavor": "fully-configurable",
               "input_mapping": [
                 {
                   "dependency_input": "prefix",
@@ -818,10 +823,22 @@
                   "reference_version": true
                 },
                 {
+                  "dependency_input": "service_plan",
+                  "value": "standard"
+                },
+                {
                   "dependency_output": "secrets_manager_crn",
                   "version_input": "existing_secrets_manager_instance_crn"
+                },
+                 {
+                  "dependency_input": "region",
+                  "version_input": "region",
+                  "reference_version": true
                 }
-              ]
+              ],
+              "optional": true,
+              "on_by_default": true,
+              "version": "v2.6.1"
             }
           ],
           "dependency_version_2": true,
