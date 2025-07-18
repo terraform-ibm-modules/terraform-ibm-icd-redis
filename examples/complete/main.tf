@@ -110,8 +110,9 @@ module "icd_redis" {
     "redis_viewer" : "Viewer",
     "redis_editor" : "Editor",
   }
-  access_tags        = var.access_tags
-  member_host_flavor = "multitenant"
+  access_tags         = var.access_tags
+  member_host_flavor  = "multitenant"
+  deletion_protection = false
   cbr_rules = [
     {
       description      = "sample rule"
