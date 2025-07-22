@@ -48,7 +48,7 @@ func TestRunStandardSolutionIBMKeys(t *testing.T) {
 	})
 
 	options.TerraformVars = map[string]interface{}{
-		"redis_version":                "7.2",
+		"redis_version":                latestVersion,
 		"provider_visibility":          "public",
 		"existing_resource_group_name": resourceGroup,
 		"prefix":                       options.Prefix,
