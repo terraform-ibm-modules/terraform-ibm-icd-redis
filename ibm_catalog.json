@@ -377,7 +377,8 @@
             {
               "key": "existing_redis_instance_crn"
             }
-          ]
+          ],
+          "terraform_version": "1.10.5"
         },
         {
           "label": "Security-enforced",
@@ -638,7 +639,8 @@
             {
               "key": "existing_redis_instance_crn"
             }
-          ]
+          ],
+          "terraform_version": "1.10.5"
         }
       ]
     }
