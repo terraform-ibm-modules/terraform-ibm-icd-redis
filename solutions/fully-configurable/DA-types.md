@@ -6,7 +6,7 @@ Several optional input variables in the IBM Cloud [Databases for Redis deployabl
 - [Service credential secrets](#service-credential-secrets) (`service_credential_secrets`)
 - [Users](#users) (`users`)
 - [Autoscaling](#autoscaling) (`auto_scaling`)
-- [Configuration](#configuaration) (`configuration`)
+- [Configuration](#configuration) (`configuration`)
 
 ## Service credentials <a name="svc-credential-name"></a>
 
