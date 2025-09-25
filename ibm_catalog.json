@@ -141,7 +141,9 @@
                 "config_constraints": {
                   "identifier": "rg_name"
                 }
-              }
+              },
+              "default_value": "Default",
+              "description": "The name of an existing resource group to provision the resources."
             },
             {
               "key": "prefix"
@@ -471,7 +473,9 @@
                 "config_constraints": {
                   "identifier": "rg_name"
                 }
-              }
+              },
+              "default_value": "Default",
+              "description": "The name of an existing resource group to provision the resources."
             },
             {
               "key": "prefix"
