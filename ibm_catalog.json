@@ -191,7 +191,7 @@
             {
               "key": "redis_version",
               "required": false,
-              "default_value": "__NULL__",
+              "default_value": "7.2",
               "options": [
                 {
                 "displayname": "preferred",
