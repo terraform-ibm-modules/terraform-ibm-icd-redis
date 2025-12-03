@@ -161,7 +161,7 @@
                 "grouping": "deployment",
                 "original_grouping": "deployment",
                 "config_constraints": {
-                  "filterString": "service:databases-for-redis",
+                  "filterString": "service:databases-for-redis-group",
                   "showKinds": [
                     "region"
                   ]
