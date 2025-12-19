@@ -8,7 +8,9 @@ module "redis" {
   service_endpoints                 = "private"
   deletion_protection               = var.deletion_protection
   version_upgrade_skip_backup       = var.version_upgrade_skip_backup
-  timeouts_update                   = var.timeouts_update
+  create_timeout                    = var.create_timeout
+  update_timeout                    = var.update_timeout
+  delete_timeout                    = var.delete_timeout
   cbr_rules                         = var.cbr_rules
   configuration                     = var.configuration
   cpu_count                         = var.cpu_count

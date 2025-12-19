@@ -296,9 +296,9 @@ resource "ibm_database" "redis_database" {
   }
 
   timeouts {
-    create = "120m" # Extending provisioning time to 120 minutes
-    update = var.timeouts_update
-    delete = "15m"
+    create = var.create_timeout
+    update = var.update_timeout
+    delete = var.delete_timeout
   }
 }
 
