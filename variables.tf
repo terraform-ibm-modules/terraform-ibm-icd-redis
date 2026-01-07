@@ -18,11 +18,8 @@ variable "redis_version" {
   default     = null
 
   validation {
-    condition = anytrue([
-      var.redis_version == null,
-      var.redis_version == "7.2"
-    ])
-    error_message = "Version must be 7.2. If no value passed, the current ICD preferred version is used."
+    condition     = var.redis_version == null ? true : contains(local.icd_supported_versions, var.redis_version)
+    error_message = "The specified redis_version '${var.redis_version == null ? "null" : var.redis_version}' is not supported in region '${var.region}'. Supported versions are: ${local.icd_supported_versions_json}"
   }
 }
 

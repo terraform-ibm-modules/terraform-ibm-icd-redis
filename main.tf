@@ -58,6 +58,26 @@ locals {
 # KMS IAM Authorization Policies
 ########################################################################################################################
 
+data "ibm_iam_auth_token" "tokendata" {}
+
+data "external" "icd_versions" {
+  program = ["python3", "${path.module}/scripts/get_icd_versions.py"]
+  query = {
+    IAM_TOKEN = sensitive(data.ibm_iam_auth_token.tokendata.iam_access_token)
+    REGION    = var.region
+    DB_TYPE   = "redis"
+  }
+}
+
+
+
+locals {
+  # Parse the list of versions from the external data source
+  # The script returns a JSON string, so we need to decode it first
+  icd_supported_versions_json = data.external.icd_versions.result["versions"]
+  icd_supported_versions      = jsondecode(local.icd_supported_versions_json)
+}
+
 locals {
   # only create auth policy if 'use_ibm_owned_encryption_key' is false, and 'skip_iam_authorization_policy' is false
   create_kms_auth_policy = !var.use_ibm_owned_encryption_key && !var.skip_iam_authorization_policy ? 1 : 0
