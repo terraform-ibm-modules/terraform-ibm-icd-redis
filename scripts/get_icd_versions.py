@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import http.client
 import json
+import os
 import sys
 from urllib.parse import urlparse
 
@@ -41,18 +42,29 @@ def validate_inputs(data):
     return token, region, db_type
 
 
-def fetch_icd_deployables(iam_token, region):
+def get_api_endpoint(region):
+    """
+    Retrieves the API endpoint from environment variable or defaults to region-based URL.
+    Args:
+        region (str): Region to construct the default URL.
+    Returns:
+        str: The API endpoint URL.
+    """
+    api_endpoint = os.getenv("IBMCLOUD_ICD_API_ENDPOINT")
+    if not api_endpoint:
+        api_endpoint = f"https://api.{region}.databases.cloud.ibm.com"
+    return api_endpoint
+
+
+def fetch_icd_deployables(iam_token, api_endpoint):
     """
     Fetches ICD deployables versions using HTTP connection.
     Args:
         iam_token (str): IBM Cloud IAM token for authentication.
-        region (str): Region to query.
+        api_endpoint (str): The API endpoint to use.
     Returns:
         dict: Parsed JSON response containing deployables information.
     """
-    # Construct API endpoint
-    api_endpoint = f"https://api.{region}.databases.cloud.ibm.com"
-    
     parsed = urlparse(api_endpoint)
     host = parsed.hostname
     
@@ -135,7 +147,8 @@ def main():
     data = parse_input()
     iam_token, region, db_type = validate_inputs(data)
     
-    deployables_data = fetch_icd_deployables(iam_token, region)
+    api_endpoint = get_api_endpoint(region)
+    deployables_data = fetch_icd_deployables(iam_token, api_endpoint)
     versions = transform_data(deployables_data, db_type)
     output = format_for_terraform(versions)
 
