@@ -67,7 +67,7 @@ def fetch_icd_deployables(iam_token, api_endpoint):
     """
     parsed = urlparse(api_endpoint)
     host = parsed.hostname
-    
+
     # Remove 'Bearer ' prefix if present to avoid double prefixing
     if iam_token.startswith("Bearer "):
         iam_token = iam_token[7:]
@@ -107,17 +107,17 @@ def transform_data(deployables_data, db_type):
         list: A list of version strings.
     """
     versions = []
-    
+
     deployables = deployables_data.get("deployables", [])
-    
+
     for item in deployables:
         if item.get("type") == db_type:
-             for ver in item.get("versions", []):
-                 if ver.get("status") not in ["dead", "hidden"]:
-                     versions.append(ver.get("version"))
-             # Found the db type, no need to continue unless there are duplicates which shouldn't happen
-             break
-             
+            for ver in item.get("versions", []):
+                if ver.get("status") not in ["dead", "hidden"]:
+                    versions.append(ver.get("version"))
+            # Found the db type, no need to continue unless there are duplicates which shouldn't happen
+            break
+
     if not versions:
         # It's possible the DB_TYPE is valid but no versions found, or invalid DB_TYPE
         # For our purpose, if we don't find any versions, it might be an issue.
@@ -146,7 +146,7 @@ def main():
     """
     data = parse_input()
     iam_token, region, db_type = validate_inputs(data)
-    
+
     api_endpoint = get_api_endpoint(region)
     deployables_data = fetch_icd_deployables(iam_token, api_endpoint)
     versions = transform_data(deployables_data, db_type)
