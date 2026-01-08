@@ -9,6 +9,8 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"sort"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -26,7 +28,10 @@ import (
 
 const fullyConfigurableSolutionTerraformDir = "solutions/fully-configurable"
 const securityEnforcedTerraformDir = "solutions/security-enforced"
-const latestVersion = "7.2"
+
+var latestVersion = "7.2"
+
+const icdType = "redis"
 
 // Use existing resource group
 const resourceGroup = "geretain-test-redis"
@@ -49,7 +54,23 @@ var validICDRegions = []string{
 func TestMain(m *testing.M) {
 	sharedInfoSvc, _ = cloudinfo.NewCloudInfoServiceFromEnv("TF_VAR_ibmcloud_api_key", cloudinfo.CloudInfoServiceOptions{})
 
-	var err error
+	icdAvailableVersions, err := sharedInfoSvc.GetAvailableIcdVersions(icdType)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	sort.Slice(icdAvailableVersions, func(i, j int) bool {
+		vi, _ := strconv.ParseFloat(icdAvailableVersions[i], 64)
+		vj, _ := strconv.ParseFloat(icdAvailableVersions[j], 64)
+		return vi < vj
+	})
+
+	if len(icdAvailableVersions) > 0 {
+		latestVersion = icdAvailableVersions[len(icdAvailableVersions)-1]
+	} else {
+		log.Fatal("No available ICD versions found")
+	}
+
 	permanentResources, err = common.LoadMapFromYaml(yamlLocation)
 	if err != nil {
 		log.Fatal(err)
