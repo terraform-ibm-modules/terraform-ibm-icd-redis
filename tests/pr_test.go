@@ -29,7 +29,7 @@ import (
 const fullyConfigurableSolutionTerraformDir = "solutions/fully-configurable"
 const securityEnforcedTerraformDir = "solutions/security-enforced"
 
-var latestVersion = "7.2"
+var latestVersion string
 
 const icdType = "redis"
 
