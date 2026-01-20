@@ -61,23 +61,23 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-  icdAvailableVersions, err := sharedInfoSvc.GetAvailableIcdVersions(icdType)
+	icdAvailableVersions, err := sharedInfoSvc.GetAvailableIcdVersions(icdType)
 
-  if err != nil {
+	if err != nil {
 		log.Fatal(err)
 	}
 
-  if len(icdAvailableVersions) == 0 {
-    log.Fatal("No available ICD versions found")
-  }
+	if len(icdAvailableVersions) == 0 {
+		log.Fatal("No available ICD versions found")
+	}
 	sort.Slice(icdAvailableVersions, func(i, j int) bool {
 		vi, _ := strconv.ParseFloat(icdAvailableVersions[i], 64)
 		vj, _ := strconv.ParseFloat(icdAvailableVersions[j], 64)
 		return vi < vj
 	})
 
-  latestVersion = icdAvailableVersions[len(icdAvailableVersions)-1]
-  oldestVersion = icdAvailableVersions[0]
+	latestVersion = icdAvailableVersions[len(icdAvailableVersions)-1]
+	oldestVersion = icdAvailableVersions[0]
 
 	permanentResources, err = common.LoadMapFromYaml(yamlLocation)
 	if err != nil {
@@ -97,7 +97,6 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 			"*.tf",
 			fmt.Sprintf("%s/*.tf", fullyConfigurableSolutionTerraformDir),
 			fmt.Sprintf("%s/*.sh", "scripts"),
-			fmt.Sprintf("%s/*.py", "scripts"),
 		},
 		TemplateFolder:     fullyConfigurableSolutionTerraformDir,
 		BestRegionYAMLPath: regionSelectionPath,
@@ -164,7 +163,6 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 			fmt.Sprintf("%s/*.tf", securityEnforcedTerraformDir),
 			fmt.Sprintf("%s/*.tf", fullyConfigurableSolutionTerraformDir),
 			fmt.Sprintf("%s/*.sh", "scripts"),
-			fmt.Sprintf("%s/*.py", "scripts"),
 		},
 		TemplateFolder:     securityEnforcedTerraformDir,
 		BestRegionYAMLPath: regionSelectionPath,
@@ -237,7 +235,6 @@ func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 			fullyConfigurableSolutionTerraformDir + "/*.tf",
 			securityEnforcedTerraformDir + "/*.tf",
 			"scripts/*.sh",
-			"scripts/*.py",
 		},
 		TemplateFolder:     securityEnforcedTerraformDir,
 		BestRegionYAMLPath: regionSelectionPath,
@@ -340,7 +337,6 @@ func TestRunExistingInstance(t *testing.T) {
 				"*.tf",
 				fmt.Sprintf("%s/*.tf", fullyConfigurableSolutionTerraformDir),
 				fmt.Sprintf("%s/*.sh", "scripts"),
-				fmt.Sprintf("%s/*.py", "scripts"),
 			},
 			TemplateFolder:         fullyConfigurableSolutionTerraformDir,
 			BestRegionYAMLPath:     regionSelectionPath,
