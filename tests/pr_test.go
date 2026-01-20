@@ -53,20 +53,20 @@ var validICDRegions = []string{
 
 // TestMain will be run before any parallel tests, used to read data from yaml for use with tests
 func TestMain(m *testing.M) {
-  
+
 	var err error
 	sharedInfoSvc, err = cloudinfo.NewCloudInfoServiceFromEnv("TF_VAR_ibmcloud_api_key", cloudinfo.CloudInfoServiceOptions{})
-  
+
 	if err != nil {
 		log.Fatal(err)
 	}
-  
+
   icdAvailableVersions, err := sharedInfoSvc.GetAvailableIcdVersions(icdType)
-  
+
   if err != nil {
 		log.Fatal(err)
 	}
-  
+
   if len(icdAvailableVersions) == 0 {
     log.Fatal("No available ICD versions found")
   }
