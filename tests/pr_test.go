@@ -30,6 +30,7 @@ const fullyConfigurableSolutionTerraformDir = "solutions/fully-configurable"
 const securityEnforcedTerraformDir = "solutions/security-enforced"
 
 var latestVersion string
+var oldestVersion string
 
 const icdType = "redis"
 
@@ -67,6 +68,7 @@ func TestMain(m *testing.M) {
 
 	if len(icdAvailableVersions) > 0 {
 		latestVersion = icdAvailableVersions[len(icdAvailableVersions)-1]
+		oldestVersion = icdAvailableVersions[0]
 	} else {
 		log.Fatal("No available ICD versions found")
 	}

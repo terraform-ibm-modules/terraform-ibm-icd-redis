@@ -19,7 +19,7 @@ variable "redis_version" {
 
   validation {
     condition     = var.redis_version == null ? true : contains(local.icd_supported_versions, var.redis_version)
-    error_message = "The specified redis_version '${var.redis_version == null ? "null" : var.redis_version}' is not supported in region '${var.region}'. Supported versions are: ${local.icd_supported_versions_json}"
+    error_message = "Unsupported redis_version '${var.redis_version == null ? "null" : var.redis_version}'. Supported versions: ${join(", ", local.icd_supported_versions)}"
   }
 }
 

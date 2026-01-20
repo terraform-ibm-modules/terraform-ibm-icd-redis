@@ -58,25 +58,6 @@ locals {
 # KMS IAM Authorization Policies
 ########################################################################################################################
 
-data "ibm_iam_auth_token" "tokendata" {}
-
-data "external" "icd_versions" {
-  program = ["python3", "${path.module}/scripts/get_icd_versions.py"]
-  query = {
-    IAM_TOKEN = sensitive(data.ibm_iam_auth_token.tokendata.iam_access_token)
-    REGION    = var.region
-    DB_TYPE   = "redis"
-  }
-}
-
-
-
-locals {
-  # Parse the list of versions from the external data source
-  # The script returns a JSON string, so we need to decode it first
-  icd_supported_versions_json = data.external.icd_versions.result["versions"]
-  icd_supported_versions      = jsondecode(local.icd_supported_versions_json)
-}
 
 locals {
   # only create auth policy if 'use_ibm_owned_encryption_key' is false, and 'skip_iam_authorization_policy' is false
@@ -176,6 +157,21 @@ resource "time_sleep" "wait_for_backup_kms_authorization_policy" {
   depends_on      = [ibm_iam_authorization_policy.backup_kms_policy]
   create_duration = "30s"
 }
+
+
+module "available_versions" {
+
+  source   = "terraform-ibm-modules/common-utilities/ibm//modules/icd-versions"
+  version  = "1.4.0"
+  region   = var.region
+  icd_type = "redis"
+}
+
+
+locals {
+  icd_supported_versions = module.available_versions.supported_versions
+}
+
 
 ########################################################################################################################
 # Redis instance
