@@ -329,7 +329,7 @@ func TestRunExistingInstance(t *testing.T) {
 		Vars: map[string]any{
 			"prefix":            prefix,
 			"region":            region,
-			"redis_version":     latestVersion,
+			"redis_version":     oldestVersion,
 			"service_endpoints": "public-and-private",
 		},
 		// Set Upgrade to true to ensure latest version of providers and modules are used by terratest.
