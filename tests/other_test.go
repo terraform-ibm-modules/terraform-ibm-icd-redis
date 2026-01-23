@@ -13,16 +13,18 @@ import (
 func TestRunStandardSolutionIBMKeys(t *testing.T) {
 	t.Parallel()
 
+	region := "us-south"
+
 	options := testhelper.TestOptionsDefault(&testhelper.TestOptions{
 		Testing:       t,
 		TerraformDir:  fullyConfigurableSolutionTerraformDir,
-		Region:        "us-south",
+		Region:        region,
 		Prefix:        "redis-key",
 		ResourceGroup: resourceGroup,
 	})
 
 	options.TerraformVars = map[string]interface{}{
-		"redis_version":                latestVersion,
+		"redis_version":                GetRegionVersions(region, true),
 		"provider_visibility":          "public",
 		"existing_resource_group_name": resourceGroup,
 		"prefix":                       options.Prefix,
@@ -37,14 +39,16 @@ func TestRunStandardSolutionIBMKeys(t *testing.T) {
 func TestRunRestoredDBExample(t *testing.T) {
 	t.Parallel()
 
+	region := fmt.Sprint(permanentResources["redisRegion"])
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
 		Testing:       t,
 		TerraformDir:  "examples/backup-restore",
 		Prefix:        "redis-restored",
-		Region:        fmt.Sprint(permanentResources["redisRegion"]),
+		Region:        region,
 		ResourceGroup: resourceGroup,
 		TerraformVars: map[string]interface{}{
 			"existing_database_crn": permanentResources["redisCrn"],
+			"redis_version":         GetRegionVersions(region, true),
 		},
 		CloudInfoService: sharedInfoSvc,
 	})

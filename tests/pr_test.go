@@ -51,17 +51,17 @@ var validICDRegions = []string{
 	"us-south",
 }
 
-// TestMain will be run before any parallel tests, used to read data from yaml for use with tests
-func TestMain(m *testing.M) {
+func GetRegionVersions(region string, isLatest bool) string {
 
-	var err error
-	sharedInfoSvc, err = cloudinfo.NewCloudInfoServiceFromEnv("TF_VAR_ibmcloud_api_key", cloudinfo.CloudInfoServiceOptions{})
+	cloudInfoSvc, err := cloudinfo.NewCloudInfoServiceFromEnv("TF_VAR_ibmcloud_api_key", cloudinfo.CloudInfoServiceOptions{
+		IcdRegion: region,
+	})
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	icdAvailableVersions, err := sharedInfoSvc.GetAvailableIcdVersions(icdType)
+	icdAvailableVersions, err := cloudInfoSvc.GetAvailableIcdVersions(icdType)
 
 	if err != nil {
 		log.Fatal(err)
@@ -94,8 +94,26 @@ func TestMain(m *testing.M) {
 		return minorI < minorJ
 	})
 
+	fmt.Println("version list is ", icdAvailableVersions)
 	latestVersion = icdAvailableVersions[len(icdAvailableVersions)-1]
 	oldestVersion = icdAvailableVersions[0]
+
+	if isLatest {
+		return latestVersion
+	} else {
+		return oldestVersion
+	}
+}
+
+// TestMain will be run before any parallel tests, used to read data from yaml for use with tests
+func TestMain(m *testing.M) {
+
+	var err error
+	sharedInfoSvc, err = cloudinfo.NewCloudInfoServiceFromEnv("TF_VAR_ibmcloud_api_key", cloudinfo.CloudInfoServiceOptions{})
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	permanentResources, err = common.LoadMapFromYaml(yamlLocation)
 	if err != nil {
@@ -124,6 +142,8 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 		CheckApplyResultForUpgrade: true,
 		WaitJobCompleteMinutes:     60,
 	})
+
+	region := options.Region
 
 	serviceCredentialSecrets := []map[string]any{
 		{
@@ -157,7 +177,8 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 		{Name: "access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
 		{Name: "existing_resource_group_name", Value: resourceGroup, DataType: "string"},
 		{Name: "deletion_protection", Value: false, DataType: "bool"},
-		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
+		{Name: "region", Value: region, DataType: "string"},
+		{Name: "redis_version", Value: GetRegionVersions(region, true), DataType: "string"}, // Always lock this test into the latest supported Redis version
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
@@ -190,7 +211,8 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 		CheckApplyResultForUpgrade: true,
 		WaitJobCompleteMinutes:     60,
 	})
-	fmt.Print(options)
+
+	region := options.Region
 
 	serviceCredentialSecrets := []map[string]any{
 		{
@@ -228,7 +250,8 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 		{Name: "existing_backup_kms_key_crn", Value: permanentResources["hpcs_south_root_key_crn"], DataType: "string"},
 		{Name: "existing_resource_group_name", Value: uniqueResourceGroup, DataType: "string"},
 		{Name: "deletion_protection", Value: false, DataType: "bool"},
-		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
+		{Name: "region", Value: region, DataType: "string"},
+		{Name: "redis_version", Value: GetRegionVersions(region, true), DataType: "string"}, // Always lock this test into the latest supported Redis version
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
@@ -261,6 +284,8 @@ func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 		DeleteWorkspaceOnFail:  false,
 		WaitJobCompleteMinutes: 60,
 	})
+
+	region := options.Region
 
 	serviceCredentialSecrets := []map[string]any{
 		{
@@ -296,7 +321,8 @@ func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 		{Name: "existing_kms_instance_crn", Value: permanentResources["hpcs_south_crn"], DataType: "string"},
 		{Name: "existing_resource_group_name", Value: resourceGroup, DataType: "string"},
 		{Name: "deletion_protection", Value: false, DataType: "bool"},
-		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
+		{Name: "region", Value: region, DataType: "string"},
+		{Name: "redis_version", Value: GetRegionVersions(region, true), DataType: "string"}, // Always lock this test into the latest supported Redis version
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
@@ -335,7 +361,7 @@ func TestRunExistingInstance(t *testing.T) {
 		Vars: map[string]any{
 			"prefix":            prefix,
 			"region":            region,
-			"redis_version":     oldestVersion,
+			"redis_version":     GetRegionVersions(region, false),
 			"service_endpoints": "public-and-private",
 		},
 		// Set Upgrade to true to ensure latest version of providers and modules are used by terratest.
