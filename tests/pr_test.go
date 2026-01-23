@@ -29,9 +29,6 @@ import (
 const fullyConfigurableSolutionTerraformDir = "solutions/fully-configurable"
 const securityEnforcedTerraformDir = "solutions/security-enforced"
 
-var latestVersion string
-var oldestVersion string
-
 const icdType = "redis"
 
 // Use existing resource group
@@ -95,8 +92,8 @@ func GetRegionVersions(region string, isLatest bool) string {
 	})
 
 	fmt.Println("version list is ", icdAvailableVersions)
-	latestVersion = icdAvailableVersions[len(icdAvailableVersions)-1]
-	oldestVersion = icdAvailableVersions[0]
+	latestVersion := icdAvailableVersions[len(icdAvailableVersions)-1]
+	oldestVersion := icdAvailableVersions[0]
 
 	if isLatest {
 		return latestVersion
@@ -107,10 +104,8 @@ func GetRegionVersions(region string, isLatest bool) string {
 
 // TestMain will be run before any parallel tests, used to read data from yaml for use with tests
 func TestMain(m *testing.M) {
-
 	var err error
 	sharedInfoSvc, err = cloudinfo.NewCloudInfoServiceFromEnv("TF_VAR_ibmcloud_api_key", cloudinfo.CloudInfoServiceOptions{})
-
 	if err != nil {
 		log.Fatal(err)
 	}
