@@ -48,7 +48,7 @@ var validICDRegions = []string{
 	"us-south",
 }
 
-func GetRegionVersions(region string, isLatest bool) string {
+func GetRegionVersions(region string) (string, string) {
 
 	cloudInfoSvc, err := cloudinfo.NewCloudInfoServiceFromEnv("TF_VAR_ibmcloud_api_key", cloudinfo.CloudInfoServiceOptions{
 		IcdRegion: region,
@@ -95,11 +95,7 @@ func GetRegionVersions(region string, isLatest bool) string {
 	latestVersion := icdAvailableVersions[len(icdAvailableVersions)-1]
 	oldestVersion := icdAvailableVersions[0]
 
-	if isLatest {
-		return latestVersion
-	} else {
-		return oldestVersion
-	}
+	return latestVersion, oldestVersion
 }
 
 // TestMain will be run before any parallel tests, used to read data from yaml for use with tests
@@ -167,13 +163,14 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 		log.Fatalf("Error converting to JSON: %s", err)
 	}
 
+	latestVersion, _ := GetRegionVersions(region)
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 		{Name: "access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
 		{Name: "existing_resource_group_name", Value: resourceGroup, DataType: "string"},
 		{Name: "deletion_protection", Value: false, DataType: "bool"},
 		{Name: "region", Value: region, DataType: "string"},
-		{Name: "redis_version", Value: GetRegionVersions(region, true), DataType: "string"}, // Always lock this test into the latest supported Redis version
+		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
@@ -238,6 +235,7 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 
 	uniqueResourceGroup := generateUniqueResourceGroupName(options.Prefix)
 
+	latestVersion, _ := GetRegionVersions(region)
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 		{Name: "access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
@@ -246,7 +244,7 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 		{Name: "existing_resource_group_name", Value: uniqueResourceGroup, DataType: "string"},
 		{Name: "deletion_protection", Value: false, DataType: "bool"},
 		{Name: "region", Value: region, DataType: "string"},
-		{Name: "redis_version", Value: GetRegionVersions(region, true), DataType: "string"}, // Always lock this test into the latest supported Redis version
+		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
@@ -309,6 +307,7 @@ func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 		log.Fatalf("Error converting to JSON: %s", err)
 	}
 
+	latestVersion, _ := GetRegionVersions(region)
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 		{Name: "prefix", Value: options.Prefix, DataType: "string"},
@@ -317,7 +316,7 @@ func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 		{Name: "existing_resource_group_name", Value: resourceGroup, DataType: "string"},
 		{Name: "deletion_protection", Value: false, DataType: "bool"},
 		{Name: "region", Value: region, DataType: "string"},
-		{Name: "redis_version", Value: GetRegionVersions(region, true), DataType: "string"}, // Always lock this test into the latest supported Redis version
+		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
@@ -351,12 +350,14 @@ func TestRunExistingInstance(t *testing.T) {
 	require.NotEqual(t, "", val, checkVariable+" environment variable is empty")
 
 	logger.Log(t, "Tempdir: ", tempTerraformDir)
+
+	_, oldestVersion := GetRegionVersions(region)
 	existingTerraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: tempTerraformDir + "/examples/basic",
 		Vars: map[string]any{
 			"prefix":            prefix,
 			"region":            region,
-			"redis_version":     GetRegionVersions(region, false),
+			"redis_version":     oldestVersion,
 			"service_endpoints": "public-and-private",
 		},
 		// Set Upgrade to true to ensure latest version of providers and modules are used by terratest.

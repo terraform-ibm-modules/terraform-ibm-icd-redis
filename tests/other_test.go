@@ -23,8 +23,9 @@ func TestRunStandardSolutionIBMKeys(t *testing.T) {
 		ResourceGroup: resourceGroup,
 	})
 
+	latestVersion, _ := GetRegionVersions(region)
 	options.TerraformVars = map[string]interface{}{
-		"redis_version":                GetRegionVersions(region, true),
+		"redis_version":                latestVersion,
 		"provider_visibility":          "public",
 		"existing_resource_group_name": resourceGroup,
 		"prefix":                       options.Prefix,
