@@ -146,7 +146,6 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 		CheckApplyResultForUpgrade: true,
 		WaitJobCompleteMinutes:     60,
 	})
-	fmt.Print(options)
 
 	serviceCredentialSecrets := []map[string]any{
 		{
