@@ -134,8 +134,6 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 		WaitJobCompleteMinutes:     60,
 	})
 
-	region := options.Region
-
 	serviceCredentialSecrets := []map[string]any{
 		{
 			"secret_group_name": fmt.Sprintf("%s-secret-group", options.Prefix),
@@ -163,6 +161,7 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 		log.Fatalf("Error converting to JSON: %s", err)
 	}
 
+	region := options.Region
 	latestVersion, _ := GetRegionVersions(region)
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
@@ -204,8 +203,6 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 		WaitJobCompleteMinutes:     60,
 	})
 
-	region := options.Region
-
 	serviceCredentialSecrets := []map[string]any{
 		{
 			"secret_group_name": fmt.Sprintf("%s-secret-group", options.Prefix),
@@ -235,6 +232,7 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 
 	uniqueResourceGroup := generateUniqueResourceGroupName(options.Prefix)
 
+	region := options.Region
 	latestVersion, _ := GetRegionVersions(region)
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
@@ -278,8 +276,6 @@ func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 		WaitJobCompleteMinutes: 60,
 	})
 
-	region := options.Region
-
 	serviceCredentialSecrets := []map[string]any{
 		{
 			"secret_group_name": fmt.Sprintf("%s-secret-group", options.Prefix),
@@ -307,6 +303,7 @@ func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 		log.Fatalf("Error converting to JSON: %s", err)
 	}
 
+	region := options.Region
 	latestVersion, _ := GetRegionVersions(region)
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
@@ -341,7 +338,6 @@ func TestRunExistingInstance(t *testing.T) {
 	if err != nil {
 		log.Fatalf("Failed to generate a secure random index: %v", err)
 	}
-	region := validICDRegions[index.Int64()]
 
 	// Verify ibmcloud_api_key variable is set
 	checkVariable := "TF_VAR_ibmcloud_api_key"
@@ -351,6 +347,7 @@ func TestRunExistingInstance(t *testing.T) {
 
 	logger.Log(t, "Tempdir: ", tempTerraformDir)
 
+	region := validICDRegions[index.Int64()]
 	_, oldestVersion := GetRegionVersions(region)
 	existingTerraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: tempTerraformDir + "/examples/basic",
