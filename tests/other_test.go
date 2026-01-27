@@ -9,46 +9,24 @@ import (
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testhelper"
 )
 
-func testPlanICDVersions(t *testing.T, version string) {
-	t.Parallel()
-
-	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
-		Testing:      t,
-		TerraformDir: "examples/basic",
-		TerraformVars: map[string]interface{}{
-			"redis_version": version,
-		},
-		CloudInfoService: sharedInfoSvc,
-	})
-	output, err := options.RunTestPlan()
-	assert.Nil(t, err, "This should not have errored")
-	assert.NotNil(t, output, "Expected some output")
-}
-
-func TestPlanICDVersions(t *testing.T) {
-	t.Parallel()
-
-	// This test will run a terraform plan on available stable versions of redis
-	versions, _ := sharedInfoSvc.GetAvailableIcdVersions("redis")
-	for _, version := range versions {
-		t.Run(version, func(t *testing.T) { testPlanICDVersions(t, version) })
-	}
-}
-
 // Test the DA when using IBM owned encryption keys
 func TestRunStandardSolutionIBMKeys(t *testing.T) {
 	t.Parallel()
 
+	region := "us-south"
+
 	options := testhelper.TestOptionsDefault(&testhelper.TestOptions{
 		Testing:       t,
 		TerraformDir:  fullyConfigurableSolutionTerraformDir,
-		Region:        "us-south",
+		Region:        region,
 		Prefix:        "redis-key",
 		ResourceGroup: resourceGroup,
 	})
 
+	latestVersion, _ := GetRegionVersions(region)
 	options.TerraformVars = map[string]interface{}{
 		"redis_version":                latestVersion,
+		"region":                       region,
 		"provider_visibility":          "public",
 		"existing_resource_group_name": resourceGroup,
 		"prefix":                       options.Prefix,

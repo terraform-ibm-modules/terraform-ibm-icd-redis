@@ -58,6 +58,7 @@ locals {
 # KMS IAM Authorization Policies
 ########################################################################################################################
 
+
 locals {
   # only create auth policy if 'use_ibm_owned_encryption_key' is false, and 'skip_iam_authorization_policy' is false
   create_kms_auth_policy = !var.use_ibm_owned_encryption_key && !var.skip_iam_authorization_policy ? 1 : 0
@@ -156,6 +157,21 @@ resource "time_sleep" "wait_for_backup_kms_authorization_policy" {
   depends_on      = [ibm_iam_authorization_policy.backup_kms_policy]
   create_duration = "30s"
 }
+
+
+module "available_versions" {
+
+  source   = "terraform-ibm-modules/common-utilities/ibm//modules/icd-versions"
+  version  = "1.4.1"
+  region   = var.region
+  icd_type = "redis"
+}
+
+
+locals {
+  icd_supported_versions = module.available_versions.supported_versions
+}
+
 
 ########################################################################################################################
 # Redis instance
