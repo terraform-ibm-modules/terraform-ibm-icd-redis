@@ -347,6 +347,17 @@
             },
             {
               "key": "existing_secrets_manager_instance_crn",
+              "display_name": "existing_secrets_manager_instance",
+              "custom_config": {
+                "type": "platform_resource",
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "resourceType": "secrets-manager",
+                  "selection": "single_select",
+                  "valueType": "crn"
+                }
+              },
               "value_constraints": [
                 {
                   "type": "regex",
@@ -469,6 +480,17 @@
             },
             {
               "key": "existing_redis_instance_crn",
+              "display_name": "existing_redis_instance",
+              "custom_config": {
+                "type": "platform_resource",
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "resourceType": "databases-for-redis",
+                  "selection": "single_select",
+                  "valueType": "crn"
+                }
+              },
               "value_constraints": [
                 {
                   "type": "regex",
@@ -739,6 +761,17 @@
             },
             {
               "key": "existing_secrets_manager_instance_crn",
+              "display_name": "existing_secrets_manager_instance",
+              "custom_config": {
+                "type": "platform_resource",
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "resourceType": "secrets-manager",
+                  "selection": "single_select",
+                  "valueType": "crn"
+                }
+              },
               "value_constraints": [
                 {
                   "type": "regex",
@@ -828,6 +861,17 @@
             },
             {
               "key": "existing_redis_instance_crn",
+              "display_name": "existing_redis_instance",
+              "custom_config": {
+                "type": "platform_resource",
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "config_constraints": {
+                  "resourceType": "databases-for-redis",
+                  "selection": "single_select",
+                  "valueType": "crn"
+                }
+              },
               "value_constraints": [
                 {
                   "type": "regex",
