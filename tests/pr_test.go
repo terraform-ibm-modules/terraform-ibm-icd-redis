@@ -1,4 +1,4 @@
-// Tests in this file are run in the PR pipeline.
+// Tests in this file are run in the PR pipeline
 package test
 
 import (
@@ -28,6 +28,7 @@ const fullyConfigurableSolutionTerraformDir = "solutions/fully-configurable"
 const securityEnforcedSolutionTerraformDir = "solutions/security-enforced"
 
 const icdType = "redis"
+const icdShortType = "redis"
 
 // Use existing resource group
 const resourceGroup = "geretain-test-redis"
@@ -122,13 +123,13 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 			"*.tf",
 			fullyConfigurableSolutionTerraformDir + "/*.tf",
 		},
-		TemplateFolder:     fullyConfigurableSolutionTerraformDir,
-		BestRegionYAMLPath: regionSelectionPath,
-		Prefix:             "r-fc-da",
-		// ResourceGroup:              resourceGroup,
+		TemplateFolder:             fullyConfigurableSolutionTerraformDir,
+		BestRegionYAMLPath:         regionSelectionPath,
+		Prefix:                     fmt.Sprintf("%s-fc-da", icdShortType),
+		ResourceGroup:              resourceGroup,
 		DeleteWorkspaceOnFail:      false,
-		CheckApplyResultForUpgrade: true,
 		WaitJobCompleteMinutes:     60,
+		CheckApplyResultForUpgrade: true,
 	})
 
 	uniqueResourceGroup := generateUniqueResourceGroupName(options.Prefix)
@@ -172,7 +173,7 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
-		{Name: "admin_pass_secrets_manager_secret_group", Value: options.Prefix, DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_group", Value: fmt.Sprintf("%s-%s-admin-secrets", icdShortType, options.Prefix), DataType: "string"},
 		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: common.GetRandomPasswordWithPrefix(), DataType: "string"},
 		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
@@ -195,13 +196,13 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 			fullyConfigurableSolutionTerraformDir + "/*.tf",
 			securityEnforcedSolutionTerraformDir + "/*.tf",
 		},
-		TemplateFolder:     securityEnforcedSolutionTerraformDir,
-		BestRegionYAMLPath: regionSelectionPath,
-		Prefix:             "r-se-da",
-		// ResourceGroup:              resourceGroup,
+		TemplateFolder:             securityEnforcedSolutionTerraformDir,
+		BestRegionYAMLPath:         regionSelectionPath,
+		Prefix:                     fmt.Sprintf("%s-se-da", icdShortType),
+		ResourceGroup:              resourceGroup,
 		DeleteWorkspaceOnFail:      false,
-		CheckApplyResultForUpgrade: true,
 		WaitJobCompleteMinutes:     60,
+		CheckApplyResultForUpgrade: true,
 	})
 
 	serviceCredentialSecrets := []map[string]interface{}{
@@ -245,7 +246,7 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
-		{Name: "admin_pass_secrets_manager_secret_group", Value: options.Prefix, DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_group", Value: fmt.Sprintf("%s-%s-admin-secrets", icdShortType, options.Prefix), DataType: "string"},
 		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: common.GetRandomPasswordWithPrefix(), DataType: "string"},
 		{Name: "existing_kms_instance_crn", Value: permanentResources["hpcs_south_crn"], DataType: "string"},
@@ -269,11 +270,12 @@ func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 			fullyConfigurableSolutionTerraformDir + "/*.tf",
 			securityEnforcedSolutionTerraformDir + "/*.tf",
 		},
-		TemplateFolder:         securityEnforcedSolutionTerraformDir,
-		BestRegionYAMLPath:     regionSelectionPath,
-		Prefix:                 "re-da-upg",
-		DeleteWorkspaceOnFail:  false,
-		WaitJobCompleteMinutes: 60,
+		TemplateFolder:             securityEnforcedSolutionTerraformDir,
+		Tags:                       []string{fmt.Sprintf("%s-se-upg", icdShortType)},
+		Prefix:                     fmt.Sprintf("%s-se-upg", icdShortType),
+		DeleteWorkspaceOnFail:      false,
+		WaitJobCompleteMinutes:     120,
+		CheckApplyResultForUpgrade: true,
 	})
 
 	serviceCredentialSecrets := []map[string]interface{}{
@@ -317,13 +319,15 @@ func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
-		{Name: "admin_pass_secrets_manager_secret_group", Value: fmt.Sprintf("redis-%s-admin-secrets", options.Prefix), DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_group", Value: fmt.Sprintf("%s-%s-admin-secrets", icdShortType, options.Prefix), DataType: "string"},
 		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: common.GetRandomPasswordWithPrefix(), DataType: "string"},
 		{Name: "existing_kms_instance_crn", Value: permanentResources["hpcs_south_crn"], DataType: "string"},
 		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
 	}
-	err = options.RunSchematicUpgradeTest()
+	err = sharedInfoSvc.WithNewResourceGroup(uniqueResourceGroup, func() error {
+		return options.RunSchematicUpgradeTest()
+	})
 	if !options.UpgradeTestSkipped {
 		assert.Nil(t, err, "This should not have errored")
 	}
@@ -398,7 +402,7 @@ func TestPlanValidation(t *testing.T) {
 
 func TestRunExistingInstance(t *testing.T) {
 	t.Parallel()
-	prefix := fmt.Sprintf("redis-t-%s", strings.ToLower(random.UniqueId()))
+	prefix := fmt.Sprintf("%s-t-%s", icdShortType, strings.ToLower(random.UniqueId()))
 	realTerraformDir := ".."
 	tempTerraformDir, _ := files.CopyTerraformFolderToTemp(realTerraformDir, fmt.Sprintf(prefix+"-%s", strings.ToLower(random.UniqueId())))
 
@@ -439,7 +443,7 @@ func TestRunExistingInstance(t *testing.T) {
 			},
 			TemplateFolder:         fullyConfigurableSolutionTerraformDir,
 			BestRegionYAMLPath:     regionSelectionPath,
-			Prefix:                 "redis-ex",
+			Prefix:                 fmt.Sprintf("%s-ex", icdShortType),
 			ResourceGroup:          resourceGroup,
 			DeleteWorkspaceOnFail:  false,
 			WaitJobCompleteMinutes: 60,
