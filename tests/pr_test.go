@@ -1,12 +1,10 @@
-// Tests in this file are run in the PR pipeline.
+// Tests in this file are run in the PR pipeline
 package test
 
 import (
-	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/big"
 	"os"
 	"sort"
 	"strconv"
@@ -22,24 +20,26 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/cloudinfo"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/common"
+	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testhelper"
 	"github.com/terraform-ibm-modules/ibmcloud-terratest-wrapper/testschematic"
 )
 
 const fullyConfigurableSolutionTerraformDir = "solutions/fully-configurable"
-const securityEnforcedTerraformDir = "solutions/security-enforced"
+const securityEnforcedSolutionTerraformDir = "solutions/security-enforced"
 
 const icdType = "redis"
+const icdShortType = "redis"
 
 // Use existing resource group
 const resourceGroup = "geretain-test-redis"
 
-// Set up tests to only use supported BYOK regions
+// Restricting due to limited availability of BYOK in certain regions
 const regionSelectionPath = "../common-dev-assets/common-go-assets/icd-region-prefs.yaml"
 
 // Define a struct with fields that match the structure of the YAML data
 const yamlLocation = "../common-dev-assets/common-go-assets/common-permanent-resources.yaml"
 
-var permanentResources map[string]any
+var permanentResources map[string]interface{}
 
 var sharedInfoSvc *cloudinfo.CloudInfoService
 var validICDRegions = []string{
@@ -113,7 +113,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-// Test the fully-configurable DA with defaults (no KMS encryption)
+// Test the fully-configurable DA with defaults (IBM owned encryption keys)
 func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 	t.Parallel()
 
@@ -121,19 +121,20 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 		Testing: t,
 		TarIncludePatterns: []string{
 			"*.tf",
-			fmt.Sprintf("%s/*.tf", fullyConfigurableSolutionTerraformDir),
-			fmt.Sprintf("%s/*.sh", "scripts"),
+			fullyConfigurableSolutionTerraformDir + "/*.tf",
 		},
-		TemplateFolder:     fullyConfigurableSolutionTerraformDir,
-		BestRegionYAMLPath: regionSelectionPath,
-		Prefix:             "r-fc-da",
-		// ResourceGroup:              resourceGroup,
+		TemplateFolder:             fullyConfigurableSolutionTerraformDir,
+		BestRegionYAMLPath:         regionSelectionPath,
+		Prefix:                     fmt.Sprintf("%s-fc-da", icdShortType),
+		ResourceGroup:              resourceGroup,
 		DeleteWorkspaceOnFail:      false,
-		CheckApplyResultForUpgrade: true,
 		WaitJobCompleteMinutes:     60,
+		CheckApplyResultForUpgrade: true,
 	})
 
-	serviceCredentialSecrets := []map[string]any{
+	uniqueResourceGroup := generateUniqueResourceGroupName(options.Prefix)
+
+	serviceCredentialSecrets := []map[string]interface{}{
 		{
 			"secret_group_name": fmt.Sprintf("%s-secret-group", options.Prefix),
 			"service_credentials": []map[string]string{
@@ -163,25 +164,28 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 	region := "us-south"
 	latestVersion, _ := GetRegionVersions(region)
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
+		{Name: "prefix", Value: options.Prefix, DataType: "string"},
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 		{Name: "access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
-		{Name: "existing_resource_group_name", Value: resourceGroup, DataType: "string"},
 		{Name: "deletion_protection", Value: false, DataType: "bool"},
+		{Name: "existing_resource_group_name", Value: uniqueResourceGroup, DataType: "string"},
 		{Name: "region", Value: region, DataType: "string"},
-		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
-		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
-		{Name: "admin_pass_secrets_manager_secret_group", Value: options.Prefix, DataType: "string"},
+		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_group", Value: fmt.Sprintf("%s-%s-admin-secrets", icdShortType, options.Prefix), DataType: "string"},
 		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
-		{Name: "prefix", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: common.GetRandomPasswordWithPrefix(), DataType: "string"},
+		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
 	}
-	err = options.RunSchematicTest()
+
+	err = sharedInfoSvc.WithNewResourceGroup(uniqueResourceGroup, func() error {
+		return options.RunSchematicTest()
+	})
 	assert.Nil(t, err, "This should not have errored")
 }
 
-// Test the security-enforced DA with defaults (KMS encryption enabled)
+// Test the security-enforced DA with defaults (KMS encryption enabled, BYOK)
 func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 	t.Parallel()
 
@@ -189,20 +193,19 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 		Testing: t,
 		TarIncludePatterns: []string{
 			"*.tf",
-			fmt.Sprintf("%s/*.tf", securityEnforcedTerraformDir),
-			fmt.Sprintf("%s/*.tf", fullyConfigurableSolutionTerraformDir),
-			fmt.Sprintf("%s/*.sh", "scripts"),
+			fullyConfigurableSolutionTerraformDir + "/*.tf",
+			securityEnforcedSolutionTerraformDir + "/*.tf",
 		},
-		TemplateFolder:     securityEnforcedTerraformDir,
-		BestRegionYAMLPath: regionSelectionPath,
-		Prefix:             "r-se-da",
-		// ResourceGroup:              resourceGroup,
+		TemplateFolder:             securityEnforcedSolutionTerraformDir,
+		BestRegionYAMLPath:         regionSelectionPath,
+		Prefix:                     fmt.Sprintf("%s-se-da", icdShortType),
+		ResourceGroup:              resourceGroup,
 		DeleteWorkspaceOnFail:      false,
-		CheckApplyResultForUpgrade: true,
 		WaitJobCompleteMinutes:     60,
+		CheckApplyResultForUpgrade: true,
 	})
 
-	serviceCredentialSecrets := []map[string]any{
+	serviceCredentialSecrets := []map[string]interface{}{
 		{
 			"secret_group_name": fmt.Sprintf("%s-secret-group", options.Prefix),
 			"service_credentials": []map[string]string{
@@ -234,21 +237,21 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 	region := "us-south"
 	latestVersion, _ := GetRegionVersions(region)
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
+		{Name: "prefix", Value: options.Prefix, DataType: "string"},
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 		{Name: "access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
-		{Name: "existing_kms_instance_crn", Value: permanentResources["hpcs_south_crn"], DataType: "string"},
-		{Name: "existing_backup_kms_key_crn", Value: permanentResources["hpcs_south_root_key_crn"], DataType: "string"},
-		{Name: "existing_resource_group_name", Value: uniqueResourceGroup, DataType: "string"},
 		{Name: "deletion_protection", Value: false, DataType: "bool"},
 		{Name: "region", Value: region, DataType: "string"},
-		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
+		{Name: "existing_resource_group_name", Value: uniqueResourceGroup, DataType: "string"},
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
-		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
-		{Name: "admin_pass_secrets_manager_secret_group", Value: options.Prefix, DataType: "string"},
+		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_group", Value: fmt.Sprintf("%s-%s-admin-secrets", icdShortType, options.Prefix), DataType: "string"},
 		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: common.GetRandomPasswordWithPrefix(), DataType: "string"},
-		{Name: "prefix", Value: options.Prefix, DataType: "string"},
+		{Name: "existing_kms_instance_crn", Value: permanentResources["hpcs_south_crn"], DataType: "string"},
+		{Name: "existing_backup_kms_key_crn", Value: permanentResources["hpcs_south_root_key_crn"], DataType: "string"},
+		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
 	}
 	err = sharedInfoSvc.WithNewResourceGroup(uniqueResourceGroup, func() error {
 		return options.RunSchematicTest()
@@ -256,6 +259,7 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 	assert.Nil(t, err, "This should not have errored")
 }
 
+// Upgrade test the security-enforced DA with defaults (KMS encryption enabled, KYOK)
 func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 	t.Parallel()
 
@@ -264,18 +268,17 @@ func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 		TarIncludePatterns: []string{
 			"*.tf",
 			fullyConfigurableSolutionTerraformDir + "/*.tf",
-			securityEnforcedTerraformDir + "/*.tf",
-			"scripts/*.sh",
+			securityEnforcedSolutionTerraformDir + "/*.tf",
 		},
-		TemplateFolder:     securityEnforcedTerraformDir,
-		BestRegionYAMLPath: regionSelectionPath,
-		Prefix:             "re-da-upg",
-		// ResourceGroup:          resourceGroup,
-		DeleteWorkspaceOnFail:  false,
-		WaitJobCompleteMinutes: 60,
+		TemplateFolder:             securityEnforcedSolutionTerraformDir,
+		Tags:                       []string{fmt.Sprintf("%s-se-upg", icdShortType)},
+		Prefix:                     fmt.Sprintf("%s-se-upg", icdShortType),
+		DeleteWorkspaceOnFail:      false,
+		WaitJobCompleteMinutes:     120,
+		CheckApplyResultForUpgrade: true,
 	})
 
-	serviceCredentialSecrets := []map[string]any{
+	serviceCredentialSecrets := []map[string]interface{}{
 		{
 			"secret_group_name": fmt.Sprintf("%s-secret-group", options.Prefix),
 			"service_credentials": []map[string]string{
@@ -302,41 +305,106 @@ func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 		log.Fatalf("Error converting to JSON: %s", err)
 	}
 
+	uniqueResourceGroup := generateUniqueResourceGroupName(options.Prefix)
+
 	region := "us-south"
 	latestVersion, _ := GetRegionVersions(region)
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
-		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 		{Name: "prefix", Value: options.Prefix, DataType: "string"},
+		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 		{Name: "access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
-		{Name: "existing_kms_instance_crn", Value: permanentResources["hpcs_south_crn"], DataType: "string"},
-		{Name: "existing_resource_group_name", Value: resourceGroup, DataType: "string"},
 		{Name: "deletion_protection", Value: false, DataType: "bool"},
 		{Name: "region", Value: region, DataType: "string"},
-		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
-		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
-		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
+		{Name: "existing_resource_group_name", Value: uniqueResourceGroup, DataType: "string"},
 		{Name: "service_credential_names", Value: string(serviceCredentialNamesJSON), DataType: "map(string)"},
+		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
+		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_group", Value: fmt.Sprintf("%s-%s-admin-secrets", icdShortType, options.Prefix), DataType: "string"},
 		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: common.GetRandomPasswordWithPrefix(), DataType: "string"},
-		{Name: "admin_pass_secrets_manager_secret_group", Value: fmt.Sprintf("redis-%s-admin-secrets", options.Prefix), DataType: "string"},
+		{Name: "existing_kms_instance_crn", Value: permanentResources["hpcs_south_crn"], DataType: "string"},
+		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
 	}
-
-	err = options.RunSchematicUpgradeTest()
+	err = sharedInfoSvc.WithNewResourceGroup(uniqueResourceGroup, func() error {
+		return options.RunSchematicUpgradeTest()
+	})
 	if !options.UpgradeTestSkipped {
 		assert.Nil(t, err, "This should not have errored")
 	}
 }
 
+func TestPlanValidation(t *testing.T) {
+	options := testhelper.TestOptionsDefault(&testhelper.TestOptions{
+		Testing:      t,
+		TerraformDir: fullyConfigurableSolutionTerraformDir,
+		Prefix:       "val-plan",
+		// ResourceGroup: resourceGroup,
+		Region: "us-south", // skip VPC region picker
+	})
+	options.TestSetup()
+	options.TerraformOptions.NoColor = true
+	options.TerraformOptions.Logger = logger.Discard
+
+	latestVersion, _ := GetRegionVersions("us-south")
+	options.TerraformOptions.Vars = map[string]interface{}{
+		"prefix":                       options.Prefix,
+		"region":                       "us-south",
+		"redis_version":                latestVersion,
+		"provider_visibility":          "public",
+		"existing_resource_group_name": resourceGroup,
+	}
+
+	// Test the DA when using an existing KMS instance
+	var fullyConfigurableWithExistingKms = map[string]interface{}{
+		"access_tags":               permanentResources["accessTags"],
+		"existing_kms_instance_crn": permanentResources["hpcs_south_crn"],
+		"kms_encryption_enabled":    true,
+	}
+
+	// Test the DA when using IBM owned encryption key
+	var fullyConfigurableWithIbmOwnedKey = map[string]interface{}{
+		"kms_encryption_enabled": false,
+	}
+
+	// Test the DA when using IBM owned encryption keys
+	var fullyConfigurableWithIbmOwnedBackupKey = map[string]interface{}{
+		"use_default_backup_encryption_key": false,
+		"kms_encryption_enabled":            false,
+	}
+
+	// Create a map of the variables
+	tfVarsMap := map[string]map[string]interface{}{
+		"fullyConfigurableWithExistingKms":       fullyConfigurableWithExistingKms,
+		"fullyConfigurableWithIbmOwnedKey":       fullyConfigurableWithIbmOwnedKey,
+		"fullyConfigurableWithIbmOwnedBackupKey": fullyConfigurableWithIbmOwnedBackupKey,
+	}
+
+	_, initErr := terraform.InitE(t, options.TerraformOptions)
+	if assert.Nil(t, initErr, "This should not have errored") {
+		// Iterate over the slice of maps
+		for name, tfVars := range tfVarsMap {
+			t.Run(name, func(t *testing.T) {
+				// Iterate over the keys and values in each map
+				for key, value := range tfVars {
+					options.TerraformOptions.Vars[key] = value
+				}
+				output, err := terraform.PlanE(t, options.TerraformOptions)
+				assert.Nil(t, err, "This should not have errored")
+				assert.NotNil(t, output, "Expected some output")
+				// Delete the keys from the map
+				for key := range tfVars {
+					delete(options.TerraformOptions.Vars, key)
+				}
+			})
+		}
+	}
+}
+
 func TestRunExistingInstance(t *testing.T) {
 	t.Parallel()
-	prefix := fmt.Sprintf("redis-t-%s", strings.ToLower(random.UniqueId()))
+	prefix := fmt.Sprintf("%s-t-%s", icdShortType, strings.ToLower(random.UniqueId()))
 	realTerraformDir := ".."
 	tempTerraformDir, _ := files.CopyTerraformFolderToTemp(realTerraformDir, fmt.Sprintf(prefix+"-%s", strings.ToLower(random.UniqueId())))
-
-	index, err := rand.Int(rand.Reader, big.NewInt(int64(len(validICDRegions))))
-	if err != nil {
-		log.Fatalf("Failed to generate a secure random index: %v", err)
-	}
 
 	// Verify ibmcloud_api_key variable is set
 	checkVariable := "TF_VAR_ibmcloud_api_key"
@@ -346,11 +414,11 @@ func TestRunExistingInstance(t *testing.T) {
 
 	logger.Log(t, "Tempdir: ", tempTerraformDir)
 
-	region := validICDRegions[index.Int64()]
+	region := validICDRegions[common.CryptoIntn(len(validICDRegions))]
 	_, oldestVersion := GetRegionVersions(region)
 	existingTerraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: tempTerraformDir + "/examples/basic",
-		Vars: map[string]any{
+		Vars: map[string]interface{}{
 			"prefix":            prefix,
 			"region":            region,
 			"redis_version":     oldestVersion,
@@ -371,25 +439,24 @@ func TestRunExistingInstance(t *testing.T) {
 			Testing: t,
 			TarIncludePatterns: []string{
 				"*.tf",
-				fmt.Sprintf("%s/*.tf", fullyConfigurableSolutionTerraformDir),
-				fmt.Sprintf("%s/*.sh", "scripts"),
+				fullyConfigurableSolutionTerraformDir + "/*.tf",
 			},
 			TemplateFolder:         fullyConfigurableSolutionTerraformDir,
 			BestRegionYAMLPath:     regionSelectionPath,
-			Prefix:                 "redis-da",
+			Prefix:                 fmt.Sprintf("%s-ex", icdShortType),
 			ResourceGroup:          resourceGroup,
 			DeleteWorkspaceOnFail:  false,
 			WaitJobCompleteMinutes: 60,
 		})
 
 		options.TerraformVars = []testschematic.TestSchematicTerraformVar{
+			{Name: "prefix", Value: options.Prefix, DataType: "string"},
 			{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 			{Name: "existing_redis_instance_crn", Value: terraform.Output(t, existingTerraformOptions, "redis_crn"), DataType: "string"},
+			{Name: "existing_resource_group_name", Value: fmt.Sprintf("%s-resource-group", prefix), DataType: "string"},
 			{Name: "deletion_protection", Value: false, DataType: "bool"},
 			{Name: "region", Value: region, DataType: "string"},
-			{Name: "existing_resource_group_name", Value: fmt.Sprintf("%s-resource-group", prefix), DataType: "string"},
 			{Name: "provider_visibility", Value: "public", DataType: "string"},
-			{Name: "prefix", Value: options.Prefix, DataType: "string"},
 		}
 		err := options.RunSchematicTest()
 		assert.Nil(t, err, "This should not have errored")
@@ -408,6 +475,6 @@ func TestRunExistingInstance(t *testing.T) {
 }
 
 func generateUniqueResourceGroupName(baseName string) string {
-	id := uuid.New().String()[:8]
+	id := uuid.New().String()[:8] // Shorten UUID for readability
 	return fmt.Sprintf("%s-%s", baseName, id)
 }
