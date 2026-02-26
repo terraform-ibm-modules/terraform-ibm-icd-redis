@@ -174,7 +174,17 @@
             {
               "key": "redis_version",
               "hidden": true,
-              "default_value": "7.2"
+              "default_value": "8.2",
+              "options": [
+                {
+                  "displayname": "8.2",
+                  "value": "8.2"
+                },
+                {
+                  "displayname": "7.2",
+                  "value": "7.2"
+                }
+              ]
             },
             {
               "key": "name"
@@ -570,7 +580,17 @@
             {
               "key": "redis_version",
               "hidden": true,
-              "default_value": "7.2"
+              "default_value": "8.2",
+              "options": [
+                {
+                  "displayname": "8.2",
+                  "value": "8.2"
+                },
+                {
+                  "displayname": "7.2",
+                  "value": "7.2"
+                }
+              ]
             },
             {
               "key": "name"
