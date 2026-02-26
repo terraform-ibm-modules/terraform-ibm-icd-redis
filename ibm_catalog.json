@@ -173,7 +173,6 @@
             },
             {
               "key": "redis_version",
-              "hidden": true,
               "default_value": "8.2",
               "options": [
                 {
@@ -579,7 +578,6 @@
             },
             {
               "key": "redis_version",
-              "hidden": true,
               "default_value": "8.2",
               "options": [
                 {
