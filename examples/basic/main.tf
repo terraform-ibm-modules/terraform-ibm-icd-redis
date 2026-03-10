@@ -28,10 +28,26 @@ module "database" {
   service_endpoints   = var.service_endpoints
   member_host_flavor  = var.member_host_flavor
   deletion_protection = false
-  service_credential_names = {
-    "redis_admin" : "Administrator",
-    "redis_operator" : "Operator",
-    "redis_viewer" : "Viewer",
-    "redis_editor" : "Editor",
-  }
+  service_credential_names = [
+    {
+      name     = "redis_admin"
+      role     = "Administrator"
+      endpoint = "public"
+    },
+    {
+      name     = "redis_operator"
+      role     = "Operator"
+      endpoint = "public"
+    },
+    {
+      name     = "redis_viewer"
+      role     = "Viewer"
+      endpoint = "public"
+    },
+    {
+      name     = "redis_editor"
+      role     = "Editor"
+      endpoint = "public"
+    }
+  ]
 }

@@ -370,10 +370,13 @@ module "cbr_rule" {
 ##############################################################################
 
 resource "ibm_resource_key" "service_credentials" {
-  for_each             = var.service_credential_names
-  name                 = each.key
-  role                 = each.value
+  for_each             = { for key in var.service_credential_names : key.name => key }
+  name                 = each.value.key_name == null ? each.key : each.value.key_name
+  role                 = each.value.role
   resource_instance_id = ibm_database.redis_database.id
+  parameters = {
+    service-endpoints = each.value.endpoint
+  }
 }
 
 locals {
@@ -384,9 +387,9 @@ locals {
   } : null
 
   service_credentials_object = length(var.service_credential_names) > 0 ? {
-    hostname    = ibm_resource_key.service_credentials[keys(var.service_credential_names)[0]].credentials["connection.rediss.hosts.0.hostname"]
-    certificate = ibm_resource_key.service_credentials[keys(var.service_credential_names)[0]].credentials["connection.rediss.certificate.certificate_base64"]
-    port        = ibm_resource_key.service_credentials[keys(var.service_credential_names)[0]].credentials["connection.rediss.hosts.0.port"]
+    hostname    = ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.hosts.0.hostname"]
+    certificate = ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.certificate.certificate_base64"]
+    port        = ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.hosts.0.port"]
     credentials = {
       for service_credential in ibm_resource_key.service_credentials :
       service_credential["name"] => {

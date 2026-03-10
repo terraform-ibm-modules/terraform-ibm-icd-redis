@@ -104,12 +104,28 @@ module "icd_redis" {
   use_same_kms_key_for_backups = false
   kms_key_crn                  = module.key_protect_all_inclusive.keys["icd.${local.data_key_name}"].crn
   backup_encryption_key_crn    = module.key_protect_all_inclusive.keys["icd.${local.backups_key_name}"].crn
-  service_credential_names = {
-    "redis_admin" : "Administrator",
-    "redis_operator" : "Operator",
-    "redis_viewer" : "Viewer",
-    "redis_editor" : "Editor",
-  }
+  service_credential_names = [
+    {
+      name     = "redis_admin"
+      role     = "Administrator"
+      endpoint = "private"
+    },
+    {
+      name     = "redis_operator"
+      role     = "Operator"
+      endpoint = "private"
+    },
+    {
+      name     = "redis_viewer"
+      role     = "Viewer"
+      endpoint = "private"
+    },
+    {
+      name     = "redis_editor"
+      role     = "Editor"
+      endpoint = "private"
+    }
+  ]
   access_tags         = var.access_tags
   member_host_flavor  = "multitenant"
   deletion_protection = false
