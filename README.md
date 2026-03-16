@@ -14,19 +14,42 @@ This module implements an instance of IBM Cloud Databases for Redis.
 <!-- Below content is automatically populated via pre-commit hook -->
 <!-- BEGIN OVERVIEW HOOK -->
 ## Overview
-* [terraform-ibm-icd-redis](#terraform-ibm-icd-redis)
-* [Submodules](./modules)
-    * [fscloud](./modules/fscloud)
-* [Examples](./examples)
-:information_source: Ctrl/Cmd+Click or right-click on the Schematics deploy button to open in a new tab
-    * <a href="./examples/backup-restore">Restore from backup example</a> <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=icd-redis-backup-restore-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/backup-restore"><img src="https://img.shields.io/badge/Deploy%20with IBM%20Cloud%20Schematics-0f62fe?logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
-    * <a href="./examples/basic">Basic example</a> <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=icd-redis-basic-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/basic"><img src="https://img.shields.io/badge/Deploy%20with IBM%20Cloud%20Schematics-0f62fe?logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
-    * <a href="./examples/complete">Complete example</a> <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=icd-redis-complete-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/complete"><img src="https://img.shields.io/badge/Deploy%20with IBM%20Cloud%20Schematics-0f62fe?logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
-    * <a href="./examples/fscloud">Financial Services compliant example</a> <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=icd-redis-fscloud-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/fscloud"><img src="https://img.shields.io/badge/Deploy%20with IBM%20Cloud%20Schematics-0f62fe?logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
-* [Deployable Architectures](./solutions)
-    * <a href="./solutions/fully-configurable">Cloud automation for Redis (Fully configurable)</a>
-    * <a href="./solutions/security-enforced">Cloud automation for Redis (Security-enforced)</a>
-* [Contributing](#contributing)
+<ul>
+  <li><a href="#terraform-ibm-icd-redis">terraform-ibm-icd-redis</a></li>
+  <li><a href="./modules">Submodules</a>
+    <ul>
+      <li><a href="./modules/fscloud">fscloud</a></li>
+    </ul>
+  </li>
+  <li><a href="./examples">Examples</a>
+    <ul>
+      <li>
+        <a href="./examples/backup-restore">Restore from backup example</a>
+        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=icd-redis-backup-restore-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/backup-restore"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
+      </li>
+      <li>
+        <a href="./examples/basic">Basic example</a>
+        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=icd-redis-basic-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/basic"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
+      </li>
+      <li>
+        <a href="./examples/complete">Complete example</a>
+        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=icd-redis-complete-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/complete"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
+      </li>
+      <li>
+        <a href="./examples/fscloud">Financial Services compliant example</a>
+        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=icd-redis-fscloud-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/fscloud"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
+      </li>
+    </ul>
+    ℹ️ Ctrl/Cmd+Click or right-click on the Schematics deploy button to open in a new tab.
+  </li>
+  <li><a href="./solutions">Deployable Architectures</a>
+    <ul>
+      <li><a href="./solutions/fully-configurable">Cloud automation for Redis (Fully configurable)</a></li>
+      <li><a href="./solutions/security-enforced">Cloud automation for Redis (Security-enforced)</a></li>
+    </ul>
+  </li>
+  <li><a href="#contributing">Contributing</a></li>
+</ul>
 <!-- END OVERVIEW HOOK -->
 
 ## terraform-ibm-icd-redis
@@ -112,7 +135,7 @@ You need the following permissions to run this module.
 | <a name="input_redis_version"></a> [redis\_version](#input\_redis\_version) | Version of the Redis instance to provision. If no value is passed, the current preferred version of IBM Cloud Databases is used. | `string` | `null` | no |
 | <a name="input_region"></a> [region](#input\_region) | The region where you want to deploy your instance. | `string` | `"us-south"` | no |
 | <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id) | The resource group ID where the Redis instance will be created. | `string` | n/a | yes |
-| <a name="input_service_credential_names"></a> [service\_credential\_names](#input\_service\_credential\_names) | Map of name, role for service credentials that you want to create for the database | `map(string)` | `{}` | no |
+| <a name="input_service_credential_names"></a> [service\_credential\_names](#input\_service\_credential\_names) | List of service credentials to create for the database, including name and optionally role and endpoint type. | <pre>list(object({<br/>    name     = string<br/>    role     = optional(string, "Viewer")<br/>    endpoint = optional(string, "private")<br/>  }))</pre> | `[]` | no |
 | <a name="input_service_endpoints"></a> [service\_endpoints](#input\_service\_endpoints) | Specify whether you want to enable the public, private, or both service endpoints. Supported values are 'public', 'private', or 'public-and-private'. | `string` | `"private"` | no |
 | <a name="input_skip_iam_authorization_policy"></a> [skip\_iam\_authorization\_policy](#input\_skip\_iam\_authorization\_policy) | Set to true to skip the creation of IAM authorization policies that permits all Databases for Redis instances in the given resource group 'Reader' access to the Key Protect or Hyper Protect Crypto Services key that was provided in the `kms_key_crn` and `backup_encryption_key_crn` inputs. This policy is required in order to enable KMS encryption, so only skip creation if there is one already present in your account. No policy is created if `use_ibm_owned_encryption_key` is true. | `bool` | `false` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Optional list of tags to be added to the Redis instance. | `list(string)` | `[]` | no |

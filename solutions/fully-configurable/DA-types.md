@@ -10,26 +10,32 @@ Several optional input variables in the IBM Cloud [Databases for Redis deployabl
 
 ## Service credentials <a name="svc-credential-name"></a>
 
-You can specify a set of IAM credentials to connect to the database with the `service_credential_names` input variable. Include a credential name and IAM service role for each key-value pair. Each role provides a specific level of access to the database. For more information, see [Adding and viewing credentials](https://cloud.ibm.com/docs/account?topic=account-service_credentials&interface=ui). If you want to add service credentials to secret manager and to allow secret manager to manage it, you should use `service_credential_secrets` , see [Service credential secrets](#service-credential-secrets)
+You can specify a set of IAM credentials to connect to the database with the `service_credential_names` input variable. Include a resource key name and IAM service role, and optionally set the endpoint type (`private` or `public`) for each key. Each role provides a specific level of access to the database. For more information, see [Adding and viewing credentials](https://cloud.ibm.com/docs/account?topic=account-service_credentials&interface=ui). If you want to add service credentials to secret manager and to allow secret manager to manage it, you should use `service_credential_secrets` , see [Service credential secrets](#service-credential-secrets)
 
 - Variable name: `service_credential_names`.
-- Type: A map. The key is the name of the service credential. The value is the role that is assigned to that credential.
-- Default value: An empty map (`{}`).
+- Type: A list of objects that represent resource keys.
+- Default value: An empty list (`[]`).
 
 ### Options for service_credential_names
 
-- Key (required): The name of the service credential.
-- Value (required): The IAM service role that is assigned to the credential. The following values are valid for service credential roles: "Administrator", "Operator", "Viewer" and "Editor". For more information, see [IBM Cloud IAM roles](https://cloud.ibm.com/docs/account?topic=account-userroles).
+- `name` (required): A unique human-readable name that identifies this resource key.
+- `role` (optional, default = `Viewer`): The IAM service role assigned to the credential. Valid values are `Administrator`, `Operator`, `Viewer`, and `Editor`.
+- `endpoint` (optional, default = `private`): The endpoint type for the resource key. Valid values are `private` and `public`.
 
-### Example service credential
+### Example service credentials
 
 ```hcl
+[
   {
-      "redis_admin" : "Administrator",
-      "redis_reader" : "Operator",
-      "redis_viewer" : "Viewer",
-      "redis_editor" : "Editor"
+    "name": "redis-admin-resource-key",
+    "role": "Administrator",
+    "endpoint": "private"
+  },
+  {
+    "name": "redis-viewer-resource-key",
+    "role": "Viewer"
   }
+]
 ```
 
 ## Service credential secrets <a name="service-credential-secrets"></a>

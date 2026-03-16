@@ -68,12 +68,28 @@ module "redis" {
   kms_key_crn               = var.kms_key_crn
   backup_encryption_key_crn = var.backup_encryption_key_crn
   backup_crn                = var.backup_crn
-  service_credential_names = {
-    "redis_admin" : "Administrator",
-    "redis_operator" : "Operator",
-    "redis_viewer" : "Viewer",
-    "redis_editor" : "Editor",
-  }
+  service_credential_names = [
+    {
+      name     = "redis_admin"
+      role     = "Administrator"
+      endpoint = "private"
+    },
+    {
+      name     = "redis_operator"
+      role     = "Operator"
+      endpoint = "private"
+    },
+    {
+      name     = "redis_viewer"
+      role     = "Viewer"
+      endpoint = "private"
+    },
+    {
+      name     = "redis_editor"
+      role     = "Editor"
+      endpoint = "private"
+    }
+  ]
   auto_scaling = {
     disk = {
       capacity_enabled : true,
