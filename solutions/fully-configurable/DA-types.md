@@ -19,7 +19,6 @@ You can specify a set of IAM credentials to connect to the database with the `se
 ### Options for service_credential_names
 
 - `name` (required): A unique human-readable name that identifies this resource key.
-- `key_name` (optional, default = `null`): Name for the generated key. If not set, `name` is used.
 - `role` (optional, default = `Viewer`): The IAM service role assigned to the credential. Valid values are `Administrator`, `Operator`, `Viewer`, and `Editor`.
 - `endpoint` (optional, default = `private`): The endpoint type for the resource key. Valid values are `private` and `public`.
 
