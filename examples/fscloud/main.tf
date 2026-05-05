@@ -63,7 +63,7 @@ module "redis" {
   region                    = var.region
   redis_version             = var.redis_version
   access_tags               = var.access_tags
-  tags                      = var.resource_tags
+  resource_tags             = var.resource_tags
   deletion_protection       = false
   kms_key_crn               = var.kms_key_crn
   backup_encryption_key_crn = var.backup_encryption_key_crn
