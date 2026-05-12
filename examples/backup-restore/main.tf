@@ -24,7 +24,7 @@ module "restored_icd_redis" {
   name                = "${var.prefix}-redis-restored"
   redis_version       = var.redis_version
   region              = var.region
-  tags                = var.resource_tags
+  resource_tags       = var.resource_tags
   access_tags         = var.access_tags
   member_host_flavor  = "multitenant"
   deletion_protection = false

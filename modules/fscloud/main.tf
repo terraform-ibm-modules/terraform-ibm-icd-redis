@@ -28,6 +28,6 @@ module "redis" {
   backup_encryption_key_crn         = var.backup_encryption_key_crn
   auto_scaling                      = var.auto_scaling
   access_tags                       = var.access_tags
-  tags                              = var.tags
+  resource_tags                     = var.resource_tags
   service_credential_names          = var.service_credential_names
 }
