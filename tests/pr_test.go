@@ -25,7 +25,6 @@ import (
 )
 
 const fullyConfigurableSolutionTerraformDir = "solutions/fully-configurable"
-const securityEnforcedSolutionTerraformDir = "solutions/security-enforced"
 
 const icdType = "redis"
 const icdShortType = "redis"
@@ -182,8 +181,8 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 	assert.Nil(t, err, "This should not have errored")
 }
 
-// Test the security-enforced DA with defaults (KMS encryption enabled, BYOK)
-func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
+// Test the fully-configurable DA with KMS encryption enabled (BYOK) - converted from security-enforced test
+func TestRunFullyConfigurableWithKMSSolutionSchematics(t *testing.T) {
 	t.Parallel()
 
 	options := testschematic.TestSchematicOptionsDefault(&testschematic.TestSchematicOptions{
@@ -191,11 +190,10 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 		TarIncludePatterns: []string{
 			"*.tf",
 			fullyConfigurableSolutionTerraformDir + "/*.tf",
-			securityEnforcedSolutionTerraformDir + "/*.tf",
 		},
-		TemplateFolder:             securityEnforcedSolutionTerraformDir,
+		TemplateFolder:             fullyConfigurableSolutionTerraformDir,
 		BestRegionYAMLPath:         regionSelectionPath,
-		Prefix:                     fmt.Sprintf("%s-se-da", icdShortType),
+		Prefix:                     fmt.Sprintf("%s-fc-kms", icdShortType),
 		ResourceGroup:              resourceGroup,
 		DeleteWorkspaceOnFail:      false,
 		WaitJobCompleteMinutes:     60,
@@ -253,6 +251,7 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 		{Name: "admin_pass_secrets_manager_secret_group", Value: fmt.Sprintf("%s-%s-admin-secrets", icdShortType, options.Prefix), DataType: "string"},
 		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: common.GetRandomPasswordWithPrefix(), DataType: "string"},
+		{Name: "kms_encryption_enabled", Value: true, DataType: "bool"},
 		{Name: "existing_kms_instance_crn", Value: permanentResources["hpcs_south_crn"], DataType: "string"},
 		{Name: "existing_backup_kms_key_crn", Value: permanentResources["hpcs_south_root_key_crn"], DataType: "string"},
 		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
@@ -263,8 +262,8 @@ func TestRunSecurityEnforcedSolutionSchematics(t *testing.T) {
 	assert.Nil(t, err, "This should not have errored")
 }
 
-// Upgrade test the security-enforced DA with defaults (KMS encryption enabled, KYOK)
-func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
+// Upgrade test the fully-configurable DA with KMS encryption (KYOK) - converted from security-enforced upgrade test
+func TestRunFullyConfigurableWithKMSUpgradeSolution(t *testing.T) {
 	t.Parallel()
 
 	options := testschematic.TestSchematicOptionsDefault(&testschematic.TestSchematicOptions{
@@ -272,11 +271,10 @@ func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 		TarIncludePatterns: []string{
 			"*.tf",
 			fullyConfigurableSolutionTerraformDir + "/*.tf",
-			securityEnforcedSolutionTerraformDir + "/*.tf",
 		},
-		TemplateFolder:             securityEnforcedSolutionTerraformDir,
-		Tags:                       []string{fmt.Sprintf("%s-se-upg", icdShortType)},
-		Prefix:                     fmt.Sprintf("%s-se-upg", icdShortType),
+		TemplateFolder:             fullyConfigurableSolutionTerraformDir,
+		Tags:                       []string{fmt.Sprintf("%s-fc-kms-upg", icdShortType)},
+		Prefix:                     fmt.Sprintf("%s-fc-kms-upg", icdShortType),
 		DeleteWorkspaceOnFail:      false,
 		WaitJobCompleteMinutes:     120,
 		CheckApplyResultForUpgrade: true,
@@ -333,6 +331,7 @@ func TestRunSecurityEnforcedUpgradeSolution(t *testing.T) {
 		{Name: "admin_pass_secrets_manager_secret_group", Value: fmt.Sprintf("%s-%s-admin-secrets", icdShortType, options.Prefix), DataType: "string"},
 		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: common.GetRandomPasswordWithPrefix(), DataType: "string"},
+		{Name: "kms_encryption_enabled", Value: true, DataType: "bool"},
 		{Name: "existing_kms_instance_crn", Value: permanentResources["hpcs_south_crn"], DataType: "string"},
 		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
 	}
