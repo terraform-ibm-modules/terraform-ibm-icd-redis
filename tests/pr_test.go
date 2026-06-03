@@ -181,7 +181,7 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 	assert.Nil(t, err, "This should not have errored")
 }
 
-// Test the fully-configurable DA with KMS encryption enabled (BYOK) - converted from security-enforced test
+// Test the fully-configurable DA with KMS encryption enabled (BYOK)
 func TestRunFullyConfigurableWithKMSSolutionSchematics(t *testing.T) {
 	t.Parallel()
 
@@ -262,7 +262,7 @@ func TestRunFullyConfigurableWithKMSSolutionSchematics(t *testing.T) {
 	assert.Nil(t, err, "This should not have errored")
 }
 
-// Upgrade test the fully-configurable DA with KMS encryption (KYOK) - converted from security-enforced upgrade test
+// Upgrade test the fully-configurable DA with KMS encryption (KYOK)
 func TestRunFullyConfigurableWithKMSUpgradeSolution(t *testing.T) {
 	t.Parallel()
 
