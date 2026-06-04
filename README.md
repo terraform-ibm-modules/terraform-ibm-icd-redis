@@ -45,7 +45,6 @@ This module implements an instance of IBM Cloud Databases for Redis.
   <li><a href="./solutions">Deployable Architectures</a>
     <ul>
       <li><a href="./solutions/fully-configurable">Cloud automation for Redis (Fully configurable)</a></li>
-      <li><a href="./solutions/security-enforced">Cloud automation for Redis (Security-enforced)</a></li>
     </ul>
   </li>
   <li><a href="#contributing">Contributing</a></li>
