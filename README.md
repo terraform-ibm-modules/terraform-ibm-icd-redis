@@ -16,36 +16,35 @@ This module implements an instance of IBM Cloud Databases for Redis.
 ## Overview
 <ul>
   <li><a href="#terraform-ibm-icd-redis">terraform-ibm-icd-redis</a></li>
-  <li><a href="./modules">Submodules</a>
+  <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/modules">Submodules</a>
     <ul>
-      <li><a href="./modules/fscloud">fscloud</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/modules/fscloud">fscloud</a></li>
     </ul>
   </li>
-  <li><a href="./examples">Examples</a>
+  <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples">Examples</a>
     <ul>
       <li>
-        <a href="./examples/backup-restore">Restore from backup example</a>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/backup-restore">Restore from backup example</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=icd-redis-backup-restore-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/backup-restore"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
       <li>
-        <a href="./examples/basic">Basic example</a>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/basic">Basic example</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=icd-redis-basic-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/basic"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
       <li>
-        <a href="./examples/complete">Complete example</a>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/complete">Complete example</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=icd-redis-complete-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/complete"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
       <li>
-        <a href="./examples/fscloud">Financial Services compliant example</a>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/fscloud">Financial Services compliant example</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=icd-redis-fscloud-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/examples/fscloud"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
     </ul>
     ℹ️ Ctrl/Cmd+Click or right-click on the Schematics deploy button to open in a new tab.
   </li>
-  <li><a href="./solutions">Deployable Architectures</a>
+  <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/solutions">Deployable Architectures</a>
     <ul>
-      <li><a href="./solutions/fully-configurable">Cloud automation for Redis (Fully configurable)</a></li>
-      <li><a href="./solutions/security-enforced">Cloud automation for Redis (Security-enforced)</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/solutions/fully-configurable">Cloud automation for Redis (Fully configurable)</a></li>
     </ul>
   </li>
   <li><a href="#contributing">Contributing</a></li>
@@ -93,10 +92,10 @@ You need the following permissions to run this module.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_available_versions"></a> [available\_versions](#module\_available\_versions) | terraform-ibm-modules/common-utilities/ibm//modules/icd-versions | 1.5.0 |
-| <a name="module_backup_key_crn_parser"></a> [backup\_key\_crn\_parser](#module\_backup\_key\_crn\_parser) | terraform-ibm-modules/common-utilities/ibm//modules/crn-parser | 1.5.0 |
-| <a name="module_cbr_rule"></a> [cbr\_rule](#module\_cbr\_rule) | terraform-ibm-modules/cbr/ibm//modules/cbr-rule-module | 1.36.2 |
-| <a name="module_kms_key_crn_parser"></a> [kms\_key\_crn\_parser](#module\_kms\_key\_crn\_parser) | terraform-ibm-modules/common-utilities/ibm//modules/crn-parser | 1.5.0 |
+| <a name="module_available_versions"></a> [available\_versions](#module\_available\_versions) | terraform-ibm-modules/common-utilities/ibm//modules/icd-versions | 1.6.1 |
+| <a name="module_backup_key_crn_parser"></a> [backup\_key\_crn\_parser](#module\_backup\_key\_crn\_parser) | terraform-ibm-modules/common-utilities/ibm//modules/crn-parser | 1.6.1 |
+| <a name="module_cbr_rule"></a> [cbr\_rule](#module\_cbr\_rule) | terraform-ibm-modules/cbr/ibm//modules/cbr-rule-module | 1.36.5 |
+| <a name="module_kms_key_crn_parser"></a> [kms\_key\_crn\_parser](#module\_kms\_key\_crn\_parser) | terraform-ibm-modules/common-utilities/ibm//modules/crn-parser | 1.6.1 |
 
 ### Resources
 
