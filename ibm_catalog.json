@@ -72,7 +72,7 @@
                 "crn:v1:bluemix:public:iam::::role:Editor"
               ],
               "service_name": "databases-for-redis",
-              "notes": "Required to configure a Databases for Redis instance."
+              "notes": "Required to configure an instance of Databases for Redis."
             },
             {
               "role_crns": [
