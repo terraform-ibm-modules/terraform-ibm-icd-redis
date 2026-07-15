@@ -106,9 +106,9 @@ func TestRunBasicGen2Example(t *testing.T) {
 		BestRegionYAMLPath: regionSelectionPath,
 		ResourceGroup:      resourceGroup,
 		TerraformVars: map[string]interface{}{ // Limited gen2 to Montreal and version 7.2
-			"region":            "ca-mon",
+			"region":            "eu-de",
 			"plan":              "standard-gen2",
-			"redis_version":     "7.2",
+			"redis_version":     "8.2",
 			"service_endpoints": "private",
 		},
 		CloudInfoService: sharedInfoSvc,

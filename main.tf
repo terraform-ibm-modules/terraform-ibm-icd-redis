@@ -403,14 +403,14 @@ locals {
   } : null
 
   service_credentials_object = length(var.service_credential_names) > 0 ? {
-    hostname    = ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.hosts.0.hostname"]
+    hostname    = can(ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.hosts.0.hostname"]) ? ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.hosts.0.hostname"] : null
     certificate = can(ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.certificate.certificate_base64"]) ? ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.certificate.certificate_base64"] : null
-    port        = ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.hosts.0.port"]
+    port        = can(ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.hosts.0.port"]) ? ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.hosts.0.port"] : null
     credentials = {
       for service_credential in ibm_resource_key.service_credentials :
       service_credential["name"] => {
-        username = service_credential.credentials["connection.rediss.authentication.username"]
-        password = service_credential.credentials["connection.rediss.authentication.password"]
+        username = can(service_credential.credentials["connection.rediss.authentication.username"]) ? service_credential.credentials["connection.rediss.authentication.username"] : null
+        password = can(service_credential.credentials["connection.rediss.authentication.password"]) ? service_credential.credentials["connection.rediss.authentication.password"] : null
       }
     }
   } : null
