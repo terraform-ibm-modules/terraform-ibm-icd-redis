@@ -57,29 +57,3 @@ func TestRunRestoredDBExample(t *testing.T) {
 	assert.Nil(t, err, "This should not have errored")
 	assert.NotNil(t, output, "Expected some output")
 }
-
-func TestRunRestoredDBGen2Example(t *testing.T) {
-	t.Parallel()
-
-	// TODO: replace with a real Gen2 Redis instance CRN and region once a permanent Gen2 instance is available
-	redisGen2Crn := "crn:v1:bluemix:public:databases-for-redis:eu-de:a/abac0df06b644a9cabc6e44f55b3880e:replace-with-real-gen2-instance-guid::"
-	redisGen2Region := "eu-de"
-
-	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
-		Testing:       t,
-		TerraformDir:  "examples/backup-restore",
-		Prefix:        "redis-gen2-restored",
-		Region:        redisGen2Region,
-		ResourceGroup: resourceGroup,
-		TerraformVars: map[string]interface{}{
-			"existing_database_crn": redisGen2Crn,
-			"plan":                  "standard-gen2",
-			"region":                redisGen2Region,
-		},
-		CloudInfoService: sharedInfoSvc,
-	})
-
-	output, err := options.RunTestConsistency()
-	assert.Nil(t, err, "This should not have errored")
-	assert.NotNil(t, output, "Expected some output")
-}

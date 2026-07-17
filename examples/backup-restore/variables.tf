@@ -40,12 +40,6 @@ variable "access_tags" {
   default     = []
 }
 
-variable "plan" {
-  type        = string
-  description = "The name of the service plan that you choose for your Redis instance"
-  default     = "standard"
-}
-
 variable "existing_database_crn" {
   type        = string
   description = "The existing CRN of a backup resource to restore from."
