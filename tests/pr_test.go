@@ -46,21 +46,7 @@ var validICDRegions = []string{
 	"us-south",
 }
 
-func GetRegionVersions(region string) (string, string) {
-
-	cloudInfoSvc, err := cloudinfo.NewCloudInfoServiceFromEnv("TF_VAR_ibmcloud_api_key", cloudinfo.CloudInfoServiceOptions{
-		IcdRegion: region,
-	})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	icdAvailableVersions, err := cloudInfoSvc.GetAvailableIcdVersions(icdType)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+func GetLatestAndOldestVersions(icdAvailableVersions []string) (string, string) {
 
 	if len(icdAvailableVersions) == 0 {
 		log.Fatal("No available ICD versions found")
@@ -94,10 +80,55 @@ func GetRegionVersions(region string) (string, string) {
 	oldestVersion := icdAvailableVersions[0]
 
 	return latestVersion, oldestVersion
+
+}
+
+func GetRegionVersions(region string) (string, string) {
+
+	icdRegion := region
+	if region == "ca-mon" {
+		icdRegion = "ca-tor"
+	}
+
+	cloudInfoSvc, err := cloudinfo.NewCloudInfoServiceFromEnv("TF_VAR_ibmcloud_api_key", cloudinfo.CloudInfoServiceOptions{
+		IcdRegion: icdRegion,
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	icdAvailableVersions, err := cloudInfoSvc.GetAvailableIcdVersions(icdType)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return GetLatestAndOldestVersions(icdAvailableVersions)
+}
+
+func GetVersionsGen2(region string, plan string) (string, string) {
+
+	cloudInfoSvc, err := cloudinfo.NewCloudInfoServiceFromEnv("TF_VAR_ibmcloud_api_key", cloudinfo.CloudInfoServiceOptions{})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	icdAvailableVersions, err := cloudInfoSvc.GetAvailableIcdVersionsGen2("databases-for-redis", plan, region) // this function takes service, plan and region as arguments in this specific order
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return GetLatestAndOldestVersions(icdAvailableVersions)
 }
 
 func TestRunBasicGen2Example(t *testing.T) {
 	t.Parallel()
+
+	latestVersion, _ := GetVersionsGen2("eu-de", "standard-gen2")
+	fmt.Println("Latest version is ", latestVersion)
 
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
 		Testing:            t,
@@ -105,10 +136,10 @@ func TestRunBasicGen2Example(t *testing.T) {
 		Prefix:             "redis-gen2",
 		BestRegionYAMLPath: regionSelectionPath,
 		ResourceGroup:      resourceGroup,
-		TerraformVars: map[string]interface{}{ // Limited gen2 to Montreal and version 7.2
+		TerraformVars: map[string]interface{}{ // Limited gen2 to eu-de
 			"region":            "eu-de",
 			"plan":              "standard-gen2",
-			"redis_version":     "8.2",
+			"redis_version":     latestVersion,
 			"service_endpoints": "private",
 		},
 		CloudInfoService: sharedInfoSvc,

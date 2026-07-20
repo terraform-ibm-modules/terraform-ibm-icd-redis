@@ -164,15 +164,14 @@ resource "time_sleep" "wait_for_backup_kms_authorization_policy" {
 
 
 # Workaround:
-# Montreal does not have ICD classic endpoint, so default to Toronto. This stops the module erroring,
-# but it gets the classic versions and not the gen2 versions.
-# This MAY be wrong and result in an apply time failure IF the user specifies gen2 and an unsupported version.
-# ref: https://github.com/terraform-ibm-modules/terraform-ibm-common-utilities/issues/157
+# Montreal does not have ICD classic endpoint, so common-utilities submodule defaults to Toronto for Gen1 Databases. This stops the module erroring.
 module "available_versions" {
   source   = "terraform-ibm-modules/common-utilities/ibm//modules/icd-versions"
-  version  = "1.9.0"
-  region   = var.region == "ca-mon" ? "ca-tor" : var.region
+  version  = "1.8.0"
+  region   = var.region
   icd_type = "redis"
+  plan     = var.plan
+  service  = "databases-for-redis"
 }
 
 
