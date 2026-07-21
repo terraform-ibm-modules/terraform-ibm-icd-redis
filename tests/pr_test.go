@@ -169,8 +169,8 @@ func TestRunFullyConfigurableSolutionSchematics(t *testing.T) {
 		{Name: "service_credential_names", Value: serviceCredentialNames, DataType: "list(object)"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
-		{Name: "admin_pass_secrets_manager_secret_group", Value: "admin-secrets", DataType: "string"},
-		{Name: "admin_pass_secrets_manager_secret_name", Value: "admin-password", DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_group", Value: fmt.Sprintf("%s-%s-admin-secrets", icdShortType, options.Prefix), DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: common.GetRandomPasswordWithPrefix(), DataType: "string"},
 		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
 	}
@@ -247,8 +247,8 @@ func TestRunFullyConfigurableWithKMSUpgradeSolution(t *testing.T) {
 		{Name: "service_credential_names", Value: resourceKeys, DataType: "list(object)"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
-		{Name: "admin_pass_secrets_manager_secret_group", Value: "admin-secrets", DataType: "string"},
-		{Name: "admin_pass_secrets_manager_secret_name", Value: "admin-password", DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_group", Value: fmt.Sprintf("%s-%s-admin-secrets", icdShortType, options.Prefix), DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: common.GetRandomPasswordWithPrefix(), DataType: "string"},
 		{Name: "kms_encryption_enabled", Value: true, DataType: "bool"},
 		{Name: "existing_kms_instance_crn", Value: permanentResources["hpcs_south_crn"], DataType: "string"},
