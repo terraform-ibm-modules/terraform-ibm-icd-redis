@@ -144,10 +144,6 @@
             {
               "key": "prefix",
               "required": true,
-              "default_value": "dev",
-              "random_string": {
-                "length": 4
-              },
               "value_constraints": [
                 {
                   "type": "regex",
