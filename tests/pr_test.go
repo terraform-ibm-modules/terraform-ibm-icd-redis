@@ -25,6 +25,7 @@ import (
 )
 
 const fullyConfigurableSolutionTerraformDir = "solutions/fully-configurable"
+const fullyConfigurableGen2SolutionTerraformDir = "solutions/fully-configurable-gen2"
 
 const icdType = "redis"
 const icdShortType = "redis"
@@ -406,4 +407,131 @@ func TestRunExistingInstance(t *testing.T) {
 func generateUniqueResourceGroupName(baseName string) string {
 	id := uuid.New().String()[:8] // Shorten UUID for readability
 	return fmt.Sprintf("%s-%s", baseName, id)
+}
+
+// Test the fully-configurable-gen2 DA with defaults (IBM owned encryption keys)
+func TestRunFullyConfigurableGen2SolutionSchematics(t *testing.T) {
+	t.Parallel()
+
+	options := testschematic.TestSchematicOptionsDefault(&testschematic.TestSchematicOptions{
+		Testing: t,
+		TarIncludePatterns: []string{
+			"*.tf",
+			fullyConfigurableGen2SolutionTerraformDir + "/*.tf",
+		},
+		TemplateFolder:             fullyConfigurableGen2SolutionTerraformDir,
+		BestRegionYAMLPath:         regionSelectionPath,
+		Prefix:                     fmt.Sprintf("%s-fc-g2-da", icdShortType),
+		ResourceGroup:              resourceGroup,
+		DeleteWorkspaceOnFail:      false,
+		WaitJobCompleteMinutes:     60,
+		CheckApplyResultForUpgrade: true,
+	})
+
+	uniqueResourceGroup := generateUniqueResourceGroupName(options.Prefix)
+
+	serviceCredentialSecrets := []map[string]interface{}{
+		{
+			"secret_group_name": fmt.Sprintf("%s-secret-group", options.Prefix),
+			"service_credentials": []map[string]string{
+				{
+					"secret_name": fmt.Sprintf("%s-cred-reader", options.Prefix),
+					"service_credentials_source_service_role_crn": "crn:v1:bluemix:public:iam::::role:Viewer",
+				},
+				{
+					"secret_name": fmt.Sprintf("%s-cred-writer", options.Prefix),
+					"service_credentials_source_service_role_crn": "crn:v1:bluemix:public:iam::::role:Editor",
+				},
+			},
+		},
+	}
+
+	serviceCredentialNames := []map[string]string{
+		{
+			"name":     "redis-admin",
+			"role":     "Administrator",
+			"endpoint": "private",
+		},
+	}
+
+	region := "us-south"
+	latestVersion, _ := GetRegionVersions(region)
+	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
+		{Name: "prefix", Value: options.Prefix, DataType: "string"},
+		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
+		{Name: "access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
+		{Name: "deletion_protection", Value: false, DataType: "bool"},
+		{Name: "existing_resource_group_name", Value: uniqueResourceGroup, DataType: "string"},
+		{Name: "region", Value: region, DataType: "string"},
+		{Name: "service_credential_names", Value: serviceCredentialNames, DataType: "list(object)"},
+		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
+		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_group", Value: fmt.Sprintf("%s-%s-admin-secrets", icdShortType, options.Prefix), DataType: "string"},
+		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
+		{Name: "admin_pass", Value: common.GetRandomPasswordWithPrefix(), DataType: "string"},
+		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
+		{Name: "member_host_flavor", Value: "b3c.4x16", DataType: "string"},
+	}
+
+	err := sharedInfoSvc.WithNewResourceGroup(uniqueResourceGroup, func() error {
+		return options.RunSchematicTest()
+	})
+	assert.Nil(t, err, "This should not have errored")
+}
+
+// Plan validation for the fully-configurable-gen2 DA
+func TestPlanValidationGen2(t *testing.T) {
+	options := testhelper.TestOptionsDefault(&testhelper.TestOptions{
+		Testing:      t,
+		TerraformDir: fullyConfigurableGen2SolutionTerraformDir,
+		Prefix:       "val-plan-g2",
+		Region:       "us-south",
+	})
+	options.TestSetup()
+	options.TerraformOptions.NoColor = true
+	options.TerraformOptions.Logger = logger.Discard
+
+	latestVersion, _ := GetRegionVersions("us-south")
+	options.TerraformOptions.Vars = map[string]interface{}{
+		"prefix":                       options.Prefix,
+		"region":                       "us-south",
+		"redis_version":                latestVersion,
+		"provider_visibility":          "public",
+		"existing_resource_group_name": resourceGroup,
+		"member_host_flavor":           "b3c.4x16",
+	}
+
+	// Test the DA when using an existing KMS instance
+	var gen2WithExistingKms = map[string]interface{}{
+		"access_tags":               permanentResources["accessTags"],
+		"existing_kms_instance_crn": permanentResources["hpcs_south_crn"],
+		"kms_encryption_enabled":    true,
+	}
+
+	// Test the DA when using IBM owned encryption key
+	var gen2WithIbmOwnedKey = map[string]interface{}{
+		"kms_encryption_enabled": false,
+	}
+
+	tfVarsMap := map[string]map[string]interface{}{
+		"gen2WithExistingKms": gen2WithExistingKms,
+		"gen2WithIbmOwnedKey": gen2WithIbmOwnedKey,
+	}
+
+	_, initErr := terraform.InitContextE(t, context.Background(), options.TerraformOptions)
+	if assert.Nil(t, initErr, "This should not have errored") {
+		for name, tfVars := range tfVarsMap {
+			t.Run(name, func(t *testing.T) {
+				for key, value := range tfVars {
+					options.TerraformOptions.Vars[key] = value
+				}
+				output, err := terraform.PlanContextE(t, context.Background(), options.TerraformOptions)
+				assert.Nil(t, err, "This should not have errored")
+				assert.NotNil(t, output, "Expected some output")
+				for key := range tfVars {
+					delete(options.TerraformOptions.Vars, key)
+				}
+			})
+		}
+	}
 }
