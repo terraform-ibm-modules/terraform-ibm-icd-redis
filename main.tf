@@ -408,8 +408,8 @@ locals {
     credentials = {
       for service_credential in ibm_resource_key.service_credentials :
       service_credential["name"] => {
-        username = can(service_credential.credentials["connection.rediss.authentication.username"]) ? service_credential.credentials["connection.rediss.authentication.username"] : null
-        password = can(service_credential.credentials["connection.rediss.authentication.password"]) ? service_credential.credentials["connection.rediss.authentication.password"] : null
+        username = local.is_gen2 ? service_credential.credentials["username"] : service_credential.credentials["connection.rediss.authentication.username"]
+        password = local.is_gen2 ? service_credential.credentials["password"] : service_credential.credentials["connection.rediss.authentication.password"]
       }
     }
   } : null
