@@ -3,6 +3,7 @@ module "redis" {
   resource_group_id                 = var.resource_group_id
   redis_version                     = var.redis_version
   region                            = var.region
+  plan                              = var.plan
   skip_iam_authorization_policy     = var.skip_iam_authorization_policy
   name                              = var.name
   service_endpoints                 = "private"
