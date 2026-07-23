@@ -52,7 +52,7 @@
       ],
       "flavors": [
         {
-          "label": "Fully configurable",
+          "label": "Fully configurable Gen 1 (Classic)",
           "name": "fully-configurable",
           "index": 1,
           "install_type": "fullstack",
@@ -182,6 +182,10 @@
                   "value": "8.2"
                 }
               ]
+            },
+            {
+              "key": "plan",
+              "hidden": true
             },
             {
               "key": "name"
@@ -474,13 +478,13 @@
           "ignore_readme": true
         },
         {
-          "label": "Fully configurable (gen2)",
+          "label": "Fully configurable Gen 2 (VPC)",
           "name": "fully-configurable-gen2",
           "index": 2,
           "install_type": "fullstack",
           "working_directory": "solutions/fully-configurable-gen2",
           "release_notes_url": "https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/releases",
-          "short_description": "Ideal for users who want flexibility with dedicated compute resources (gen2 hosting model).",
+          "short_description": "Ideal for users who want flexibility with a reliable starting point for IBM Cloud Database on VPC (Gen2).",
           "iam_permissions": [
             {
               "role_crns": [
@@ -534,22 +538,7 @@
               "key": "ibmcloud_api_key"
             },
             {
-              "key": "provider_visibility",
-              "hidden": true,
-              "options": [
-                {
-                  "displayname": "private",
-                  "value": "private"
-                },
-                {
-                  "displayname": "public",
-                  "value": "public"
-                },
-                {
-                  "displayname": "public-and-private",
-                  "value": "public-and-private"
-                }
-              ]
+              "key": "kms_encryption_enabled"
             },
             {
               "key": "existing_resource_group_name",
@@ -634,85 +623,16 @@
               "key": "members"
             },
             {
-              "key": "member_host_flavor",
-              "required": true,
-              "default_value": "b3c.4x16",
-              "options": [
-                {
-                  "displayname": "b3c.4x16 (4 vCPU, 16 GB RAM)",
-                  "value": "b3c.4x16"
-                },
-                {
-                  "displayname": "b3c.8x32 (8 vCPU, 32 GB RAM)",
-                  "value": "b3c.8x32"
-                },
-                {
-                  "displayname": "b3c.16x64 (16 vCPU, 64 GB RAM)",
-                  "value": "b3c.16x64"
-                },
-                {
-                  "displayname": "b3c.32x128 (32 vCPU, 128 GB RAM)",
-                  "value": "b3c.32x128"
-                },
-                {
-                  "displayname": "m3c.8x64 (8 vCPU, 64 GB RAM)",
-                  "value": "m3c.8x64"
-                },
-                {
-                  "displayname": "m3c.16x128 (16 vCPU, 128 GB RAM)",
-                  "value": "m3c.16x128"
-                },
-                {
-                  "displayname": "m3c.30x240 (30 vCPU, 240 GB RAM)",
-                  "value": "m3c.30x240"
-                }
-              ]
+              "key": "member_memory_mb"
+            },
+            {
+              "key": "member_cpu_count"
             },
             {
               "key": "member_disk_mb"
             },
             {
-              "key": "auto_scaling",
-              "custom_config": {
-                "type": "code_editor",
-                "grouping": "deployment",
-                "original_grouping": "deployment",
-                "config_constraints": {
-                  "supportedLanguages": [
-                    "hcl"
-                  ]
-                }
-              }
-            },
-            {
-              "key": "configuration",
-              "custom_config": {
-                "type": "code_editor",
-                "grouping": "deployment",
-                "original_grouping": "deployment",
-                "config_constraints": {
-                  "supportedLanguages": [
-                    "hcl"
-                  ]
-                }
-              }
-            },
-            {
-              "key": "service_endpoints",
-              "options": [
-                {
-                  "displayname": "private",
-                  "value": "private"
-                },
-                {
-                  "displayname": "public",
-                  "value": "public"
-                },
-                {
-                  "displayname": "public-and-private",
-                  "value": "public-and-private"
-                }
-              ]
+              "key": "member_host_flavor"
             },
             {
               "key": "deletion_protection"
@@ -728,9 +648,6 @@
             {
               "key": "delete_timeout",
               "hidden": true
-            },
-            {
-              "key": "version_upgrade_skip_backup"
             },
             {
               "key": "service_credential_names",
@@ -761,9 +678,6 @@
               }
             },
             {
-              "key": "admin_pass"
-            },
-            {
               "key": "existing_secrets_manager_instance_crn",
               "display_name": "existing_secrets_manager_instance",
               "custom_config": {
@@ -785,58 +699,19 @@
               ]
             },
             {
-              "key": "existing_secrets_manager_endpoint_type",
-              "hidden": true,
-              "options": [
-                {
-                  "displayname": "public",
-                  "value": "public"
-                },
-                {
-                  "displayname": "private",
-                  "value": "private"
-                }
-              ]
-            },
-            {
               "key": "skip_redis_secrets_manager_auth_policy"
-            },
-            {
-              "key": "admin_pass_secrets_manager_secret_group"
-            },
-            {
-              "key": "admin_pass_secrets_manager_secret_name"
-            },
-            {
-              "key": "use_existing_admin_pass_secrets_manager_secret_group"
-            },
-            {
-              "key": "users",
-              "type": "array",
-              "custom_config": {
-                "type": "code_editor",
-                "grouping": "deployment",
-                "original_grouping": "deployment",
-                "config_constraints": {
-                  "supportedLanguages": [
-                    "hcl"
-                  ]
-                }
-              }
             },
             {
               "key": "ibmcloud_kms_api_key"
             },
             {
-              "key": "kms_encryption_enabled"
-            },
-            {
               "key": "existing_kms_instance_crn",
+              "required": true,
               "value_constraints": [
                 {
                   "type": "regex",
                   "description": "The value provided for 'existing_kms_instance_crn' is not valid.",
-                  "value": "^__NULL__$|^crn:v\\d:(.*:){2}(kms|hs-crypto):(.*:)([aos]\\/[\\w_\\-]+):[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}::$"
+                  "value": "^__NULL__$|^crn:v\\d:(.*:){2}kms:(.*:)([aos]\\/[\\w_\\-]+):[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}::$"
                 }
               ]
             },
@@ -846,21 +721,7 @@
                 {
                   "type": "regex",
                   "description": "The value provided for 'existing_kms_key_crn' is not valid.",
-                  "value": "^__NULL__$|^crn:v\\d:(.*:){2}(kms|hs-crypto):(.*:)([aos]\\/[\\w_\\-]+):[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}:key:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-                }
-              ]
-            },
-            {
-              "key": "kms_endpoint_type",
-              "hidden": true,
-              "options": [
-                {
-                  "displayname": "public",
-                  "value": "public"
-                },
-                {
-                  "displayname": "private",
-                  "value": "private"
+                  "value": "^__NULL__$|^crn:v\\d:(.*:){2}kms:(.*:)([aos]\\/[\\w_\\-]+):[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}:key:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
                 }
               ]
             },
@@ -869,29 +730,6 @@
             },
             {
               "key": "key_name"
-            },
-            {
-              "key": "backup_crn",
-              "value_constraints": [
-                {
-                  "type": "regex",
-                  "description": "The value provided for 'backup_crn' is not valid.",
-                  "value": "^__NULL__$|^crn:v\\d:(.*:){2}databases-for-redis:(.*:)([aos]\\/[\\w_\\-]+):[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}:backup:[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$"
-                }
-              ]
-            },
-            {
-              "key": "existing_backup_kms_key_crn",
-              "value_constraints": [
-                {
-                  "type": "regex",
-                  "description": "The value provided for 'existing_backup_kms_key_crn' is not valid.",
-                  "value": "^__NULL__$|^crn:v\\d:(.*:){2}(kms|hs-crypto):(.*:)([aos]\\/[\\w_\\-]+):[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}:key:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-                }
-              ]
-            },
-            {
-              "key": "use_default_backup_encryption_key"
             },
             {
               "key": "skip_redis_kms_auth_policy"
@@ -916,6 +754,18 @@
                   "value": "^__NULL__$|^crn:v\\d:(.*:){2}databases-for-redis:(.*:)([aos]\\/[\\w_\\-]+):[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}::$"
                 }
               ]
+            },
+            {
+              "key": "provider_visibility",
+              "hidden": true
+            },
+            {
+              "key": "kms_endpoint_type",
+              "hidden": true
+            },
+            {
+              "key": "existing_secrets_manager_endpoint_type",
+              "hidden": true
             }
           ],
           "terraform_version": "1.12.2",

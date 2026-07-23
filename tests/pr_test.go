@@ -524,7 +524,7 @@ func TestRunFullyConfigurableGen2SolutionSchematics(t *testing.T) {
 		{Name: "admin_pass_secrets_manager_secret_name", Value: options.Prefix, DataType: "string"},
 		{Name: "admin_pass", Value: common.GetRandomPasswordWithPrefix(), DataType: "string"},
 		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
-		{Name: "member_host_flavor", Value: "b3c.4x16", DataType: "string"},
+		{Name: "member_host_flavor", Value: "bx3d.4x20", DataType: "string"},
 	}
 
 	err := sharedInfoSvc.WithNewResourceGroup(uniqueResourceGroup, func() error {
@@ -552,7 +552,7 @@ func TestPlanValidationGen2(t *testing.T) {
 		"redis_version":                latestVersion,
 		"provider_visibility":          "public",
 		"existing_resource_group_name": resourceGroup,
-		"member_host_flavor":           "b3c.4x16",
+		"member_host_flavor":           "bx3d.4x20",
 	}
 
 	// Test the DA when using an existing KMS instance

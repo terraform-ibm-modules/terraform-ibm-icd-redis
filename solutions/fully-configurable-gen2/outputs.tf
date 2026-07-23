@@ -50,7 +50,7 @@ output "secrets_manager_secrets" {
 }
 
 output "next_steps_text" {
-  value       = "Your Database for Redis instance is ready. You can now take advantage of reduced application response time , achieve cost-optimized performance, low latency, high throughput, in a highly available and scalable solution."
+  value       = "Your IBM Cloud Databases Gen 2 (VPC) for Redis instance is ready. You can now take advantage of reduced application response time, achieve cost-optimized performance, low latency, high throughput, in a highly available and scalable solution."
   description = "Next steps text"
 }
 
