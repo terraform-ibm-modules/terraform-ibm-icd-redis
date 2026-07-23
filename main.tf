@@ -17,6 +17,10 @@ locals {
 
   # maxmemory configuration should 80% of the deployment's memory.
   calculate_config_maxmemory = tonumber(format("%.0f", var.memory_mb * 0.8))
+
+  # Determine if gen2 plan is being used
+  is_gen2    = can(regex("-gen2$", var.plan))
+  is_classic = !local.is_gen2 # For code readability and maintenance
 }
 
 ########################################################################################################################
@@ -159,12 +163,15 @@ resource "time_sleep" "wait_for_backup_kms_authorization_policy" {
 }
 
 
+# Workaround:
+# Montreal does not have ICD classic endpoint, so common-utilities submodule defaults to Toronto for Gen1 Databases. This stops the module erroring.
 module "available_versions" {
-
   source   = "terraform-ibm-modules/common-utilities/ibm//modules/icd-versions"
   version  = "1.9.0"
   region   = var.region
   icd_type = "redis"
+  plan     = var.plan
+  service  = "databases-for-redis"
 }
 
 
@@ -180,7 +187,7 @@ locals {
 resource "ibm_database" "redis_database" {
   depends_on                  = [time_sleep.wait_for_authorization_policy]
   name                        = var.name
-  plan                        = "standard" # Only standard plan is available for redis
+  plan                        = var.plan
   location                    = var.region
   service                     = "databases-for-redis"
   version                     = var.redis_version
@@ -379,10 +386,11 @@ module "cbr_rule" {
 resource "ibm_resource_key" "service_credentials" {
   for_each             = { for key in var.service_credential_names : key.name => key }
   name                 = each.key
-  role                 = each.value.role
+  role                 = local.is_classic ? each.value.role : null
   resource_instance_id = ibm_database.redis_database.id
   parameters = {
     service-endpoints = each.value.endpoint
+    role_crn          = local.is_gen2 ? "crn:v1:bluemix:public:iam::::role:${each.value.role}" : null
   }
 }
 
@@ -394,20 +402,21 @@ locals {
   } : null
 
   service_credentials_object = length(var.service_credential_names) > 0 ? {
-    hostname    = ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.hosts.0.hostname"]
-    certificate = ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.certificate.certificate_base64"]
-    port        = ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.hosts.0.port"]
+    hostname    = can(ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.hosts.0.hostname"]) ? ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.hosts.0.hostname"] : null
+    certificate = can(ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.certificate.certificate_base64"]) ? ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.certificate.certificate_base64"] : null
+    port        = can(ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.hosts.0.port"]) ? ibm_resource_key.service_credentials[var.service_credential_names[0].name].credentials["connection.rediss.hosts.0.port"] : null
     credentials = {
       for service_credential in ibm_resource_key.service_credentials :
       service_credential["name"] => {
-        username = service_credential.credentials["connection.rediss.authentication.username"]
-        password = service_credential.credentials["connection.rediss.authentication.password"]
+        username = local.is_gen2 ? service_credential.credentials["username"] : service_credential.credentials["connection.rediss.authentication.username"]
+        password = local.is_gen2 ? service_credential.credentials["password"] : service_credential.credentials["connection.rediss.authentication.password"]
       }
     }
   } : null
 }
 
 data "ibm_database_connection" "database_connection" {
+  count         = local.is_classic ? 1 : 0
   endpoint_type = var.service_endpoints == "public-and-private" ? "public" : var.service_endpoints
   deployment_id = ibm_database.redis_database.id
   user_id       = ibm_database.redis_database.adminuser
