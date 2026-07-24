@@ -98,7 +98,7 @@ variable "member_cpu_count" {
 variable "member_disk_mb" {
   type        = number
   description = "The disk that is allocated per member. [Learn more](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-resources-scaling)."
-  default     = 5120
+  default     = 15360
 }
 
 variable "member_host_flavor" {
