@@ -45,6 +45,7 @@ This module implements an instance of IBM Cloud Databases for Redis.
   <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/solutions">Deployable Architectures</a>
     <ul>
       <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/solutions/fully-configurable">Cloud automation for Redis (Fully configurable)</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/tree/main/solutions/fully-configurable-gen2">Databases for Redis - Fully Configurable (gen2) Deployable Architecture</a></li>
     </ul>
   </li>
   <li><a href="#contributing">Contributing</a></li>
