@@ -502,7 +502,7 @@ func TestRunFullyConfigurableGen2SolutionSchematics(t *testing.T) {
 	serviceCredentialNames := []map[string]string{
 		{
 			"name":     "redis-admin",
-			"role":     "Administrator",
+			"role":     "Manager",
 			"endpoint": "private",
 		},
 	}
