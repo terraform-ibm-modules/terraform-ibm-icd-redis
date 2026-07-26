@@ -72,11 +72,13 @@ locals {
 
 # Create IAM Authorization Policies to allow Redis to access KMS for the encryption key
 resource "ibm_iam_authorization_policy" "kms_policy" {
-  count                    = local.create_kms_auth_policy
-  source_service_name      = "databases-for-redis"
-  source_resource_group_id = var.resource_group_id
+  count               = local.create_kms_auth_policy
+  source_service_name = "databases-for-redis"
+  # Gen2 broker requires an account-level S2S policy (no resource group scope).
+  # Gen1/Classic uses resource-group scope.
+  source_resource_group_id = local.is_classic ? var.resource_group_id : null
   roles                    = ["Reader", "Authorization Delegator"] # Authorization Delegator role required for backup encryption key
-  description              = "Allow all Redis instances in the resource group ${var.resource_group_id} to read the ${local.kms_service} key ${local.kms_key_id} from the instance GUID ${local.kms_key_instance_guid}"
+  description              = local.is_gen2 ? "Allow all Redis instances to read the ${local.kms_service} key ${local.kms_key_id} from the instance GUID ${local.kms_key_instance_guid}" : "Allow all Redis instances in the resource group ${var.resource_group_id} to read the ${local.kms_service} key ${local.kms_key_id} from the instance GUID ${local.kms_key_instance_guid}"
   resource_attributes {
     name     = "serviceName"
     operator = "stringEquals"
