@@ -507,20 +507,23 @@ func TestRunFullyConfigurableGen2SolutionSchematics(t *testing.T) {
 		},
 	}
 
-	latestVersion, _ := GetVersionsGen2("eu-de", "standard-gen2")
+	// Temporary external issues. Hardcoding can be removed when external features are addressed
+	// Hard code region ca-mon, the test function to lookup latest does not work in Montreal, no classic endpoint
+	// Hard code version 8.2, because latest can not be looked (see also region)
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
 		{Name: "prefix", Value: options.Prefix, DataType: "string"},
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 		{Name: "access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
 		{Name: "deletion_protection", Value: false, DataType: "bool"},
 		{Name: "existing_resource_group_name", Value: uniqueResourceGroup, DataType: "string"},
-		{Name: "region", Value: "eu-de", DataType: "string"},
+		{Name: "region", Value: "ca-mon", DataType: "string"},
 		{Name: "service_credential_names", Value: serviceCredentialNames, DataType: "list(object)"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},
 		{Name: "kms_encryption_enabled", Value: true, DataType: "bool"},
 		{Name: "existing_kms_instance_crn", Value: permanentResources["kp_dedicated_us_south_crn"], DataType: "string"},
-		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
+		{Name: "redis_version", Value: "8.2", DataType: "string"}, // Always lock this test into the latest supported Redis version
+		{Name: "member_host_flavor", Value: "bx3d.4x20", DataType: "string"},
 	}
 
 	err := sharedInfoSvc.WithNewResourceGroup(uniqueResourceGroup, func() error {
