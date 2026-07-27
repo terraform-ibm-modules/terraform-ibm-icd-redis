@@ -10,7 +10,10 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
+	"github.com/IBM/cloud-databases-go-sdk/clouddatabasesv5"
+	"github.com/IBM/go-sdk-core/v5/core"
 	"github.com/google/uuid"
 	"github.com/gruntwork-io/terratest/modules/files"
 	"github.com/gruntwork-io/terratest/modules/logger"
@@ -122,6 +125,90 @@ func GetVersionsGen2(region string, plan string) (string, string) {
 	}
 
 	return GetLatestAndOldestVersions(icdAvailableVersions)
+}
+
+// GetLatestGen2BackupCRN uses the IBM Cloud Databases SDK to fetch the most recent
+// completed, restorable backup for the given gen2 deployment CRN.
+// The ibm_database_backups Terraform data source does not support gen2 deployments,
+// so this helper is used to retrieve the backup CRN programmatically.
+//
+// Gen2 backups are served by the regional ICD API endpoint. The region is extracted
+// from the deployment CRN (field index 5). If no backup is available yet (the instance
+// was recently provisioned), the function polls every 10 minutes for up to 90 minutes.
+func GetLatestGen2BackupCRN(deploymentCRN string) string {
+	apiKey := os.Getenv("TF_VAR_ibmcloud_api_key")
+	if apiKey == "" {
+		log.Fatal("TF_VAR_ibmcloud_api_key environment variable not set")
+	}
+
+	// Extract region from CRN: crn:v1:cname:ctype:service:REGION:scope:instance:rtype:resource
+	parts := strings.Split(deploymentCRN, ":")
+	if len(parts) < 6 || parts[5] == "" {
+		log.Fatalf("Cannot extract region from deployment CRN: %s", deploymentCRN)
+	}
+	region := parts[5]
+
+	// Build the region-specific ICD API URL
+	// Format: https://api.{region}.databases.cloud.ibm.com/v5/ibm
+	regionalURL, err := clouddatabasesv5.ConstructServiceURL(map[string]string{
+		"region":   region,
+		"platform": "ibm",
+	})
+	if err != nil {
+		log.Fatalf("Error constructing ICD API URL for region %s: %v", region, err)
+	}
+
+	icdClient, err := clouddatabasesv5.NewCloudDatabasesV5(&clouddatabasesv5.CloudDatabasesV5Options{
+		URL: regionalURL,
+		Authenticator: &core.IamAuthenticator{
+			ApiKey: apiKey, // pragma: allowlist secret
+		},
+	})
+	if err != nil {
+		log.Fatalf("Error creating Cloud Databases client: %v", err)
+	}
+
+	// Poll until a completed, restorable backup is found.
+	// A newly provisioned gen2 instance may not have a backup for up to ~90 minutes.
+	const (
+		maxWait  = 90 * time.Minute
+		interval = 10 * time.Minute
+	)
+	deadline := time.Now().Add(maxWait)
+
+	for {
+		listOpts := icdClient.NewListDeploymentBackupsOptions(deploymentCRN)
+		backups, _, err := icdClient.ListDeploymentBackups(listOpts)
+		if err != nil {
+			fmt.Printf("Warning: listing backups for %s failed: %v — retrying in %s\n", deploymentCRN, err, interval)
+		} else if backups != nil && len(backups.Backups) > 0 {
+			// Find the latest completed and restorable backup
+			var latestBackupCRN string
+			var latestTime time.Time
+			for _, b := range backups.Backups {
+				if b.ID == nil || b.Status == nil || b.IsRestorable == nil {
+					continue
+				}
+				if *b.Status != "completed" || !*b.IsRestorable {
+					continue
+				}
+				if b.CreatedAt != nil && time.Time(*b.CreatedAt).After(latestTime) {
+					latestTime = time.Time(*b.CreatedAt)
+					latestBackupCRN = *b.ID
+				}
+			}
+			if latestBackupCRN != "" {
+				fmt.Printf("Latest gen2 backup CRN for %s: %s\n", deploymentCRN, latestBackupCRN)
+				return latestBackupCRN
+			}
+		}
+
+		if time.Now().After(deadline) {
+			log.Fatalf("No completed, restorable backup found for deployment %s after %s", deploymentCRN, maxWait)
+		}
+		fmt.Printf("No backup available yet for %s, waiting %s (deadline: %s)...\n", deploymentCRN, interval, deadline.Format(time.RFC3339))
+		time.Sleep(interval)
+	}
 }
 
 func TestRunBasicGen2Example(t *testing.T) {
