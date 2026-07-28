@@ -57,3 +57,27 @@ func TestRunRestoredDBExample(t *testing.T) {
 	assert.Nil(t, err, "This should not have errored")
 	assert.NotNil(t, output, "Expected some output")
 }
+
+func TestRunRestoredDBGen2Example(t *testing.T) {
+	t.Parallel()
+
+	latestVersion, _ := GetVersionsGen2(fmt.Sprint(permanentResources["redisGen2Region"]), "standard-gen2")
+
+	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
+		Testing:       t,
+		TerraformDir:  "examples/backup-restore",
+		Prefix:        "redis-gen2-restored",
+		Region:        fmt.Sprint(permanentResources["redisGen2Region"]),
+		ResourceGroup: resourceGroup,
+		TerraformVars: map[string]interface{}{
+			"plan":          "standard-gen2",
+			"redis_version": latestVersion,
+			"backup_crn":    permanentResources["redisGen2BackupCrn"],
+		},
+		CloudInfoService: sharedInfoSvc,
+	})
+
+	output, err := options.RunTestConsistency()
+	assert.Nil(t, err, "This should not have errored")
+	assert.NotNil(t, output, "Expected some output")
+}

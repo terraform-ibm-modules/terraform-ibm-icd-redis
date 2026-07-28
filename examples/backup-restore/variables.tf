@@ -40,8 +40,28 @@ variable "access_tags" {
   default     = []
 }
 
+variable "plan" {
+  type        = string
+  description = "The name of the service plan that you choose for your Redis instance"
+  default     = "standard"
+
+  validation {
+    condition = anytrue([
+      var.plan == "standard",
+      var.plan == "standard-gen2",
+    ])
+    error_message = "Only supported plans are standard and standard-gen2"
+  }
+}
+
 variable "existing_database_crn" {
   type        = string
-  description = "The existing CRN of a backup resource to restore from."
+  description = "The CRN of the existing database deployment whose latest backup will be used to restore from. Used for classic plan instances."
+  default     = null
+}
+
+variable "backup_crn" {
+  type        = string
+  description = "The CRN of a specific backup to restore from (crn:v1:<...>:backup:). Used for gen2 plan instances, since the ibm_database_backups data source does not support gen2 deployments."
   default     = null
 }

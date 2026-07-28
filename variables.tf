@@ -360,11 +360,6 @@ variable "backup_encryption_key_crn" {
     ])
     error_message = "Value must be the KMS key CRN from a Key Protect or Hyper Protect Crypto Services instance in one of the supported backup regions."
   }
-
-  validation {
-    condition     = local.is_classic || (local.is_gen2 && var.backup_encryption_key_crn == null)
-    error_message = "`backup_encryption_key_crn` is only supported for classic instances, remove `backup_encryption_key_crn` or select a classic `plan`."
-  }
 }
 
 variable "skip_iam_authorization_policy" {
@@ -416,10 +411,5 @@ variable "backup_crn" {
       can(regex("^crn:.*:backup:", var.backup_crn)),
     ])
     error_message = "backup_crn must be null OR starts with 'crn:' and contains ':backup:'"
-  }
-
-  validation {
-    condition     = local.is_classic || (local.is_gen2 && var.backup_crn == null)
-    error_message = "`backup_crn` is only supported for classic instances, remove `backup_crn` or select a classic `plan`."
   }
 }
