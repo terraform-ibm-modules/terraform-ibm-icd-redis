@@ -62,6 +62,6 @@ variable "existing_database_crn" {
 
 variable "backup_crn" {
   type        = string
-  description = "The CRN of a specific backup to restore from (crn:v1:<...>:backup:). Required for gen2 plan instances, since the ibm_database_backups data source does not support gen2 deployments."
+  description = "The CRN of a specific backup to restore from (crn:v1:<...>:backup:). Used for gen2 plan instances, since the ibm_database_backups data source does not support gen2 deployments."
   default     = null
 }

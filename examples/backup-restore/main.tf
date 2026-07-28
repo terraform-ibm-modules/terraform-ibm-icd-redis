@@ -1,7 +1,7 @@
 locals {
   is_gen2 = can(regex("-gen2$", var.plan))
   # For classic plans, derive the backup CRN from the ibm_database_backups data source.
-  # For gen2 plans, the data source does not work, so var.backup_crn must be supplied directly.
+  # For gen2 plans, the data source does not support gen2 deployments, so var.backup_crn is supplied directly.
   resolved_backup_crn = local.is_gen2 ? var.backup_crn : data.ibm_database_backups.backup_database[0].backups[0].backup_id
 }
 

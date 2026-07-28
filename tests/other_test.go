@@ -61,22 +61,18 @@ func TestRunRestoredDBExample(t *testing.T) {
 func TestRunRestoredDBGen2Example(t *testing.T) {
 	t.Parallel()
 
-	const gen2Region = "eu-de"
-	const gen2DeploymentCRN = "crn:v1:bluemix:public:databases-for-redis:eu-de:a/abac0df06b644a9cabc6e44f55b3880e:d238b078-fd92-4dfa-b027-267282644410::"
-
-	latestVersion, _ := GetVersionsGen2(gen2Region, "standard-gen2")
-	backupCRN := GetLatestGen2BackupCRN(gen2DeploymentCRN)
+	latestVersion, _ := GetVersionsGen2(fmt.Sprint(permanentResources["redisGen2Region"]), "standard-gen2")
 
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
 		Testing:       t,
 		TerraformDir:  "examples/backup-restore",
 		Prefix:        "redis-gen2-restored",
-		Region:        gen2Region,
+		Region:        fmt.Sprint(permanentResources["redisGen2Region"]),
 		ResourceGroup: resourceGroup,
 		TerraformVars: map[string]interface{}{
 			"plan":          "standard-gen2",
 			"redis_version": latestVersion,
-			"backup_crn":    backupCRN,
+			"backup_crn":    permanentResources["redisGen2BackupCrn"],
 		},
 		CloudInfoService: sharedInfoSvc,
 	})
