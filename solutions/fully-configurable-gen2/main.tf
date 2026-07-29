@@ -73,13 +73,6 @@ module "kms_key_crn_parser" {
   crn     = var.existing_kms_key_crn
 }
 
-module "kms_backup_key_crn_parser" {
-  count   = var.existing_backup_kms_key_crn != null ? 1 : 0
-  source  = "terraform-ibm-modules/common-utilities/ibm//modules/crn-parser"
-  version = "1.9.0"
-  crn     = var.existing_backup_kms_key_crn
-}
-
 #######################################################################################################################
 # KMS IAM Authorization Policies
 #   - only created if user passes a value for 'ibmcloud_kms_api_key' (used when KMS is in different account to Redis)
@@ -91,9 +84,8 @@ data "ibm_iam_account_settings" "iam_account_settings" {
 }
 
 locals {
-  account_id                                  = data.ibm_iam_account_settings.iam_account_settings.account_id
-  create_cross_account_kms_auth_policy        = var.kms_encryption_enabled && !var.skip_redis_kms_auth_policy && var.ibmcloud_kms_api_key != null
-  create_cross_account_backup_kms_auth_policy = var.kms_encryption_enabled && !var.skip_redis_kms_auth_policy && var.ibmcloud_kms_api_key != null && var.existing_backup_kms_key_crn != null
+  account_id                           = data.ibm_iam_account_settings.iam_account_settings.account_id
+  create_cross_account_kms_auth_policy = var.kms_encryption_enabled && !var.skip_redis_kms_auth_policy && var.ibmcloud_kms_api_key != null
 
   # If KMS encryption enabled (and existing Redis instance is not being passed), parse details from the existing key if being passed, otherwise get it from the key that the DA creates
   kms_account_id    = !var.kms_encryption_enabled || var.existing_redis_instance_crn != null ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].account_id : module.kms_instance_crn_parser[0].account_id
@@ -102,15 +94,6 @@ locals {
   kms_key_crn       = !var.kms_encryption_enabled || var.existing_redis_instance_crn != null ? null : var.existing_kms_key_crn != null ? var.existing_kms_key_crn : module.kms[0].keys[format("%s.%s", local.redis_key_ring_name, local.redis_key_name)].crn
   kms_key_id        = !var.kms_encryption_enabled || var.existing_redis_instance_crn != null ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].resource : module.kms[0].keys[format("%s.%s", local.redis_key_ring_name, local.redis_key_name)].key_id
   kms_region        = !var.kms_encryption_enabled || var.existing_redis_instance_crn != null ? null : var.existing_kms_key_crn != null ? module.kms_key_crn_parser[0].region : module.kms_instance_crn_parser[0].region
-
-  # If creating KMS cross account policy for backups, parse backup key details from passed in key CRN
-  backup_kms_account_id    = local.create_cross_account_backup_kms_auth_policy ? module.kms_backup_key_crn_parser[0].account_id : local.kms_account_id
-  backup_kms_service       = local.create_cross_account_backup_kms_auth_policy ? module.kms_backup_key_crn_parser[0].service_name : local.kms_service
-  backup_kms_instance_guid = local.create_cross_account_backup_kms_auth_policy ? module.kms_backup_key_crn_parser[0].service_instance : local.kms_instance_guid
-  backup_kms_key_id        = local.create_cross_account_backup_kms_auth_policy ? module.kms_backup_key_crn_parser[0].resource : local.kms_key_id
-  backup_kms_key_crn       = var.existing_redis_instance_crn != null || local.use_ibm_owned_encryption_key ? null : var.existing_backup_kms_key_crn
-  # Always use same key for backups unless user explicially passed a value for 'existing_backup_kms_key_crn'
-  use_same_kms_key_for_backups = var.existing_backup_kms_key_crn == null ? true : false
 }
 
 # Create auth policy (scoped to exact KMS key)
@@ -161,78 +144,8 @@ resource "time_sleep" "wait_for_authorization_policy" {
   create_duration = "30s"
 }
 
-# Create auth policy (scoped to exact KMS key for backups)
-resource "ibm_iam_authorization_policy" "backup_kms_policy" {
-  count                    = local.create_cross_account_backup_kms_auth_policy ? 1 : 0
-  provider                 = ibm.kms
-  source_service_account   = local.account_id
-  source_service_name      = "databases-for-redis"
-  source_resource_group_id = module.resource_group.resource_group_id
-  roles                    = ["Reader", "Authorization Delegator"] # Authorization Delegator role required for backup encryption key
-  description              = "Allow all Redis instances in the resource group ${module.resource_group.resource_group_id} in the account ${local.account_id} to read the ${local.backup_kms_service} key ${local.backup_kms_key_id} from the instance GUID ${local.backup_kms_instance_guid}"
-  resource_attributes {
-    name     = "serviceName"
-    operator = "stringEquals"
-    value    = local.backup_kms_service
-  }
-  resource_attributes {
-    name     = "accountId"
-    operator = "stringEquals"
-    value    = local.backup_kms_account_id
-  }
-  resource_attributes {
-    name     = "serviceInstance"
-    operator = "stringEquals"
-    value    = local.backup_kms_instance_guid
-  }
-  resource_attributes {
-    name     = "resourceType"
-    operator = "stringEquals"
-    value    = "key"
-  }
-  resource_attributes {
-    name     = "resource"
-    operator = "stringEquals"
-    value    = local.backup_kms_key_id
-  }
-  # Scope of policy now includes the key, so ensure to create new policy before
-  # destroying old one to prevent any disruption to every day services.
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-# workaround for https://github.com/IBM-Cloud/terraform-provider-ibm/issues/4478
-resource "time_sleep" "wait_for_backup_kms_authorization_policy" {
-  count           = local.create_cross_account_backup_kms_auth_policy ? 1 : 0
-  depends_on      = [ibm_iam_authorization_policy.backup_kms_policy]
-  create_duration = "30s"
-}
-
 #######################################################################################################################
-# Redis admin password
-#######################################################################################################################
-
-resource "random_password" "admin_password" {
-  count            = var.admin_pass == null ? 1 : 0
-  length           = 32
-  special          = true
-  override_special = "-_"
-  min_numeric      = 1
-}
-
-locals {
-  # _- are invalid first characters
-  # if - replace first char with J
-  # elseif _ replace first char with K
-  # else use asis
-  generated_admin_password = (length(random_password.admin_password) > 0 ? (startswith(random_password.admin_password[0].result, "-") ? "J${substr(random_password.admin_password[0].result, 1, -1)}" : startswith(random_password.admin_password[0].result, "_") ? "K${substr(random_password.admin_password[0].result, 1, -1)}" : random_password.admin_password[0].result) : null)
-  # admin password to use
-  admin_pass = var.admin_pass == null ? local.generated_admin_password : var.admin_pass
-}
-
-#######################################################################################################################
-# Redis
+# Redis Gen2
 #######################################################################################################################
 
 # Look up existing instance details if user passes one
@@ -245,8 +158,7 @@ module "redis_instance_crn_parser" {
 
 # Existing instance local vars
 locals {
-  existing_redis_guid   = var.existing_redis_instance_crn != null ? module.redis_instance_crn_parser[0].service_instance : null
-  existing_redis_region = var.existing_redis_instance_crn != null ? module.redis_instance_crn_parser[0].region : null
+  existing_redis_guid = var.existing_redis_instance_crn != null ? module.redis_instance_crn_parser[0].service_instance : null
 }
 
 # Do a data lookup on the resource GUID to get more info that is needed for the 'ibm_database' data lookup below
@@ -277,34 +189,34 @@ data "ibm_database_connection" "existing_connection" {
 module "redis" {
   count                             = var.existing_redis_instance_crn != null ? 0 : 1
   source                            = "../.."
-  depends_on                        = [time_sleep.wait_for_authorization_policy, time_sleep.wait_for_backup_kms_authorization_policy]
+  depends_on                        = [time_sleep.wait_for_authorization_policy]
   resource_group_id                 = module.resource_group.resource_group_id
   name                              = "${local.prefix}${var.name}"
-  plan                              = var.plan
+  plan                              = "standard-gen2" # this is the only gen2 plan
   region                            = var.region
   redis_version                     = var.redis_version
-  skip_iam_authorization_policy     = var.kms_encryption_enabled ? var.skip_redis_kms_auth_policy : true
+  skip_iam_authorization_policy     = var.skip_redis_kms_auth_policy
   use_ibm_owned_encryption_key      = local.use_ibm_owned_encryption_key
   kms_key_crn                       = local.kms_key_crn
-  backup_encryption_key_crn         = local.backup_kms_key_crn
-  use_same_kms_key_for_backups      = local.use_same_kms_key_for_backups
-  use_default_backup_encryption_key = var.use_default_backup_encryption_key
+  backup_encryption_key_crn         = null  # not supported by gen2
+  use_same_kms_key_for_backups      = false # not supported by gen2
+  use_default_backup_encryption_key = false # not supported by gen2
   access_tags                       = var.access_tags
   resource_tags                     = var.resource_tags
-  admin_pass                        = local.admin_pass
-  users                             = var.users
+  admin_pass                        = null # not supported by gen2
+  users                             = []   # not supported by gen2
   members                           = var.members
   member_host_flavor                = var.member_host_flavor
   memory_mb                         = var.member_memory_mb
   disk_mb                           = var.member_disk_mb
   cpu_count                         = var.member_cpu_count
-  auto_scaling                      = var.auto_scaling
-  configuration                     = var.configuration
+  auto_scaling                      = null # not supported by gen2
+  configuration                     = null # not supported by gen2
   service_credential_names          = var.service_credential_names
-  backup_crn                        = var.backup_crn
-  service_endpoints                 = var.service_endpoints
+  backup_crn                        = null      # not supported by gen2
+  service_endpoints                 = "private" # this is the only supported service endpoint for gen2
   deletion_protection               = var.deletion_protection
-  version_upgrade_skip_backup       = var.version_upgrade_skip_backup
+  version_upgrade_skip_backup       = false
   create_timeout                    = var.create_timeout
   update_timeout                    = var.update_timeout
   delete_timeout                    = var.delete_timeout
@@ -380,20 +292,7 @@ locals {
     }
   ]
 
-  # Build the structure of the arbitrary credential type secret for admin password
-  admin_pass_secret = [{
-    secret_group_name     = "${local.prefix}${var.admin_pass_secrets_manager_secret_group}"
-    existing_secret_group = var.use_existing_admin_pass_secrets_manager_secret_group
-    secrets = [{
-      secret_name             = "${local.prefix}${var.admin_pass_secrets_manager_secret_name}"
-      secret_type             = "arbitrary"
-      secret_payload_password = local.admin_pass
-      }
-    ]
-  }]
-
-  # Concatenate into 1 secrets object
-  secrets = concat(local.service_credential_secrets, local.admin_pass_secret)
+  secrets = local.service_credential_secrets # gen2 does not support admin_pass secret
   # Parse Secrets Manager details from the CRN
   existing_secrets_manager_instance_guid   = var.existing_secrets_manager_instance_crn != null ? module.sm_instance_crn_parser[0].service_instance : null
   existing_secrets_manager_instance_region = var.existing_secrets_manager_instance_crn != null ? module.sm_instance_crn_parser[0].region : null

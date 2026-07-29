@@ -78,6 +78,20 @@ variable "redis_version" {
   default     = null
 }
 
+variable "plan" {
+  type        = string
+  description = "The name of the service plan that you choose for your Redis instance. The Gen 1 (Classic) plan is `standard`. The Gen 2 (VPC) plan is `standard-gen2`."
+  default     = "standard"
+
+  validation {
+    condition = anytrue([
+      var.plan == "standard",
+      var.plan == "standard-gen2",
+    ])
+    error_message = "Only supported plans are standard and standard-gen2"
+  }
+}
+
 ##############################################################################
 # ICD hosting model properties
 ##############################################################################
