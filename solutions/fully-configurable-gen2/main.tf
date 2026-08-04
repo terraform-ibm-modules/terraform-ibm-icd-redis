@@ -98,13 +98,12 @@ locals {
 
 # Create auth policy (scoped to exact KMS key)
 resource "ibm_iam_authorization_policy" "kms_policy" {
-  count                    = local.create_cross_account_kms_auth_policy ? 1 : 0
-  provider                 = ibm.kms
-  source_service_account   = local.account_id
-  source_service_name      = "databases-for-redis"
-  source_resource_group_id = module.resource_group.resource_group_id
-  roles                    = ["Reader", "Authorization Delegator"] # Authorization Delegator role required for backup encryption key
-  description              = "Allow all Redis instances in the resource group ${module.resource_group.resource_group_id} in the account ${local.account_id} to read the ${local.kms_service} key ${local.kms_key_id} from the instance GUID ${local.kms_instance_guid}"
+  count                  = local.create_cross_account_kms_auth_policy ? 1 : 0
+  provider               = ibm.kms
+  source_service_account = local.account_id
+  source_service_name    = "databases-for-redis"
+  roles                  = ["Reader", "Authorization Delegator"] # Authorization Delegator role required for backup encryption key
+  description            = "Allow all Redis instances in the resource group ${module.resource_group.resource_group_id} in the account ${local.account_id} to read the ${local.kms_service} key ${local.kms_key_id} from the instance GUID ${local.kms_instance_guid}"
   resource_attributes {
     name     = "serviceName"
     operator = "stringEquals"
