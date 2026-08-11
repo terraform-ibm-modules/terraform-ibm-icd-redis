@@ -16,11 +16,6 @@ variable "redis_version" {
   type        = string
   description = "Version of the Redis instance to provision. If no value is passed, the current preferred version of IBM Cloud Databases is used."
   default     = null
-
-  validation {
-    condition     = var.redis_version == null ? true : contains(local.icd_supported_versions, var.redis_version)
-    error_message = "Unsupported redis_version '${var.redis_version == null ? "null" : var.redis_version}'. Supported versions: ${join(", ", local.icd_supported_versions)}"
-  }
 }
 
 variable "region" {
