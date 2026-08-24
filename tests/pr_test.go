@@ -463,22 +463,19 @@ func generateUniqueResourceGroupName(baseName string) string {
 	return fmt.Sprintf("%s-%s", baseName, id)
 }
 
-// Test the fully-configurable-gen2 DA with defaults (IBM owned encryption keys)
-func TestRunFullyConfigurableGen2SolutionSchematics(t *testing.T) {
-	t.Parallel()
-
+// setupFullyConfigurableGen2Options builds and returns a configured TestSchematicOptions and a unique
+// resource group name for the fully-configurable-gen2 solution.
+func setupFullyConfigurableGen2Options(t *testing.T, prefix string) (*testschematic.TestSchematicOptions, string) {
 	options := testschematic.TestSchematicOptionsDefault(&testschematic.TestSchematicOptions{
 		Testing: t,
 		TarIncludePatterns: []string{
 			"*.tf",
 			fullyConfigurableGen2SolutionTerraformDir + "/*.tf",
 		},
-		TemplateFolder:             fullyConfigurableGen2SolutionTerraformDir,
-		Prefix:                     fmt.Sprintf("%s-gen2da", icdShortType),
-		ResourceGroup:              resourceGroup,
-		DeleteWorkspaceOnFail:      false,
-		WaitJobCompleteMinutes:     60,
-		CheckApplyResultForUpgrade: true,
+		TemplateFolder:        fullyConfigurableGen2SolutionTerraformDir,
+		Prefix:                fmt.Sprintf("%s-%s", icdShortType, prefix),
+		ResourceGroup:         resourceGroup,
+		DeleteWorkspaceOnFail: false,
 	})
 
 	uniqueResourceGroup := generateUniqueResourceGroupName(options.Prefix)
@@ -523,8 +520,33 @@ func TestRunFullyConfigurableGen2SolutionSchematics(t *testing.T) {
 		{Name: "redis_version", Value: latestVersion, DataType: "string"}, // Always lock this test into the latest supported Redis version
 	}
 
+	return options, uniqueResourceGroup
+}
+
+// Test the fully-configurable-gen2 DA
+func TestRunFullyConfigurableGen2SolutionSchematics(t *testing.T) {
+	t.Parallel()
+
+	options, uniqueResourceGroup := setupFullyConfigurableGen2Options(t, "gen2da")
+	options.WaitJobCompleteMinutes = 60
+
 	err := sharedInfoSvc.WithNewResourceGroup(uniqueResourceGroup, func() error {
 		return options.RunSchematicTest()
 	})
 	assert.Nil(t, err, "This should not have errored")
+}
+
+// Upgrade test for the fully-configurable-gen2 DA
+func TestRunFullyConfigurableGen2UpgradeSolution(t *testing.T) {
+	t.Parallel()
+
+	options, uniqueResourceGroup := setupFullyConfigurableGen2Options(t, "gen2-upg")
+	options.WaitJobCompleteMinutes = 120
+
+	err := sharedInfoSvc.WithNewResourceGroup(uniqueResourceGroup, func() error {
+		return options.RunSchematicUpgradeTest()
+	})
+	if !options.UpgradeTestSkipped {
+		assert.Nil(t, err, "This should not have errored")
+	}
 }
