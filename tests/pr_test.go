@@ -540,7 +540,7 @@ func TestRunFullyConfigurableGen2SolutionSchematics(t *testing.T) {
 func TestRunFullyConfigurableGen2UpgradeSolution(t *testing.T) {
 	t.Parallel()
 
-	options, uniqueResourceGroup := setupFullyConfigurableGen2Options(t, "gen2-upg")
+	options, uniqueResourceGroup := setupFullyConfigurableGen2Options(t, "gen2ug")
 	options.WaitJobCompleteMinutes = 120
 
 	err := sharedInfoSvc.WithNewResourceGroup(uniqueResourceGroup, func() error {
