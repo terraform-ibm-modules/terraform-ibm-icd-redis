@@ -131,12 +131,14 @@ func TestRunBasicGen2Example(t *testing.T) {
 	latestVersion, _ := GetVersionsGen2("eu-de", "standard-gen2")
 	fmt.Println("Latest version is ", latestVersion)
 
+	// ResourceGroup is intentionally not set so a unique group is created per run for this test.
+	// Independent backup policies may not be destroyed on failure, causing conflicts on re-runs within the same group.
+
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
 		Testing:            t,
 		TerraformDir:       "examples/basic",
 		Prefix:             "redis-gen2",
 		BestRegionYAMLPath: regionSelectionPath,
-		ResourceGroup:      resourceGroup,
 		TerraformVars: map[string]interface{}{ // Limited gen2 to eu-de
 			"region":            "eu-de",
 			"plan":              "standard-gen2",
@@ -466,6 +468,8 @@ func generateUniqueResourceGroupName(baseName string) string {
 // setupFullyConfigurableGen2Options builds and returns a configured TestSchematicOptions and a unique
 // resource group name for the fully-configurable-gen2 solution.
 func setupFullyConfigurableGen2Options(t *testing.T, prefix string) (*testschematic.TestSchematicOptions, string) {
+	// ResourceGroup is intentionally not set so a unique group is created per run for this test.
+	// Independent backup policies may not be destroyed on failure, causing conflicts on re-runs within the same group.
 	options := testschematic.TestSchematicOptionsDefault(&testschematic.TestSchematicOptions{
 		Testing: t,
 		TarIncludePatterns: []string{
@@ -474,7 +478,6 @@ func setupFullyConfigurableGen2Options(t *testing.T, prefix string) (*testschema
 		},
 		TemplateFolder:        fullyConfigurableGen2SolutionTerraformDir,
 		Prefix:                fmt.Sprintf("%s-%s", icdShortType, prefix),
-		ResourceGroup:         resourceGroup,
 		DeleteWorkspaceOnFail: false,
 	})
 
