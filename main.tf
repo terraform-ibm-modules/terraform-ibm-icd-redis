@@ -169,6 +169,8 @@ resource "time_sleep" "wait_for_backup_kms_authorization_policy" {
 ########################################################################################################################
 # Gen2 IAM Authorization Policies
 ########################################################################################################################
+data "ibm_iam_account_settings" "iam_account_settings" {
+}
 
 resource "ibm_iam_authorization_policy" "gen2_independent_backups_policy" {
   count                    = local.create_gen2_auth_policies
@@ -176,7 +178,17 @@ resource "ibm_iam_authorization_policy" "gen2_independent_backups_policy" {
   source_resource_group_id = var.resource_group_id
   roles                    = ["Editor"]
   description              = "Allow Redis instances in resource group ${var.resource_group_id} to access independent backups service with Editor role"
-  target_service_name      = "databases-independent-backups"
+
+  resource_attributes {
+    name     = "accountId"
+    operator = "stringEquals"
+    value    = data.ibm_iam_account_settings.iam_account_settings.account_id
+  }
+  resource_attributes {
+    name     = "serviceName"
+    operator = "stringEquals"
+    value    = "databases-independent-backups"
+  }
 
   lifecycle {
     create_before_destroy = true
@@ -190,8 +202,22 @@ resource "ibm_iam_authorization_policy" "gen2_resource_group_policy" {
   source_resource_group_id = var.resource_group_id
   roles                    = ["Viewer"]
   description              = "Allow Redis instances in resource group ${var.resource_group_id} to view resource group with Viewer role"
-  target_resource_group_id = var.resource_group_id
-  target_resource_type     = "resource-group"
+
+  resource_attributes {
+    name     = "accountId"
+    operator = "stringEquals"
+    value    = data.ibm_iam_account_settings.iam_account_settings.account_id
+  }
+  resource_attributes {
+    name     = "resourceType"
+    operator = "stringEquals"
+    value    = "resource-group"
+  }
+  resource_attributes {
+    name     = "resource"
+    operator = "stringEquals"
+    value    = var.resource_group_id
+  }
 
   lifecycle {
     create_before_destroy = true
