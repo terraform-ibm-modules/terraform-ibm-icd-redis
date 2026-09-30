@@ -739,6 +739,9 @@
               "key": "skip_redis_kms_auth_policy"
             },
             {
+              "key": "skip_independent_backup_policies"
+            },
+            {
               "key": "existing_redis_instance_crn",
               "display_name": "existing_redis_instance",
               "custom_config": {

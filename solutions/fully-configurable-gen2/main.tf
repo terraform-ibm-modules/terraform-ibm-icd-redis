@@ -195,6 +195,7 @@ module "redis" {
   region                            = var.region
   redis_version                     = var.redis_version
   skip_iam_authorization_policy     = var.skip_redis_kms_auth_policy
+  skip_independent_backup_policies  = var.skip_independent_backup_policies
   use_ibm_owned_encryption_key      = local.use_ibm_owned_encryption_key
   kms_key_crn                       = local.kms_key_crn
   backup_encryption_key_crn         = null  # not supported by gen2
