@@ -14,8 +14,8 @@ This example uses the [Profile for IBM Cloud Framework for Financial Services](h
 The following resources are provisioned by this example:
 
 - A new resource group, if an existing one is not passed in.
-- An IAM authorization between all Redis database instances in the given resource group, and the IBM Hyper Protect Crypto Services (HPCS) instance that is passed in.
-- An IBM Cloud Database for Redis database instance that is encrypted with the Hyper Protect Crypto Services (HPCS) root key that is passed in.
+- An IAM authorization between all Redis database instances in the given resource group, and the Key Protect instance that is passed in.
+- An IBM Cloud Database for Redis database instance that is encrypted with the Key Protect root key that is passed in.
 - Autoscaling rules for the IBM Cloud Database for Redis database instance.
 - Service Credentials for the Database for Redis instance.
 - A basic virtual private cloud (VPC).
@@ -27,4 +27,4 @@ The following resources are provisioned by this example:
 
 Before you run the example, make sure that you set up the following prerequisites:
 
-- A Hyper Protect Crypto Services (HPCS) instance and root key available in the region that you want to deploy your Database for Redis instance to.
+- A Key Protect instance and root key available in the region that you want to deploy your Database for Redis instance to.
