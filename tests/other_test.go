@@ -57,3 +57,23 @@ func TestRunRestoredDBExample(t *testing.T) {
 	assert.Nil(t, err, "This should not have errored")
 	assert.NotNil(t, output, "Expected some output")
 }
+
+func TestRunCompleteExampleWithKey(t *testing.T) {
+	t.Parallel()
+
+	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
+		Testing:       t,
+		TerraformDir:  "examples/complete",
+		Prefix:        "rk",
+		Region:        "us-south",
+		ResourceGroup: resourceGroup,
+		TerraformVars: map[string]interface{}{
+			"existing_kms_crn": permanentResources["hpcs_south_crn"],
+		},
+		CloudInfoService: sharedInfoSvc,
+	})
+
+	output, err := options.RunTestConsistency()
+	assert.Nil(t, err, "This should not have errored")
+	assert.NotNil(t, output, "Expected some output")
+}
