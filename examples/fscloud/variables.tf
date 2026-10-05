@@ -36,7 +36,7 @@ variable "resource_tags" {
 
 variable "kms_key_crn" {
   type        = string
-  description = "The root key CRN of a Hyper Protect Crypto Services (HPCS) that you want to use for disk encryption. See https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-hpcs&interface=ui for more information on integrating HPCS with Redis instance."
+  description = "The root key CRN of a Key Protect instance that you want to use for disk encryption."
 }
 
 variable "redis_version" {
@@ -53,7 +53,7 @@ variable "backup_crn" {
 
 variable "backup_encryption_key_crn" {
   type        = string
-  description = "The CRN of a Hyper Protect Crypto Services use for encrypting the disk that holds deployment backups. Only used if var.kms_encryption_enabled is set to true. There are limitation per region on the Hyper Protect Crypto Services and region for those services. See https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-hpcs#use-hpcs-backups"
+  description = "The CRN of a Key Protect key to use for encrypting the disk that holds deployment backups. There are limitations per region for backup encryption. See https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-key-protect&interface=ui#key-byok"
   default     = null
   # Validation happens in the root module
 }
