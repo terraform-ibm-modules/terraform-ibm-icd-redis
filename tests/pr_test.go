@@ -128,7 +128,7 @@ func GetVersionsGen2(region string, plan string) (string, string) {
 func TestRunBasicGen2Example(t *testing.T) {
 	t.Parallel()
 
-	latestVersion, _ := GetVersionsGen2("eu-de", "standard-gen2")
+	latestVersion, _ := GetVersionsGen2("us-south", "standard-gen2")
 	fmt.Println("Latest version is ", latestVersion)
 
 	// ResourceGroup is intentionally not set so a unique group is created per run for this test.
@@ -139,8 +139,8 @@ func TestRunBasicGen2Example(t *testing.T) {
 		TerraformDir:       "examples/basic",
 		Prefix:             "redis-gen2",
 		BestRegionYAMLPath: regionSelectionPath,
-		TerraformVars: map[string]interface{}{ // Limited gen2 to eu-de
-			"region":            "eu-de",
+		TerraformVars: map[string]interface{}{
+			"region":            "us-south",
 			"plan":              "standard-gen2",
 			"redis_version":     latestVersion,
 			"service_endpoints": "private",
@@ -510,14 +510,14 @@ func setupFullyConfigurableGen2Options(t *testing.T, prefix string) (*testschema
 		},
 	}
 
-	latestVersion, _ := GetVersionsGen2("eu-de", "standard-gen2")
+	latestVersion, _ := GetVersionsGen2("us-south", "standard-gen2")
 	options.TerraformVars = []testschematic.TestSchematicTerraformVar{
 		{Name: "prefix", Value: options.Prefix, DataType: "string"},
 		{Name: "ibmcloud_api_key", Value: options.RequiredEnvironmentVars["TF_VAR_ibmcloud_api_key"], DataType: "string", Secure: true},
 		{Name: "access_tags", Value: permanentResources["accessTags"], DataType: "list(string)"},
 		{Name: "deletion_protection", Value: false, DataType: "bool"},
 		{Name: "existing_resource_group_name", Value: uniqueResourceGroup, DataType: "string"},
-		{Name: "region", Value: "eu-de", DataType: "string"},
+		{Name: "region", Value: "us-south", DataType: "string"},
 		{Name: "service_credential_names", Value: serviceCredentialNames, DataType: "list(object)"},
 		{Name: "service_credential_secrets", Value: serviceCredentialSecrets, DataType: "list(object)"},
 		{Name: "existing_secrets_manager_instance_crn", Value: permanentResources["secretsManagerCRN"], DataType: "string"},

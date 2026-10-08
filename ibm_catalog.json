@@ -83,6 +83,13 @@
             },
             {
               "role_crns": [
+                "crn:v1:bluemix:public:iam::::role:Editor"
+              ],
+              "service_name": "hs-crypto",
+              "notes": "[Optional] Editor access is required to create keys in HPCS. It is only required when using HPCS for encryption."
+            },
+            {
+              "role_crns": [
                 "crn:v1:bluemix:public:iam::::role:Operator",
                 "crn:v1:bluemix:public:iam::::serviceRole:Writer",
                 "crn:v1:bluemix:public:iam::::serviceRole:Manager"
@@ -501,13 +508,6 @@
               ],
               "service_name": "databases-for-redis",
               "notes": "Required to configure an instance of Databases for Redis."
-            },
-            {
-              "role_crns": [
-                "crn:v1:bluemix:public:iam::::role:Editor"
-              ],
-              "service_name": "hs-crypto",
-              "notes": "[Optional] Editor access is required to create keys in HPCS. It is only required when using HPCS for encryption."
             },
             {
               "role_crns": [
