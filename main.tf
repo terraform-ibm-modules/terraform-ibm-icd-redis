@@ -473,3 +473,17 @@ data "ibm_database_connection" "database_connection" {
   user_id       = ibm_database.redis_database.adminuser
   user_type     = "database"
 }
+
+##############################################################################
+# Check Blocks
+##############################################################################
+
+check "warn_hs_crypto_key" {
+  assert {
+    condition = !(
+      (var.kms_key_crn != null && can(regex(".*hs-crypto.*", var.kms_key_crn))) ||
+      (var.backup_encryption_key_crn != null && can(regex(".*hs-crypto.*", var.backup_encryption_key_crn)))
+    )
+    error_message = "WARNING (Non-fatal, execution will continue): An IBM Cloud Hyper Protect Crypto Services (hs-crypto) instance or key CRN was provided. Note that IBM Cloud Hyper Protect Crypto Services is deprecated. Consider migrating to a supported alternative."
+  }
+}
