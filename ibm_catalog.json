@@ -746,7 +746,7 @@
               "key": "skip_redis_kms_auth_policy"
             },
             {
-              "key": "skip_independent_backup_policies"
+              "key": "skip_independent_backup_auth_policies"
             },
             {
               "key": "existing_redis_instance_crn",
