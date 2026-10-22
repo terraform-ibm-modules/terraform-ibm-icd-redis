@@ -631,6 +631,9 @@
               }
             },
             {
+              "key": "configuration"
+            },
+            {
               "key": "members"
             },
             {

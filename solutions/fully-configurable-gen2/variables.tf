@@ -144,6 +144,18 @@ variable "deletion_protection" {
   default     = true
 }
 
+variable "configuration" {
+  description = "Database Configuration for the Redis Gen2 instance. [Learn more](https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/blob/main/solutions/fully-configurable-gen2/DA-types.md#configuration)."
+  type = object({
+    maxmemory                   = optional(number)
+    maxmemory-policy            = optional(string)
+    appendonly                  = optional(string)
+    maxmemory-samples           = optional(number)
+    stop-writes-on-bgsave-error = optional(string)
+  })
+  default = null
+}
+
 variable "update_timeout" {
   type        = string
   description = "A database update may require a longer timeout for the update to complete. The default is 120 minutes. Set this variable to change the `update` value in the `timeouts` block. [Learn more](https://developer.hashicorp.com/terraform/language/resources/syntax#operation-timeouts)."

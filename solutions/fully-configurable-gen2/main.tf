@@ -211,7 +211,7 @@ module "redis" {
   disk_mb                               = var.member_disk_mb
   cpu_count                             = var.member_cpu_count
   auto_scaling                          = null # not supported by gen2
-  configuration                         = null # not supported by gen2
+  configuration                         = var.configuration
   service_credential_names              = var.service_credential_names
   backup_crn                            = null      # not supported by gen2
   service_endpoints                     = "private" # this is the only supported service endpoint for gen2

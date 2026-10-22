@@ -231,11 +231,6 @@ variable "configuration" {
   })
   description = "Database Configuration. Default values will get picked up if not all the values are passed."
   default     = null
-
-  validation {
-    condition     = local.is_classic || (local.is_gen2 && var.configuration == null)
-    error_message = "`configuration` is only supported for classic instances, remove `configuration` or select a classic `plan`."
-  }
 }
 
 ##############################################################
