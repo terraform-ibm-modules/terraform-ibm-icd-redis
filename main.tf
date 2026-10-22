@@ -252,7 +252,6 @@ resource "ibm_database" "redis_database" {
   backup_encryption_key_crn   = local.backup_encryption_key_crn
   backup_id                   = var.backup_crn
 
-  # For default configuration, see here: https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-changing-configuration&interface=cli
   configuration = var.configuration == null ? null : jsonencode({
     maxmemory                   = var.configuration.maxmemory != null ? var.configuration.maxmemory : local.calculate_config_maxmemory
     maxmemory-policy            = var.configuration.maxmemory-policy != null ? var.configuration.maxmemory-policy : "noeviction"

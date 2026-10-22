@@ -76,4 +76,5 @@ module "database" {
   disk_mb                  = local.is_gen2 ? 15360 : 1024
   deletion_protection      = false
   service_credential_names = local.is_gen2 ? local.gen2_service_credential_names : local.classic_service_credential_names
+  configuration            = var.configuration
 }
