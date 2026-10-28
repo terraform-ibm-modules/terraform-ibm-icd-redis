@@ -171,17 +171,8 @@ data "ibm_database" "existing_db_instance" {
   count             = var.existing_redis_instance_crn != null ? 1 : 0
   name              = data.ibm_resource_instance.existing_instance_resource[0].name
   resource_group_id = data.ibm_resource_instance.existing_instance_resource[0].resource_group_id
-  location          = var.region
+  location          = data.ibm_resource_instance.existing_instance_resource[0].location
   service           = "databases-for-redis"
-}
-
-# Lookup existing instance connection details
-data "ibm_database_connection" "existing_connection" {
-  count         = var.existing_redis_instance_crn != null ? 1 : 0
-  endpoint_type = "private"
-  deployment_id = data.ibm_database.existing_db_instance[0].id
-  user_id       = data.ibm_database.existing_db_instance[0].adminuser
-  user_type     = "database"
 }
 
 # Create new instance
@@ -227,8 +218,8 @@ locals {
   redis_id       = var.existing_redis_instance_crn != null ? data.ibm_database.existing_db_instance[0].id : module.redis[0].id
   redis_version  = var.existing_redis_instance_crn != null ? data.ibm_database.existing_db_instance[0].version : module.redis[0].version
   redis_crn      = var.existing_redis_instance_crn != null ? var.existing_redis_instance_crn : module.redis[0].crn
-  redis_hostname = var.existing_redis_instance_crn != null ? data.ibm_database_connection.existing_connection[0].rediss[0].hosts[0].hostname : module.redis[0].hostname
-  redis_port     = var.existing_redis_instance_crn != null ? data.ibm_database_connection.existing_connection[0].rediss[0].hosts[0].port : module.redis[0].port
+  redis_hostname = var.existing_redis_instance_crn != null ? null : module.redis[0].hostname
+  redis_port     = var.existing_redis_instance_crn != null ? null : module.redis[0].port
 }
 
 #######################################################################################################################
