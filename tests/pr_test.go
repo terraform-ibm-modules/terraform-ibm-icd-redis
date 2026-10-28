@@ -144,6 +144,13 @@ func TestRunBasicGen2Example(t *testing.T) {
 			"plan":              "standard-gen2",
 			"redis_version":     latestVersion,
 			"service_endpoints": "private",
+			"configuration": map[string]interface{}{
+				"maxmemory":                   80,
+				"maxmemory-policy":            "noeviction",
+				"appendonly":                  "no",
+				"maxmemory-samples":           5,
+				"stop-writes-on-bgsave-error": "yes",
+			},
 		},
 		CloudInfoService: sharedInfoSvc,
 	})

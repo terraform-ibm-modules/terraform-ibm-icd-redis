@@ -154,6 +154,10 @@ variable "configuration" {
     stop-writes-on-bgsave-error = optional(string)
   })
   default = null
+  validation {
+    condition     = var.configuration == null || var.configuration.maxmemory == null || (var.configuration.maxmemory >= 0 && var.configuration.maxmemory <= 100)
+    error_message = "`maxmemory` must be a percentage between 0 and 100."
+  }
 }
 
 variable "update_timeout" {
