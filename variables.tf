@@ -229,8 +229,23 @@ variable "configuration" {
     maxmemory-samples           = optional(number)
     stop-writes-on-bgsave-error = optional(string)
   })
-  description = "Database Configuration. Default values will get picked up if not all the values are passed."
+  description = "Database configuration parameters for Classic and Gen 2 plans. For more information, see the [Classic configuration documentation](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-changing-configuration&interface=cli) and the [Gen 2 configuration documentation](https://cloud.ibm.com/docs/databases-for-redis-gen2?topic=databases-for-redis-gen2-changing-configuration)."
   default     = null
+
+  validation {
+    condition     = !local.is_gen2 || try(var.configuration.maxmemory, null) == null || (var.configuration.maxmemory >= 0 && var.configuration.maxmemory <= 100)
+    error_message = "For gen2 plans, `maxmemory` must be a percentage between 0 and 100."
+  }
+
+  validation {
+    condition     = !local.is_gen2 || try(var.configuration.maxmemory-policy, null) == null || contains(["noeviction", "allkeys-lru", "allkeys-lfu", "allkeys-random", "volatile-lru", "volatile-lfu", "volatile-random", "volatile-ttl"], var.configuration.maxmemory-policy)
+    error_message = "For gen2 plans, `maxmemory-policy` must be one of: `noeviction`, `allkeys-lru`, `allkeys-lfu`, `allkeys-random`, `volatile-lru`, `volatile-lfu`, `volatile-random`, `volatile-ttl`."
+  }
+
+  validation {
+    condition     = !local.is_gen2 || alltrue([for value in [try(var.configuration.appendonly, null), try(var.configuration.stop-writes-on-bgsave-error, null)] : value == null || contains(["yes", "no"], value)])
+    error_message = "For gen2 plans, `appendonly` and `stop-writes-on-bgsave-error` must be either `yes` or `no`."
+  }
 }
 
 ##############################################################
