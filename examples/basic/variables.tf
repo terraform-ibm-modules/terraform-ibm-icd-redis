@@ -56,15 +56,3 @@ variable "service_endpoints" {
     error_message = "Valid values for service_endpoints are 'public', 'public-and-private', and 'private'"
   }
 }
-
-variable "configuration" {
-  type = object({
-    maxmemory                   = optional(number)
-    maxmemory-policy            = optional(string)
-    appendonly                  = optional(string)
-    maxmemory-samples           = optional(number)
-    stop-writes-on-bgsave-error = optional(string)
-  })
-  description = "Database Configuration. Default values will get picked up if not all the values are passed."
-  default     = null
-}
