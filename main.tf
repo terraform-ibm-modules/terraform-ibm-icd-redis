@@ -253,7 +253,14 @@ resource "ibm_database" "redis_database" {
   backup_id                   = var.backup_crn
 
   # For default configuration, see here: https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-changing-configuration&interface=cli
-  configuration = var.configuration == null ? null : jsonencode({
+  # Note: the gen2 broker requires all configuration values to be strings.
+  configuration = var.configuration == null ? null : local.is_gen2 ? jsonencode({
+    maxmemory                   = tostring(var.configuration.maxmemory != null ? var.configuration.maxmemory : 80)
+    maxmemory-policy            = var.configuration.maxmemory-policy != null ? var.configuration.maxmemory-policy : "noeviction"
+    appendonly                  = var.configuration.appendonly != null ? var.configuration.appendonly : "yes"
+    maxmemory-samples           = tostring(var.configuration.maxmemory-samples != null ? var.configuration.maxmemory-samples : 5)
+    stop-writes-on-bgsave-error = var.configuration.stop-writes-on-bgsave-error != null ? var.configuration.stop-writes-on-bgsave-error : "yes"
+    }) : jsonencode({
     maxmemory                   = var.configuration.maxmemory != null ? var.configuration.maxmemory : local.calculate_config_maxmemory
     maxmemory-policy            = var.configuration.maxmemory-policy != null ? var.configuration.maxmemory-policy : "noeviction"
     appendonly                  = var.configuration.appendonly != null ? var.configuration.appendonly : "yes"
