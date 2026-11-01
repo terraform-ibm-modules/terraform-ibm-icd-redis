@@ -12,7 +12,7 @@ module "resource_group" {
 
 locals {
   is_gen2             = can(regex("-gen2$", var.plan))
-  gen2_host_flavor    = "bxf.8x32"
+  gen2_host_flavor    = "bx3d.4x20"
   classic_host_flavor = "multitenant"
 }
 
