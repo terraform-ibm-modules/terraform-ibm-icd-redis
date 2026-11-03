@@ -30,8 +30,8 @@ variable "redis_version" {
 
 variable "disk_mb" {
   type        = number
-  description = "Allocated disk per member. [Learn more](https://cloud.ibm.com/docs/databases-for-postgresql?topic=databases-for-postgresql-resources-scaling)"
-  default     = 1024
+  description = "Allocated disk per member. [Learn more](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-resources-scaling&interface=ui)"
+  default     = 10240
 }
 
 variable "resource_group" {
