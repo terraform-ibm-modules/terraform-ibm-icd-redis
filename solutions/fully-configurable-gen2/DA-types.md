@@ -4,6 +4,7 @@ Several optional input variables in the IBM Cloud [Databases for Redis deployabl
 
 - [Service credentials](#svc-credential-name) (`service_credential_names`)
 - [Service credential secrets](#service-credential-secrets) (`service_credential_secrets`)
+- [Configuration](#configuration) (`configuration`)
 
 ## Service credentials <a name="svc-credential-name"></a>
 
@@ -59,7 +60,7 @@ In the configuration, specify the secret group name, whether it already exists o
 #### Options for service_credentials
 
 - `secret_name`: (required): A unique human-readable name of the secret to create.
-- `service_credentials_source_service_role_crn`: (required): The CRN of the role to give the service credential in the IBM Cloud Database service. Service credentials role CRNs can be found at https://cloud.ibm.com/iam/roles, select the IBM Cloud Database and select the role.
+- `service_credentials_source_service_role_crn`: (required): The CRN of the role to give the service credential in the IBM Cloud Database service. Service credentials role CRNs can be found at <https://cloud.ibm.com/iam/roles>, select the IBM Cloud Database and select the role.
 - `secret_labels`: (optional, default = `[]`): Labels of the secret to create. Up to 30 labels can be created. Labels can be 2 - 30 characters, including spaces. Special characters that are not permitted include the angled brackets (<>), comma (,), colon (:), ampersand (&), and vertical pipe character (|).
 - `secret_auto_rotation`: (optional, default = `true`): Whether to configure automatic rotation of service credential.
 - `secret_auto_rotation_unit`: (optional, default = `day`): Specifies the unit of time for rotation of a secret. Acceptable values are `day` or `month`.
@@ -68,6 +69,7 @@ In the configuration, specify the secret group name, whether it already exists o
 - `service_credential_secret_description`: (optional, default = `null`): Description of the secret to create.
 
 The following example includes all the configuration options for four service credentials and two secret groups.
+
 ```hcl
 [
   {
@@ -100,4 +102,35 @@ The following example includes all the configuration options for four service cr
     ]
   }
 ]
+```
+
+## Configuration  <a name="configuration"></a>
+
+The Configuration variable tunes the Redis database to suit different use cases. For more information, see [Configuration](https://cloud.ibm.com/docs/databases-for-redis-gen2?topic=databases-for-redis-gen2-changing-configuration).
+
+- Variable name: `configuration`
+- Type: An object with `maxmemory`, `maxmemory-policy`, `appendonly`, `maxmemory-samples` and `stop-writes-on-bgsave-error` attributes
+
+### Options for configuration
+
+The configuration object contains the following options. All options are optional.
+
+- `maxmemory`: Determines the amount of data that you can store in Redis. Set as a percentage of the deployment's available memory. (default: `80`% of a data node's available memory).
+- `maxmemory-policy`: Determines eviction behavior when the `maxmemory` limit is reached. [Learn more](https://cloud.ibm.com/docs/databases-for-redis-gen2?topic=databases-for-redis-gen2-redis-cache#redis-cache-maxmemory-policy) (default: `noeviction`). Valid values: `noeviction`, `allkeys-lru`, `allkeys-lfu`, `allkeys-random`, `volatile-lru`, `volatile-lfu`, `volatile-random`, `volatile-ttl`.
+- `appendonly`: Enables or disables Redis persistence. If you are caching data, set this value to `no`. (default: `yes`).
+- `maxmemory-samples`: Tunes the approximated LRU eviction algorithm when Redis is configured as a cache. Higher values give a more accurate approximation at the cost of more CPU. [Learn more](https://cloud.ibm.com/docs/databases-for-redis-gen2?topic=databases-for-redis-gen2-redis-cache#redis-cache-other-settings) (default: `5`).
+- `stop-writes-on-bgsave-error`: Redis stops accepting writes if it detects an unsuccessful backup snapshot. For caching, you can set to `no`. (default: `yes`).
+
+### Example configuration
+
+The following example shows values for the `configuration` input.
+
+```hcl
+{
+    "maxmemory": 80,
+    "maxmemory-policy": "noeviction",
+    "appendonly": "yes",
+    "maxmemory-samples": 5,
+    "stop-writes-on-bgsave-error": "yes"
+}
 ```

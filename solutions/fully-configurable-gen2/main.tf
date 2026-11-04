@@ -32,7 +32,7 @@ module "kms" {
   }
   count                       = local.create_new_kms_key ? 1 : 0
   source                      = "terraform-ibm-modules/kms-all-inclusive/ibm"
-  version                     = "5.6.15"
+  version                     = "5.6.17"
   create_key_protect_instance = false
   region                      = local.kms_region
   existing_kms_instance_crn   = var.existing_kms_instance_crn
@@ -202,7 +202,7 @@ module "redis" {
   disk_mb                               = var.member_disk_mb
   cpu_count                             = var.member_cpu_count
   auto_scaling                          = null # not supported by gen2
-  configuration                         = null # not supported by gen2
+  configuration                         = var.configuration
   service_credential_names              = var.service_credential_names
   backup_crn                            = var.backup_crn
   service_endpoints                     = "private" # this is the only supported service endpoint for gen2
