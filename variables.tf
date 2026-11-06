@@ -233,17 +233,17 @@ variable "configuration" {
   default     = null
 
   validation {
-    condition     = local.is_gen2 && var.configuration != null ? (var.configuration["maxmemory"] != null ? var.configuration["maxmemory"] >= 0 && var.configuration["maxmemory"] <= 100 : true) : true
+    condition     = !local.is_gen2 || try(var.configuration.maxmemory, null) == null || (var.configuration.maxmemory >= 0 && var.configuration.maxmemory <= 100)
     error_message = "For gen2 plans, `maxmemory` must be a percentage between 0 and 100."
   }
 
   validation {
-    condition     = local.is_gen2 && var.configuration != null ? (var.configuration["maxmemory-policy"] != null ? contains(["noeviction", "allkeys-lru", "allkeys-lfu", "allkeys-random", "volatile-lru", "volatile-lfu", "volatile-random", "volatile-ttl"], var.configuration["maxmemory-policy"]) : true) : true
+    condition     = !local.is_gen2 || try(var.configuration.maxmemory-policy, null) == null || contains(["noeviction", "allkeys-lru", "allkeys-lfu", "allkeys-random", "volatile-lru", "volatile-lfu", "volatile-random", "volatile-ttl"], var.configuration.maxmemory-policy)
     error_message = "For gen2 plans, `maxmemory-policy` must be one of: `noeviction`, `allkeys-lru`, `allkeys-lfu`, `allkeys-random`, `volatile-lru`, `volatile-lfu`, `volatile-random`, `volatile-ttl`."
   }
 
   validation {
-    condition     = local.is_gen2 && var.configuration != null ? alltrue([for value in [var.configuration["appendonly"], var.configuration["stop-writes-on-bgsave-error"]] : value != null ? contains(["yes", "no"], value) : true]) : true
+    condition     = !local.is_gen2 || alltrue([for value in [try(var.configuration.appendonly, null), try(var.configuration.stop-writes-on-bgsave-error, null)] : value == null || contains(["yes", "no"], value)])
     error_message = "For gen2 plans, `appendonly` and `stop-writes-on-bgsave-error` must be either `yes` or `no`."
   }
 }
