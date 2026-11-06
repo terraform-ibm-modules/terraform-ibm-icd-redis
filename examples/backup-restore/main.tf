@@ -10,6 +10,12 @@ module "resource_group" {
   existing_resource_group_name = var.resource_group
 }
 
+locals {
+  is_gen2             = can(regex("-gen2$", var.plan))
+  gen2_host_flavor    = "bx3d.4x20"
+  classic_host_flavor = "multitenant"
+}
+
 data "ibm_database_backups" "backup_database" {
   deployment_id = var.existing_database_crn
 }
@@ -22,11 +28,13 @@ module "restored_icd_redis" {
   # version           = "X.Y.Z" # Replace "X.Y.Z" with a release version to lock into a specific release
   resource_group_id   = module.resource_group.resource_group_id
   name                = "${var.prefix}-redis-restored"
+  plan                = var.plan
   redis_version       = var.redis_version
   region              = var.region
   resource_tags       = var.resource_tags
   access_tags         = var.access_tags
-  member_host_flavor  = "multitenant"
+  member_host_flavor  = local.is_gen2 ? local.gen2_host_flavor : local.classic_host_flavor
+  disk_mb             = var.disk_mb
   deletion_protection = false
   backup_crn          = data.ibm_database_backups.backup_database.backups[0].backup_id
 }
