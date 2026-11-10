@@ -344,16 +344,9 @@ variable "skip_redis_secrets_manager_auth_policy" {
 
 variable "backup_crn" {
   type        = string
-  description = "The CRN of a backup resource to restore from. The backup is created by a database deployment with the same service ID. The backup is loaded after provisioning and the new deployment starts up that uses that data. Supports only Gen2 independent backup CRNs in the format `crn:v1:<…>:databases-independent-backups:<…>`. If omitted, the database is provisioned empty."
+  description = "The CRN of a backup resource to restore from. The backup is created by a database deployment with the same service ID in the same account and region. The backup is loaded after provisioning and the new deployment starts up that uses that data. Supports only Gen2 independent backup CRNs in the format `crn:v1:<…>:databases-independent-backups:<…>`. If omitted, the database is provisioned empty. [Learn more](https://cloud.ibm.com/docs/cloud-databases-gen2?topic=cloud-databases-gen2-dashboard-backups&interface=ui)."
   default     = null
-
-  validation {
-    condition = anytrue([
-      var.backup_crn == null,
-      can(regex("^crn:.*:databases-independent-backups:", var.backup_crn))
-    ])
-    error_message = "backup_crn must be null, OR a Gen2 independent backup CRN containing ':databases-independent-backups:'"
-  }
+  # Validation is done by the root module, which rejects classic and malformed backup CRNs for Gen2 plans.
 }
 
 ##############################################################

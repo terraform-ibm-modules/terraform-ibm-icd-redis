@@ -17,11 +17,11 @@ This example provides an end-to-end executable flow of how a Redis DB instance c
 
 ## Classic restore
 
-Set `plan` to a classic plan (e.g. `standard`) and provide the CRN of an existing **classic** Redis instance via `existing_database_crn`. The `member_host_flavor` is automatically set to `multitenant`.
+Set `plan` to a classic plan (e.g. `standard`) and provide the CRN of an existing **classic** Redis instance via `existing_database_crn`. The module does not send sizing (`group`) to classic restores, so the restored instance inherits its sizing from the backup. `member_host_flavor` and `disk_mb` can be overridden if needed.
 
 ## Gen2 restore
 
-Set `plan` to a Gen2 plan (e.g. `standard-gen2`) and provide the CRN of an existing **Gen2** Redis instance via `existing_database_crn`. The `member_host_flavor` is automatically set to `bx3d.4x20`.
+Set `plan` to a Gen2 plan (e.g. `standard-gen2`) and provide the CRN of an existing **Gen2** Redis instance via `existing_database_crn`. The `member_host_flavor` defaults to `bx3d.4x20` and `disk_mb` defaults to `15360`. Set both to at least the size of the source instance if it is larger. The example uses the first backup returned by the `ibm_database_backups` data source as the latest backup.
 
 The `ibm_database_backups` data source returns backups for the given deployment. For Gen2 instances, the backup CRN is in the `databases-independent-backups` format:
 
