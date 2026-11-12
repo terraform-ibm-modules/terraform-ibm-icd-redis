@@ -30,7 +30,7 @@ variable "redis_version" {
 
 variable "disk_mb" {
   type        = number
-  description = "Allocated disk per member. Must be at least the size of the source instance. If null, defaults to 15360 for Gen2 plans and 1024 for classic plans (classic restores inherit sizing from the backup). [Learn more](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-resources-scaling&interface=ui)"
+  description = "Allocated disk per member. [Learn more](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-resources-scaling&interface=ui)"
   default     = 15360
 }
 
