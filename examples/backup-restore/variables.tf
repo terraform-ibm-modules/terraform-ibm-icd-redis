@@ -31,13 +31,7 @@ variable "redis_version" {
 variable "disk_mb" {
   type        = number
   description = "Allocated disk per member. Must be at least the size of the source instance. If null, defaults to 15360 for Gen2 plans and 1024 for classic plans (classic restores inherit sizing from the backup). [Learn more](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-resources-scaling&interface=ui)"
-  default     = null
-}
-
-variable "member_host_flavor" {
-  type        = string
-  description = "Allocated host flavor per member. Must be at least the size of the source instance. If null, defaults to `bx3d.4x20` for Gen2 plans and `multitenant` for classic plans. [Learn more](https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/database#host_flavor)."
-  default     = null
+  default     = 15360
 }
 
 variable "resource_group" {

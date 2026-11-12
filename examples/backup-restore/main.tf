@@ -12,8 +12,8 @@ module "resource_group" {
 
 locals {
   is_gen2             = can(regex("-gen2$", var.plan))
-  default_host_flavor = local.is_gen2 ? "bx3d.4x20" : "multitenant"
-  default_disk_mb     = local.is_gen2 ? 15360 : 1024
+  gen2_host_flavor    = "bx3d.4x20"
+  classic_host_flavor = "multitenant"
 }
 
 data "ibm_database_backups" "backup_database" {
@@ -33,8 +33,8 @@ module "restored_icd_redis" {
   region              = var.region
   resource_tags       = var.resource_tags
   access_tags         = var.access_tags
-  member_host_flavor  = var.member_host_flavor != null ? var.member_host_flavor : local.default_host_flavor
-  disk_mb             = var.disk_mb != null ? var.disk_mb : local.default_disk_mb
+  member_host_flavor  = local.is_gen2 ? local.gen2_host_flavor : local.classic_host_flavor
+  disk_mb             = var.disk_mb
   deletion_protection = false
   backup_crn          = data.ibm_database_backups.backup_database.backups[0].backup_id
 }
