@@ -17,7 +17,7 @@ This example provides an end-to-end executable flow of how a Redis DB instance c
 
 ## Classic restore
 
-Set `plan` to a classic plan (e.g. `standard`) and provide the CRN of an existing **classic** Redis instance via `existing_database_crn`. The module does not send sizing (`group`) to classic restores, so the restored instance inherits its sizing from the backup. `member_host_flavor` and `disk_mb` can be overridden if needed.
+Set `plan` to a classic plan (e.g. `standard`) and provide the CRN of an existing **classic** Redis instance via `existing_database_crn`.
 
 ## Gen2 restore
 
