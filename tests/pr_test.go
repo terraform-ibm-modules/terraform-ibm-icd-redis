@@ -557,3 +557,26 @@ func TestRunFullyConfigurableGen2UpgradeSolution(t *testing.T) {
 		assert.Nil(t, err, "This should not have errored")
 	}
 }
+
+func TestRunRestoredDBGen2Example(t *testing.T) {
+	t.Parallel()
+	// ResourceGroup is intentionally not set so a unique group is created per run for this test.
+	// Independent backup policies may not be destroyed on failure, causing conflicts on re-runs within the same group.
+	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
+		Testing:      t,
+		TerraformDir: "examples/backup-restore",
+		Prefix:       "g2-r",
+		TerraformVars: map[string]interface{}{
+			"plan":                  "standard-gen2",
+			"disk_mb":               permanentResources["redisGen2DiskMb"],
+			"redis_version":         permanentResources["redisGen2Version"],
+			"region":                permanentResources["redisGen2Region"],
+			"existing_database_crn": permanentResources["redisGen2Crn"],
+		},
+		CloudInfoService: sharedInfoSvc,
+	})
+
+	output, err := options.RunTestConsistency()
+	assert.Nil(t, err, "This should not have errored")
+	assert.NotNil(t, output, "Expected some output")
+}

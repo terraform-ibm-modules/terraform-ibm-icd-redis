@@ -421,19 +421,33 @@ variable "cbr_rules" {
 
 variable "backup_crn" {
   type        = string
-  description = "The CRN of a backup resource to restore from. The backup is created by a database deployment with the same service ID. The backup is loaded after provisioning and the new deployment starts up that uses that data. A backup CRN is in the format crn:v1:<…>:backup:. If omitted, the database is provisioned empty."
+  description = "The CRN of a backup resource to restore from. The backup is created by a database deployment with the same service ID. The backup is loaded after provisioning and the new deployment starts up that uses that data. Supports classic backup CRNs in the format `crn:v1:<…>:backup:<…>` and, with a `-gen2` plan, Gen2 independent backup CRNs in the format `crn:v1:<…>:databases-independent-backups:<…>`. If omitted, the database is provisioned empty. [Learn more](https://cloud.ibm.com/docs/cloud-databases?topic=cloud-databases-dashboard-backups&interface=ui)."
   default     = null
 
   validation {
     condition = anytrue([
       var.backup_crn == null,
       can(regex("^crn:.*:backup:", var.backup_crn)),
+      can(regex("^crn:.*:databases-independent-backups:", var.backup_crn))
     ])
-    error_message = "backup_crn must be null OR starts with 'crn:' and contains ':backup:'"
+    error_message = "backup_crn must be null, OR a classic backup CRN containing ':backup:', OR a Gen2 independent backup CRN containing ':databases-independent-backups:'"
   }
 
   validation {
-    condition     = local.is_classic || (local.is_gen2 && var.backup_crn == null)
-    error_message = "`backup_crn` is only supported for classic instances, remove `backup_crn` or select a classic `plan`."
+    condition = anytrue([
+      var.backup_crn == null,
+      !can(regex("^crn:.*:databases-independent-backups:", var.backup_crn)),
+      can(regex("-gen2$", var.plan))
+    ])
+    error_message = "A Gen2 independent backup CRN (containing ':databases-independent-backups:') can only be used with a Gen2 plan (plan must end with '-gen2')."
+  }
+
+  validation {
+    condition = anytrue([
+      var.backup_crn == null,
+      !can(regex("^crn:.*:backup:", var.backup_crn)),
+      !can(regex("-gen2$", var.plan))
+    ])
+    error_message = "A classic backup CRN (containing ':backup:') cannot be used with a Gen2 plan."
   }
 }

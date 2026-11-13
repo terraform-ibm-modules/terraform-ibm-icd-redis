@@ -32,7 +32,7 @@ module "kms" {
   }
   count                       = local.create_new_kms_key ? 1 : 0
   source                      = "terraform-ibm-modules/kms-all-inclusive/ibm"
-  version                     = "5.6.17"
+  version                     = "5.6.20"
   create_key_protect_instance = false
   region                      = local.kms_region
   existing_kms_instance_crn   = var.existing_kms_instance_crn
@@ -204,7 +204,7 @@ module "redis" {
   auto_scaling                          = null # not supported by gen2
   configuration                         = var.configuration
   service_credential_names              = var.service_credential_names
-  backup_crn                            = null      # not supported by gen2
+  backup_crn                            = var.backup_crn
   service_endpoints                     = "private" # this is the only supported service endpoint for gen2
   deletion_protection                   = var.deletion_protection
   version_upgrade_skip_backup           = false
@@ -292,7 +292,7 @@ locals {
 module "secrets_manager_service_credentials" {
   count   = length(local.secrets) > 0 && var.existing_secrets_manager_instance_crn != null ? 1 : 0
   source  = "terraform-ibm-modules/secrets-manager/ibm//modules/secrets"
-  version = "3.1.2"
+  version = "3.2.2"
   # converted into implicit dependency and removed explicit depends_on time_sleep.wait_for_redis_authorization_policy for this module because of issue https://github.com/terraform-ibm-modules/terraform-ibm-icd-redis/issues/608
   existing_sm_instance_guid   = local.create_secrets_manager_auth_policy > 0 ? time_sleep.wait_for_redis_authorization_policy[0].triggers["secrets_manager_guid"] : local.existing_secrets_manager_instance_guid
   existing_sm_instance_region = local.create_secrets_manager_auth_policy > 0 ? time_sleep.wait_for_redis_authorization_policy[0].triggers["secrets_manager_region"] : local.existing_secrets_manager_instance_region

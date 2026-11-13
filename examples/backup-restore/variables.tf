@@ -10,6 +10,12 @@ variable "region" {
   default     = "us-south"
 }
 
+variable "plan" {
+  type        = string
+  description = "The name of the service plan that you choose for your Redis instance. Use a `-gen2` plan (e.g. `standard-gen2`) to restore a Gen2 backup."
+  default     = "standard"
+}
+
 variable "prefix" {
   type        = string
   description = "Prefix to append to all resources created by this example"
@@ -20,6 +26,12 @@ variable "redis_version" {
   type        = string
   description = "Version of the redis instance. If no value passed, the current ICD preferred version is used."
   default     = null
+}
+
+variable "disk_mb" {
+  type        = number
+  description = "Allocated disk per member. [Learn more](https://cloud.ibm.com/docs/databases-for-redis?topic=databases-for-redis-resources-scaling&interface=ui)"
+  default     = 15360
 }
 
 variable "resource_group" {
