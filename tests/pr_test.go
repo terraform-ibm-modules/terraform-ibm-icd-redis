@@ -509,6 +509,11 @@ func setupFullyConfigurableGen2Options(t *testing.T, prefix string) (*testschema
 			"role":     "Manager",
 			"endpoint": "private",
 		},
+		{
+			"name":     "redis-reader",
+			"role":     "Reader",
+			"endpoint": "private",
+		},
 	}
 
 	latestVersion, _ := GetVersionsGen2("us-south", "standard-gen2")
