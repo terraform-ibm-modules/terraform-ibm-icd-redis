@@ -493,7 +493,7 @@ func setupFullyConfigurableGen2Options(t *testing.T, prefix string) (*testschema
 			"service_credentials": []map[string]string{
 				{
 					"secret_name": fmt.Sprintf("%s-cred-reader", options.Prefix),
-					"service_credentials_source_service_role_crn": "crn:v1:bluemix:public:iam::::role:Viewer",
+					"service_credentials_source_service_role_crn": "crn:v1:bluemix:public:iam::::serviceRole:Reader",
 				},
 				{
 					"secret_name": fmt.Sprintf("%s-cred-writer", options.Prefix),
